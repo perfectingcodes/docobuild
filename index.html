@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DOCO — Do More. Be More.</title>
+<meta name="description" content="DOCO fast-dissolving wellness strips. Four clean formulas — Multivitamin, Sports Energy, Calm + Stress, Sleep. Absorbs in seconds, no water, no bottles. Do More. Be More.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,600;1,800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="stylesheet" href="css/style.css?v=11">
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<!-- ===== TOP TICKER ===== -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker__track">
+    <span>Free shipping over $45</span><i>✦</i><span>Absorbs in seconds</span><i>✦</i><span>Dissolves fast — no water</span><i>✦</i><span>Four clean formulas</span><i>✦</i><span>Do more. Be more.</span><i>✦</i>
+    <span>Free shipping over $45</span><i>✦</i><span>Absorbs in seconds</span><i>✦</i><span>Dissolves fast — no water</span><i>✦</i><span>Four clean formulas</span><i>✦</i><span>Do more. Be more.</span><i>✦</i>
+  </div>
+</div>
+
+<!-- ===== HEADER ===== -->
+<header class="site-header" id="siteHeader">
+  <div class="container site-header__inner">
+    <a href="index.html" class="brand" aria-label="DOCO home"><img src="assets/logo.png" alt="DOCO"></a>
+    <nav class="mainnav" id="mainnav" aria-label="Primary">
+      <a href="shop.html">Shop</a>
+      <a href="index.html#science">Science</a>
+      <a href="index.html#reviews">Reviews</a>
+      <a href="#quiz" data-quiz-open>Quiz</a>
+      <a href="index.html#faq">FAQ</a>
+    </nav>
+    <div class="site-header__actions">
+      <a href="product.html?sku=stack" class="btn btn--ink btn--sm">Get the stack <span class="arr">→</span></a>
+      <button type="button" class="iconbtn" id="cartBtn" data-bag-open aria-label="Open your bag"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16l-1.2 11.2a2 2 0 0 1-2 1.8H7.2a2 2 0 0 1-2-1.8L4 7Z"/><path d="M8.5 7V5.8a3.5 3.5 0 0 1 7 0V7"/></svg><span class="iconbtn__count" id="cartCount">0</span></button>
+      <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<!-- ===== MOBILE DRAWER ===== -->
+<div class="drawer" id="drawer" aria-hidden="true">
+  <nav class="drawer__nav" aria-label="Mobile">
+    <a href="shop.html">Shop</a>
+    <a href="index.html#science">Science</a>
+    <a href="index.html#reviews">Reviews</a>
+    <a href="#quiz" data-quiz-open>Quiz</a>
+    <a href="index.html#faq">FAQ</a>
+    <a href="product.html?sku=stack" class="btn btn--solid btn--block">Get the stack →</a>
+  </nav>
+  <div class="drawer__meta">
+    <a href="tel:4012179740">401-217-9740</a>
+    <a href="mailto:joyce@docostrips.com">joyce@docostrips.com</a>
+  </div>
+</div>
+<div class="scrim" id="scrim" hidden></div>
+
+<main id="main">
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="container hero__grid">
+    <div class="hero__text">
+      <p class="rating"><span class="rating__stars">★★★★★</span> Four clean formulas · No water needed</p>
+      <h1 class="hero__title">Do more.<br><span class="accent">Be more.</span></h1>
+      <p class="serif-accent">Big wellness. Tiny strip. Zero fuss.</p>
+      <p class="hero__body">Energy, focus, calm and sleep in a fast-dissolving strip — absorbed in seconds, no water, no bottles, no complicated routine.</p>
+      <div class="hero__cta">
+        <a href="#lineup" class="btn btn--solid btn--lg">Shop the formulas <span class="arr">→</span></a>
+        <button type="button" class="btn btn--text" data-quiz-open>Take the quiz →</button>
+      </div>
+      <ul class="hero__chips" aria-label="Formulas">
+        <li><span class="dot dot--multi"></span>Multivitamin</li>
+        <li><span class="dot dot--sport"></span>Sports&nbsp;Energy</li>
+        <li><span class="dot dot--calm"></span>Calm&nbsp;+&nbsp;Stress</li>
+        <li><span class="dot dot--sleep"></span>Sleep</li>
+      </ul>
+    </div>
+    <div class="hero__media">
+      <img src="assets/hero-lifestyle.jpg" alt="The four DOCO formulas in nature with an active lifestyle" fetchpriority="high">
+      <div class="hero__badge">
+        <svg viewBox="0 0 200 200" aria-hidden="true"><defs><path id="cp" d="M100,100 m-72,0 a72,72 0 1,1 144,0 a72,72 0 1,1 -144,0"/></defs><text><textPath href="#cp" startOffset="0">DO MORE · BE MORE · THE DO COMPANY · DO MORE · </textPath></text></svg>
+        <span class="hero__badge-mid">~15s</span>
+      </div>
+      <div class="hero__float">
+        <span class="hero__float-k">No water</span>
+        <strong>Dissolves in seconds</strong>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== MARQUEE ===== -->
+<div class="marquee" aria-hidden="true">
+  <div class="marquee__track">
+    <span>Do more</span><b>✦</b><span>Be more</span><b>✦</b><span>No water</span><b>✦</b><span>No bottles</span><b>✦</b><span>No excuses</span><b>✦</b>
+    <span>Do more</span><b>✦</b><span>Be more</span><b>✦</b><span>No water</span><b>✦</b><span>No bottles</span><b>✦</b><span>No excuses</span><b>✦</b>
+  </div>
+</div>
+
+<!-- ===== VALUE STRIP ===== -->
+<section class="valuestrip">
+  <div class="container valuestrip__grid">
+    <div class="vitem reveal"><strong>Seconds</strong><span>to absorb — not 30+ min</span></div>
+    <div class="vitem reveal" data-delay="1"><strong>Zero</strong><span>water or bottles needed</span></div>
+    <div class="vitem reveal" data-delay="2"><strong>4</strong><span>clean, focused formulas</span></div>
+    <div class="vitem reveal" data-delay="3"><strong>Pocket</strong><span>-sized, take anywhere</span></div>
+  </div>
+</section>
+
+<!-- ===== FORMULAS (per-product color sections) ===== -->
+<section id="formulas">
+  <div class="container formulas-intro reveal">
+    <p class="eyebrow">Your DO crew</p>
+    <h2 class="display">Four formulas.<br>One <span class="accent">relentless</span> routine.</h2>
+    <p class="serif-accent serif-accent--dark">Pick your edge. Powders, pills and bulky bottles not invited.</p>
+  </div>
+
+</section>
+
+<!-- ===== SHOWCASE — scroll-pinned product stage ===== -->
+<section class="showcase" id="showcase" aria-label="Formula showcase">
+  <div class="showcase__stage">
+    <div class="showcase__bg" aria-hidden="true"></div>
+    <div class="showcase__pattern" aria-hidden="true"></div>
+
+    <div class="container showcase__top">
+      <span class="showcase__counter"><b class="showcase__cur">01</b><i>/</i>04</span>
+      <span class="showcase__label">Scroll to explore <i>&darr;</i></span>
+    </div>
+
+    <div class="showcase__slides">
+      <article class="slide" data-sku="multi" data-color="#ef7d1e" style="--c:#ef7d1e">
+        <div class="container slide__grid">
+          <div class="slide__text">
+            <p class="slide__eyebrow">The daily foundation</p>
+            <h3 class="slide__name">Multivitamin</h3>
+            <p class="serif-accent slide__tag">From someday to every day.</p>
+            <p class="slide__desc">Ten nutrients that support everyday body functions in one portable strip. The vitamin habit you can actually keep.</p>
+            <div class="slide__inside"><span class="slide__inside-k">Inside your strip</span><ul><li><b>Vitamin A</b><i>900 mcg</i></li><li><b>Vitamin D3</b><i>800 IU</i></li><li><b>Vitamin K2</b><i>120 mcg</i></li><li><b>Vitamin B5</b><i>5 mg</i></li><li><b>Vitamin B6</b><i>2 mg</i></li></ul><a class="slide__more" href="product.html?sku=multi">Full panel &rarr;</a></div>
+            <div class="mode" role="radiogroup" aria-label="Purchase option"><button type="button" class="mode__opt is-on" data-mode="once" role="radio" aria-checked="true">One-time</button><button type="button" class="mode__opt" data-mode="sub" role="radio" aria-checked="false">Subscribe &amp; save 15%</button></div>
+            <div class="slide__foot"><span class="slide__price" data-price>$24.99</span><button type="button" class="btn btn--light" data-add="multi">Add to bag →</button><a class="slide__more" href="product.html?sku=multi">Details →</a></div>
+          </div>
+          <div class="slide__stage">
+            <span class="slide__idx" aria-hidden="true">01</span>
+            <div class="slide__glow" aria-hidden="true"></div>
+            <div class="slide__card"><img src="assets/multivitamin.jpg" alt="Multivitamin DOCO strips"><div class="slide__glare" aria-hidden="true"></div></div>
+            <span class="callout callout--a">10 nutrients</span><span class="callout callout--b">D3 800 IU</span><span class="callout callout--c">B12 1,500 mcg</span>
+          </div>
+        </div>
+      </article>
+      <article class="slide" data-sku="sport" data-color="#d63a30" style="--c:#d63a30">
+        <div class="container slide__grid">
+          <div class="slide__text">
+            <p class="slide__eyebrow">Fuel the grind</p>
+            <h3 class="slide__name">Sports Energy</h3>
+            <p class="serif-accent slide__tag">Energy now. No crash later.</p>
+            <p class="slide__desc">A labeled 80 mg of natural caffeine with L-theanine and B12 &mdash; a measured option for the gym, the office, the next move. No drink to carry.</p>
+            <div class="slide__inside"><span class="slide__inside-k">Inside your strip</span><ul><li><b>Natural caffeine</b><i>80 mg</i></li><li><b>L-theanine</b><i>30 mg</i></li><li><b>Vitamin B12</b><i>1,500 mcg</i></li></ul><a class="slide__more" href="product.html?sku=sport">Full panel &rarr;</a></div>
+            <div class="mode" role="radiogroup" aria-label="Purchase option"><button type="button" class="mode__opt is-on" data-mode="once" role="radio" aria-checked="true">One-time</button><button type="button" class="mode__opt" data-mode="sub" role="radio" aria-checked="false">Subscribe &amp; save 15%</button></div>
+            <div class="slide__foot"><span class="slide__price" data-price>$24.99</span><button type="button" class="btn btn--light" data-add="sport">Add to bag →</button><a class="slide__more" href="product.html?sku=sport">Details →</a></div>
+          </div>
+          <div class="slide__stage">
+            <span class="slide__idx" aria-hidden="true">02</span>
+            <div class="slide__glow" aria-hidden="true"></div>
+            <div class="slide__card"><img src="assets/sports-energy.jpg" alt="Sports Energy DOCO strips"><div class="slide__glare" aria-hidden="true"></div></div>
+            <span class="callout callout--a">80 mg caffeine</span><span class="callout callout--b">L-theanine 30 mg</span><span class="callout callout--c">Vitamin B12</span>
+          </div>
+        </div>
+      </article>
+      <article class="slide" data-sku="calm" data-color="#2592c9" style="--c:#2592c9">
+        <div class="container slide__grid">
+          <div class="slide__text">
+            <p class="slide__eyebrow">Clarity on demand</p>
+            <h3 class="slide__name">Calm + Stress</h3>
+            <p class="serif-accent slide__tag">From chaos to calm.</p>
+            <p class="slide__desc">SunTheanine&reg; L-theanine with holy basil, passionflower and lemon balm in a lemon strip &mdash; your cue to step away, breathe, and reset.</p>
+            <div class="slide__inside"><span class="slide__inside-k">Inside your strip</span><ul><li><b>SunTheanine&reg; L-theanine</b><i>50 mg</i></li><li><b>Holy basil</b><i>30 mg</i></li><li><b>Passionflower</b><i>20 mg</i></li><li><b>Lemon balm</b><i>10 mg</i></li><li><b>Ashwagandha</b><i>5 mg</i></li></ul><a class="slide__more" href="product.html?sku=calm">Full panel &rarr;</a></div>
+            <div class="mode" role="radiogroup" aria-label="Purchase option"><button type="button" class="mode__opt is-on" data-mode="once" role="radio" aria-checked="true">One-time</button><button type="button" class="mode__opt" data-mode="sub" role="radio" aria-checked="false">Subscribe &amp; save 15%</button></div>
+            <div class="slide__foot"><span class="slide__price" data-price>$24.99</span><button type="button" class="btn btn--light" data-add="calm">Add to bag →</button><a class="slide__more" href="product.html?sku=calm">Details →</a></div>
+          </div>
+          <div class="slide__stage">
+            <span class="slide__idx" aria-hidden="true">03</span>
+            <div class="slide__glow" aria-hidden="true"></div>
+            <div class="slide__card"><img src="assets/calm-stress.jpg" alt="Calm + Stress DOCO strips"><div class="slide__glare" aria-hidden="true"></div></div>
+            <span class="callout callout--a">L-theanine 50 mg</span><span class="callout callout--b">Holy basil 30 mg</span><span class="callout callout--c">Lemon flavor</span>
+          </div>
+        </div>
+      </article>
+      <article class="slide" data-sku="sleep" data-color="#6a4fc9" style="--c:#6a4fc9">
+        <div class="container slide__grid">
+          <div class="slide__text">
+            <p class="slide__eyebrow">Recover to win</p>
+            <h3 class="slide__name">Sleep</h3>
+            <p class="serif-accent slide__tag">From restless to rested.</p>
+            <p class="slide__desc">Tart cherry, saffron and B6 in a cranberry strip &mdash; your cue to set the phone aside, lower the lights and begin the wind-down. No added melatonin.</p>
+            <div class="slide__inside"><span class="slide__inside-k">Inside your strip</span><ul><li><b>Tart cherry</b><i>50 mg</i></li><li><b>Saffron</b><i>14 mg</i></li><li><b>Vitamin B6</b><i>1.4 mg</i></li></ul><a class="slide__more" href="product.html?sku=sleep">Full panel &rarr;</a></div>
+            <div class="mode" role="radiogroup" aria-label="Purchase option"><button type="button" class="mode__opt is-on" data-mode="once" role="radio" aria-checked="true">One-time</button><button type="button" class="mode__opt" data-mode="sub" role="radio" aria-checked="false">Subscribe &amp; save 15%</button></div>
+            <div class="slide__foot"><span class="slide__price" data-price>$24.99</span><button type="button" class="btn btn--light" data-add="sleep">Add to bag →</button><a class="slide__more" href="product.html?sku=sleep">Details →</a></div>
+          </div>
+          <div class="slide__stage">
+            <span class="slide__idx" aria-hidden="true">04</span>
+            <div class="slide__glow" aria-hidden="true"></div>
+            <div class="slide__card"><img src="assets/sleep.jpg" alt="Sleep DOCO strips"><div class="slide__glare" aria-hidden="true"></div></div>
+            <span class="callout callout--a">Tart cherry 50 mg</span><span class="callout callout--b">Saffron 14 mg</span><span class="callout callout--c">No melatonin</span>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <div class="container showcase__nav">
+      <button class="showcase__arrow" data-dir="-1" aria-label="Previous formula">&larr;</button>
+      <div class="showcase__dots">
+        <button data-go="0" class="is-on" aria-label="Multivitamin"></button>
+        <button data-go="1" aria-label="Sports Energy"></button>
+        <button data-go="2" aria-label="Calm + Stress"></button>
+        <button data-go="3" aria-label="Sleep"></button>
+      </div>
+      <button class="showcase__arrow" data-dir="1" aria-label="Next formula">&rarr;</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===== LINEUP — shop side by side ===== -->
+<section class="lineup" id="lineup">
+  <div class="container">
+    <div class="lineup__head reveal">
+      <div><p class="eyebrow">Shop the lineup</p><h2 class="display">Pick your <span class="accent">edge.</span></h2></div>
+      <div class="tabs" role="tablist" data-target="#lineupGrid"><button type="button" class="tab is-on" data-filter="all">All</button><button type="button" class="tab" data-filter="formula">Formulas</button><button type="button" class="tab" data-filter="bundle">Bundles</button></div>
+    </div>
+    <div class="pgrid" id="lineupGrid" data-product-grid></div>
+    <div class="lineup__more reveal"><a class="btn btn--ink" href="shop.html">See the full shop <span class="arr">&rarr;</span></a></div>
+  </div>
+</section>
+
+<!-- ===== SCIENCE ===== -->
+<section class="science" id="science">
+  <div class="container">
+    <p class="eyebrow">Why DOCO</p>
+    <h2 class="display">Made to be<br><span class="accent">actually absorbed.</span></h2>
+    <p class="serif-accent serif-accent--dark science__intro">Oral strips deliver straight through the lining of your mouth &mdash; no digestion, no waste.</p>
+    <div class="sci-grid">
+      <div class="sci reveal">
+        <div class="sci__check" aria-hidden="true">✓</div>
+        <h3><span class="sci__big">Seconds</span>, not 30+ minutes</h3>
+        <p>Dissolve-on-tongue delivery reaches you fast &mdash; pills and gummies crawl through digestion first.</p>
+      </div>
+      <div class="sci reveal" data-delay="1">
+        <div class="sci__check" aria-hidden="true">✓</div>
+        <h3><span class="sci__big">No</span> water, pills or bottles</h3>
+        <p>One pocket-sized strip. Nothing to swallow, nothing to carry, nothing to leave half-finished on a shelf.</p>
+      </div>
+      <div class="sci reveal" data-delay="2">
+        <div class="sci__check" aria-hidden="true">✓</div>
+        <h3><span class="sci__big">Clean</span>, considered formulas</h3>
+        <p>Thoughtfully dosed, great-tasting, and easy to stick with &mdash; the dose on the label is the dose on your tongue.</p>
+      </div>
+    </div>
+    <a href="#ritual" class="link-arrow">See how it works <span>→</span></a>
+  </div>
+</section>
+
+<!-- ===== RITUAL ===== -->
+<section class="ritual" id="ritual">
+  <div class="container">
+    <div class="ritual__head reveal">
+      <div>
+        <p class="eyebrow eyebrow--light">The ritual</p>
+        <h2 class="display display--light">Peel. Place. <span class="accent">Go.</span></h2>
+      </div>
+      <p class="ritual__sub">A better habit only sticks if it&rsquo;s effortless. Three seconds &mdash; that&rsquo;s the whole routine. No water. No pills. No excuses.</p>
+    </div>
+    <ol class="steps">
+      <li class="step reveal">
+        <div class="step__top"><span class="step__num">01</span><span class="step__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="5" width="18" height="22" rx="3"/><path d="M7 11h18"/><path d="M19 5l5 5"/><path d="M12 19l3 3 5-6"/></svg></span></div>
+        <h3>Peel</h3>
+        <p>Tear open a single pocket-sized strip. Travel-ready, mess-free, gone in a snap.</p>
+        <span class="step__time">1 second</span>
+      </li>
+      <li class="step reveal" data-delay="1">
+        <div class="step__top"><span class="step__num">02</span><span class="step__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 13c0-4 4.5-7 10-7s10 3 10 7c0 6-4.5 12-10 12S6 19 6 13Z"/><path d="M11 14c2-1.5 8-1.5 10 0"/><rect x="12.5" y="16.5" width="7" height="4.5" rx="1"/></svg></span></div>
+        <h3>Place</h3>
+        <p>Rest it on your tongue. Nothing to swallow, nothing to carry, nothing to leave half-finished on a shelf.</p>
+        <span class="step__time">2 seconds</span>
+      </li>
+      <li class="step reveal" data-delay="2">
+        <div class="step__top"><span class="step__num">03</span><span class="step__icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 3 8 18h8l-2 11 10-15h-8l2-11Z"/></svg></span></div>
+        <h3>Go</h3>
+        <p>It dissolves in seconds and gets to work. One better choice, done &mdash; now go do more.</p>
+        <span class="step__time">~15 seconds</span>
+      </li>
+    </ol>
+    <div class="ritual__bar reveal" data-delay="2">
+      <span><b>0</b> water</span><i></i><span><b>0</b> pills</span><i></i><span><b>~15s</b> to dissolve</span><i></i><span><b>1</b> better choice a day</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== REVIEWS ===== -->
+<section class="reviews" id="reviews">
+  <div class="container">
+    <div class="reviews__head reveal">
+      <p class="eyebrow">The doers</p>
+      <h2 class="display">Made for people<br>who <span class="accent">get things done.</span></h2>
+    </div>
+    <div class="rgrid">
+      <figure class="rcard reveal">
+        <div class="rcard__stars">★★★★★</div>
+        <h3 class="rcard__title">My afternoon fuel</h3>
+        <blockquote>&ldquo;Sports Energy is my new pre-workout. No shaker, no crash — I grab one on the way out the door.&rdquo;</blockquote>
+        <figcaption><b>Maya R.</b><span>Marathoner &amp; founder</span></figcaption>
+        <a href="#formulas" class="rcard__shop">Shop Energy →</a>
+      </figure>
+      <figure class="rcard reveal" data-delay="1">
+        <div class="rcard__stars">★★★★★</div>
+        <h3 class="rcard__title">Actually present</h3>
+        <blockquote>&ldquo;Calm + Stress lives in my bag. Two minutes before a big meeting and I&rsquo;m present. It fits my day instead of fighting it.&rdquo;</blockquote>
+        <figcaption><b>Devin K.</b><span>Product lead</span></figcaption>
+        <a href="#formulas" class="rcard__shop">Shop Calm →</a>
+      </figure>
+      <figure class="rcard reveal" data-delay="2">
+        <div class="rcard__stars">★★★★★</div>
+        <h3 class="rcard__title">A habit I kept</h3>
+        <blockquote>&ldquo;Finally a wellness habit I&rsquo;ve actually kept. The Sleep strip is part of my wind-down now — no water glass by the bed.&rdquo;</blockquote>
+        <figcaption><b>Priya S.</b><span>Nurse &amp; mom of two</span></figcaption>
+        <a href="#formulas" class="rcard__shop">Shop Sleep →</a>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ===== STACK ===== -->
+<section class="stack" id="stack">
+  <div class="container stack__grid">
+    <div class="stack__media reveal">
+      <img src="assets/crew-mockup.jpg" alt="The DOCO Variety Pack — all four formulas">
+    </div>
+    <div class="stack__body reveal" data-delay="1" data-sku="stack">
+      <p class="eyebrow eyebrow--light">Build your stack</p>
+      <h2 class="display display--light">Do more,<br>for <span class="accent">less.</span></h2>
+      <ul class="stack__list">
+        <li><span class="dot dot--multi"></span> <strong>Multivitamin</strong> — your daily foundation</li>
+        <li><span class="dot dot--sport"></span> <strong>Sports Energy</strong> — a clean, crash-free lift</li>
+        <li><span class="dot dot--calm"></span> <strong>Calm + Stress</strong> — clarity on demand</li>
+        <li><span class="dot dot--sleep"></span> <strong>Sleep</strong> — fall asleep faster, wake up ready</li>
+      </ul>
+      <div class="stack__price">
+        <span class="stack__now" data-price>$79.99</span>
+        <span class="stack__was">$99.96</span>
+        <span class="stack__save">Save 20%</span>
+      </div>
+      <p class="stack__note">The Variety Pack — all four formulas in one box.</p>
+      <div class="mode mode--dark" role="radiogroup" aria-label="Purchase option"><button type="button" class="mode__opt is-on" data-mode="once" role="radio" aria-checked="true">One-time</button><button type="button" class="mode__opt" data-mode="sub" role="radio" aria-checked="false">Subscribe &amp; save 10%</button></div>
+      <button type="button" class="btn btn--solid btn--lg" data-add="stack">Add the stack to bag <span class="arr">→</span></button>
+      <ul class="stack__perks"><li>Free shipping</li><li>60-day guarantee</li><li>Cancel anytime</li></ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===== STORY ===== -->
+<section class="story" id="story">
+  <img src="assets/mark-orange.png" alt="" class="story__watermark" aria-hidden="true">
+  <div class="container story__inner">
+    <p class="eyebrow">Our story</p>
+    <h2 class="story__head reveal">Wellness got complicated.<br><span class="serif-it">We made it simple again.</span></h2>
+    <div class="story__cols reveal" data-delay="1">
+      <p>Somewhere along the way, taking care of yourself turned into a second job &mdash; a cabinet full of bottles, a drawer of gummies, routines you quit by February.</p>
+      <p>DOCO started with one idea: the easier something is, the more you&rsquo;ll actually do it. So we put real wellness into a strip that dissolves on your tongue in seconds. No water. No bottles. No excuses. Just one better choice, every day. <strong>Do more. Be more.</strong></p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FAQ ===== -->
+<section class="faq" id="faq">
+  <div class="container faq__grid">
+    <div class="faq__head reveal">
+      <p class="eyebrow">Quick answers</p>
+      <h2 class="display">Got<br>questions?</h2>
+      <p class="serif-accent serif-accent--dark">Everything you need to know before your first strip.</p>
+    </div>
+    <div class="faq__list reveal" data-delay="1">
+      <details class="qa"><summary>Will I actually feel it?<span class="qa__ic"></span></summary><p>That&rsquo;s the point. Because the strip dissolves on your tongue, the actives go to work fast. Energy and Sleep are quick and noticeable; Calm and Multivitamin build over a few weeks, like any good routine.</p></details>
+      <details class="qa"><summary>How do I take one — and how does it taste?<span class="qa__ic"></span></summary><p>Place one strip on your tongue and let it dissolve for a few seconds. No water, nothing to swallow. They&rsquo;re lightly flavored and genuinely taste good — clean and subtle, never chalky.</p></details>
+      <details class="qa"><summary>Why a strip instead of a pill or gummy?<span class="qa__ic"></span></summary><p>Pills and gummies take the long way through digestion. A strip dissolves and absorbs directly — faster, simpler, and far easier to keep up with wherever you are.</p></details>
+      <details class="qa"><summary>How many strips are in a box?<span class="qa__ic"></span></summary><p>30 strips in every box &mdash; about a month of once-a-day use. Two-box duos are 60 strips; the Variety Pack is 120.</p></details>
+      <details class="qa"><summary>Can I combine products?<span class="qa__ic"></span></summary><p>Check each label and ask a health professional before combining supplements or medications. Bundles are shopping options, not directions to use products together.</p></details>
+      <details class="qa"><summary>What&rsquo;s actually in them?<span class="qa__ic"></span></summary><p>Every product page lists the full panel &mdash; actives with amounts plus the supporting ingredients that form, flavor and stabilize the strip. Sports Energy carries a labeled 80 mg of natural caffeine; Sleep has no added melatonin.</p></details>
+      <details class="qa"><summary>How does Subscribe &amp; Save work?<span class="qa__ic"></span></summary><p>Pick &ldquo;Subscribe &amp; save&rdquo; on any formula and we&rsquo;ll ship a fresh box every month at 15% off (10% on the Variety Pack). Skip a month, swap formulas, or cancel anytime from your account &mdash; no hoops.</p></details>
+      <details class="qa"><summary>When do DOCO strips ship?<span class="qa__ic"></span></summary><p>DOCO is launching soon. Join the list below for early access, launch offers, and first dibs on the Variety Pack.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- ===== QUIZ CTA ===== -->
+<section class="quiz" id="quiz">
+  <div class="container quiz__grid">
+    <div class="quiz__text reveal">
+      <p class="eyebrow eyebrow--onorange">60-second match</p>
+      <h2 class="quiz__head">Not sure where<br>to start?</h2>
+      <p class="serif-accent quiz__sub">Five quick questions. One formula built for your day.</p>
+      <button type="button" class="btn btn--ink btn--lg" data-quiz-open>Take the quiz <span class="arr">&rarr;</span></button>
+      <ul class="quiz__perks"><li>About a minute</li><li>Instant match</li><li>No email needed</li></ul>
+    </div>
+    <div class="quiz__preview reveal" data-delay="1" aria-hidden="true">
+      <div class="qp">
+        <div class="qp__head"><img src="assets/mark-orange.png" alt=""><span>Find your formula</span><em>2 / 5</em></div>
+        <div class="qp__bar"><i></i></div>
+        <p class="qp__q">When does your day hit a wall?</p>
+        <div class="qp__opts">
+          <span><b>A</b>First thing in the morning</span>
+          <span class="is-on"><b>B</b>The mid-afternoon slump<i>&check;</i></span>
+          <span><b>C</b>Evening &mdash; I can&rsquo;t switch off</span>
+          <span><b>D</b>At night &mdash; I can&rsquo;t fall asleep</span>
+        </div>
+      </div>
+      <div class="qp__result"><img src="assets/sports-energy.jpg" alt=""><div><span>Your match</span><b>Sports Energy</b></div></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer__cta reveal">
+      <h2 class="footer__big">Do more.<br>Be more.</h2>
+      <form class="signup" onsubmit="return false">
+        <label for="email" class="signup__label">Join the doers — early access &amp; launch offers</label>
+        <div class="signup__row">
+          <input type="email" id="email" placeholder="your@email.com" autocomplete="email">
+          <button type="submit" class="btn btn--solid">Sign up →</button>
+        </div>
+      </form>
+    </div>
+    <div class="footer__links">
+      <div class="footer__brandcol">
+        <img src="assets/logo-stacked-white.png" alt="DOCO — The Do Company" class="footer__logo">
+      </div>
+      <div class="footer__col"><h5>Shop</h5><a href="product.html?sku=multi">Multivitamin</a><a href="product.html?sku=sport">Sports Energy</a><a href="product.html?sku=calm">Calm + Stress</a><a href="product.html?sku=sleep">Sleep</a><a href="product.html?sku=stack">The Variety Pack</a><a href="shop.html">All products</a></div>
+      <div class="footer__col"><h5>Learn</h5><a href="index.html#science">Science</a><a href="index.html#ritual">How it works</a><a href="index.html#story">Our story</a><a href="index.html#faq">FAQ</a></div>
+      <div class="footer__col"><h5>Support</h5><a href="mailto:joyce@docostrips.com">Contact</a><a href="#">Returns</a><a href="#">Shipping</a><a href="tel:4012179740">401-217-9740</a></div>
+      <div class="footer__col"><h5>Follow</h5><a href="#">Instagram</a><a href="#">Facebook</a></div>
+    </div>
+  </div>
+  <div class="footer__wordmark" aria-hidden="true">DOCO</div>
+  <div class="container footer__bottom">
+    <p>&copy; 2026 DOCO — The Do Company LLC. All rights reserved.</p>
+    <p>Designed &amp; maintained by Cassio Marketing Solutions.</p>
+    <p class="footer__legal">These statements have not been evaluated by the Food and Drug Administration. These products are not intended to diagnose, treat, cure, or prevent any disease. Ask a health professional before starting a supplement if pregnant, nursing, taking medication, or managing a health condition. Use each product only as directed on its box.</p>
+  </div>
+</footer>
+
+
+<script src="js/main.js?v=11"></script>
+</body>
+</html>

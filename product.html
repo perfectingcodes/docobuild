@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DOCO</title>
+<meta name="description" content="DOCO fast-dissolving wellness strips.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,600;1,800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="stylesheet" href="css/style.css?v=11">
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<!-- ===== TOP TICKER ===== -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker__track">
+    <span>Free shipping over $45</span><i>✦</i><span>Absorbs in seconds</span><i>✦</i><span>Dissolves fast — no water</span><i>✦</i><span>Four clean formulas</span><i>✦</i><span>Do more. Be more.</span><i>✦</i>
+    <span>Free shipping over $45</span><i>✦</i><span>Absorbs in seconds</span><i>✦</i><span>Dissolves fast — no water</span><i>✦</i><span>Four clean formulas</span><i>✦</i><span>Do more. Be more.</span><i>✦</i>
+  </div>
+</div>
+
+<!-- ===== HEADER ===== -->
+<header class="site-header" id="siteHeader">
+  <div class="container site-header__inner">
+    <a href="index.html" class="brand" aria-label="DOCO home"><img src="assets/logo.png" alt="DOCO"></a>
+    <nav class="mainnav" id="mainnav" aria-label="Primary">
+      <a href="shop.html">Shop</a>
+      <a href="index.html#science">Science</a>
+      <a href="index.html#reviews">Reviews</a>
+      <a href="#quiz" data-quiz-open>Quiz</a>
+      <a href="index.html#faq">FAQ</a>
+    </nav>
+    <div class="site-header__actions">
+      <a href="product.html?sku=stack" class="btn btn--ink btn--sm">Get the stack <span class="arr">→</span></a>
+      <button type="button" class="iconbtn" id="cartBtn" data-bag-open aria-label="Open your bag"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16l-1.2 11.2a2 2 0 0 1-2 1.8H7.2a2 2 0 0 1-2-1.8L4 7Z"/><path d="M8.5 7V5.8a3.5 3.5 0 0 1 7 0V7"/></svg><span class="iconbtn__count" id="cartCount">0</span></button>
+      <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<!-- ===== MOBILE DRAWER ===== -->
+<div class="drawer" id="drawer" aria-hidden="true">
+  <nav class="drawer__nav" aria-label="Mobile">
+    <a href="shop.html">Shop</a>
+    <a href="index.html#science">Science</a>
+    <a href="index.html#reviews">Reviews</a>
+    <a href="#quiz" data-quiz-open>Quiz</a>
+    <a href="index.html#faq">FAQ</a>
+    <a href="product.html?sku=stack" class="btn btn--solid btn--block">Get the stack →</a>
+  </nav>
+  <div class="drawer__meta">
+    <a href="tel:4012179740">401-217-9740</a>
+    <a href="mailto:joyce@docostrips.com">joyce@docostrips.com</a>
+  </div>
+</div>
+<div class="scrim" id="scrim" hidden></div>
+
+<main id="main">
+<section class="pdp" id="pdp"></section>
+<section class="pdp__related"><div class="container"><div class="lineup__head"><div><p class="eyebrow">Pairs well with</p><h2 class="display">Stack it <span class="accent">up.</span></h2></div><a class="btn btn--chip" href="shop.html">All products &rarr;</a></div><div class="pgrid pgrid--3" data-related></div></div></section>
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer__cta reveal">
+      <h2 class="footer__big">Do more.<br>Be more.</h2>
+      <form class="signup" onsubmit="return false">
+        <label for="email" class="signup__label">Join the doers — early access &amp; launch offers</label>
+        <div class="signup__row">
+          <input type="email" id="email" placeholder="your@email.com" autocomplete="email">
+          <button type="submit" class="btn btn--solid">Sign up →</button>
+        </div>
+      </form>
+    </div>
+    <div class="footer__links">
+      <div class="footer__brandcol">
+        <img src="assets/logo-stacked-white.png" alt="DOCO — The Do Company" class="footer__logo">
+      </div>
+      <div class="footer__col"><h5>Shop</h5><a href="product.html?sku=multi">Multivitamin</a><a href="product.html?sku=sport">Sports Energy</a><a href="product.html?sku=calm">Calm + Stress</a><a href="product.html?sku=sleep">Sleep</a><a href="product.html?sku=stack">The Variety Pack</a><a href="shop.html">All products</a></div>
+      <div class="footer__col"><h5>Learn</h5><a href="index.html#science">Science</a><a href="index.html#ritual">How it works</a><a href="index.html#story">Our story</a><a href="index.html#faq">FAQ</a></div>
+      <div class="footer__col"><h5>Support</h5><a href="mailto:joyce@docostrips.com">Contact</a><a href="#">Returns</a><a href="#">Shipping</a><a href="tel:4012179740">401-217-9740</a></div>
+      <div class="footer__col"><h5>Follow</h5><a href="#">Instagram</a><a href="#">Facebook</a></div>
+    </div>
+  </div>
+  <div class="footer__wordmark" aria-hidden="true">DOCO</div>
+  <div class="container footer__bottom">
+    <p>&copy; 2026 DOCO — The Do Company LLC. All rights reserved.</p>
+    <p>Designed &amp; maintained by Cassio Marketing Solutions.</p>
+    <p class="footer__legal">These statements have not been evaluated by the Food and Drug Administration. These products are not intended to diagnose, treat, cure, or prevent any disease. Ask a health professional before starting a supplement if pregnant, nursing, taking medication, or managing a health condition. Use each product only as directed on its box.</p>
+  </div>
+</footer>
+
+
+<script src="js/main.js?v=11"></script>
+</body>
+</html>
