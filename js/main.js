@@ -9,6 +9,7 @@
   var $$ = function (s, r) { return [].slice.call((r || document).querySelectorAll(s)); };
   var money = function (n) { return '$' + n.toFixed(2); };
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var COMMERCE_ENABLED = false;
   var esc = function (s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); };
 
   /* ---------- catalog ---------- */
@@ -298,4 +299,16 @@
   var reveals = $$('.reveal');
   if ('IntersectionObserver' in window && reveals.length && !reduced) { var io = new IntersectionObserver(function (es) { es.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } }); }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' }); reveals.forEach(function (el) { io.observe(el); }); }
   else reveals.forEach(function (el) { el.classList.add('in'); });
+
+  /* This launch is a product catalog, not a working store. Keep purchase
+     controls inaccessible until a real checkout and fulfillment flow exists. */
+  if (!COMMERCE_ENABLED) {
+    $$('[data-add]').forEach(function (el) {
+      el.removeAttribute('data-add');
+      el.disabled = true;
+      el.textContent = 'Orders opening at launch';
+      el.setAttribute('aria-label', 'Orders are not open yet');
+    });
+    $$('.mode, [data-bag-open], #bag, #bagScrim, #checkout').forEach(function (el) { el.hidden = true; });
+  }
 })();
