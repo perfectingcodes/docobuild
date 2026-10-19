@@ -14,7 +14,7 @@
 
   /* ---------- catalog ---------- */
   var P = {
-    multi: { kind: 'formula', name: 'Multivitamin', eyebrow: 'The daily foundation', tag: 'From someday to every day.', flavor: 'Cranberry', price: 24.99, sub: 21.24, color: '#ef7d1e', img: 'assets/multivitamin.jpg',
+    multi: { kind: 'formula', name: 'Multivitamin', eyebrow: 'The daily foundation', tag: 'From someday to every day.', flavor: 'Cranberry', price: 24.99, sub: 21.24, color: '#f08a30', img: 'assets/multivitamin.jpg',
       desc: 'Ten nutrients that support everyday body functions in one portable strip. The vitamin habit you can actually keep.',
       pills: ['10 nutrients', '30 strips', 'Cranberry'], callouts: ['10 nutrients', 'D3 800 IU', 'B12 1,500 mcg'],
       benefits: ['B5, B6 and biotin help your body use nutrients from food', 'B12 supports normal nerve function and red blood cell formation', 'D3 and K2 support bone health; vitamin A supports vision and immune function'],
@@ -42,7 +42,7 @@
       ingredients: [['Tart cherry', '50 mg', 'A source of plant compounds; studied in sleep research'], ['Saffron', '14 mg', 'Studied for sleep quality in certain standardized extracts'], ['Vitamin B6', '1.4 mg', 'Supports normal nervous system function and neurotransmitter production']], other: 'Pullulan, cellulose, mannitol, sunflower lecithin, pectin, natural cranberry flavor, steviol glycosides.', chooseIf: 'you want to make winding down a more intentional part of your day.', strips: 30, note: 'No added melatonin in the formula.',
       inside: 'A gentle nighttime blend in a cranberry strip. Take it about 30 minutes before bed — no water needed.',
       gallery: ['assets/sleep.jpg', 'assets/pair-relax.jpg', 'assets/crew-mockup.jpg'] },
-    'duo-domore': { kind: 'bundle', includes: ['multi', 'sport'], name: 'The Do More Duo', eyebrow: 'Perfect pair', tag: 'Daily nutrients plus clean energy.', strips: 60, price: 44.99, sub: 38.24, color: '#ef7d1e', img: 'assets/pair-domore.jpg',
+    'duo-domore': { kind: 'bundle', includes: ['multi', 'sport'], name: 'The Do More Duo', eyebrow: 'Perfect pair', tag: 'Daily nutrients plus clean energy.', strips: 60, price: 44.99, sub: 38.24, color: '#f08a30', img: 'assets/pair-domore.jpg',
       desc: 'Multivitamin for the baseline, Sports Energy for the push. The combo for getting after it.',
       pills: ['Multivitamin', 'Sports Energy', 'Save $5'], benefits: ['Your daily foundation plus a clean lift', 'Two formulas, one simple routine', 'Save $5 vs. buying separately'],
       inside: 'One box of Multivitamin (cranberry) and one box of Sports Energy (strawberry + mint).', gallery: ['assets/pair-domore.jpg', 'assets/multivitamin.jpg', 'assets/sports-energy.jpg'] },
@@ -270,29 +270,65 @@
   });
   qBack.addEventListener('click', function () { if (qCount.textContent === 'Your match') qi = QUESTIONS.length - 1; else if (qi > 0) qi--; renderQ('back'); });
 
-  /* ---------- showcase: scroll-pinned stage + pointer tilt ---------- */
+  /* ---------- showcase v3: scroll-pinned stage · scroll-scrubbed spin · drag-to-spin spring · pointer tilt · ingredient reveals ---------- */
   (function () {
     var sc = $('#showcase'); if (!sc) return;
     var stage = $('.showcase__stage', sc), slides = $$('.slide', sc), dots = $$('.showcase__dots button', sc), cur = $('.showcase__cur', sc), n = slides.length, active = -1, ticking = false;
-    if (reduced) { slides.forEach(function (s) { s.classList.add('is-active'); }); return; }
+    var KEYS = [0.08, 0.26, 0.44];            /* sub-progress at which ingredient 1 / 2 / 3 pop in */
+    var scrollSpin = 0, lift = 0;
+    var drag = { on: false, x0: 0, last: 0, start: 0, rot: 0, vel: 0, raf: null, el: null };
+    if (reduced) { slides.forEach(function (s) { s.classList.add('is-active', 'is-k1', 'is-k2', 'is-k3'); }); return; }
     function metrics() { return { top: sc.getBoundingClientRect().top + window.scrollY, scrub: sc.offsetHeight - window.innerHeight }; }
+    function paint() { var s = slides[active]; if (!s) return; var a = Math.max(-84, Math.min(84, scrollSpin + drag.rot)); s.style.setProperty('--spin', a.toFixed(2) + 'deg'); s.style.setProperty('--lift', lift.toFixed(1) + 'px'); }
     function set(i) {
-      if (i === active) return; active = i;
-      slides.forEach(function (s, k) { s.classList.toggle('is-active', k === i); s.classList.toggle('is-before', k < i); s.classList.toggle('is-after', k > i); if (k !== i) { var im = $('.slide__card img', s); if (im) im.style.transform = ''; } });
+      if (i === active) return;
+      if (active > -1) { slides[active].style.removeProperty('--spin'); slides[active].style.removeProperty('--lift'); }
+      active = i;
+      slides.forEach(function (s, k) { s.classList.toggle('is-active', k === i); s.classList.toggle('is-before', k < i); s.classList.toggle('is-after', k > i); });
       dots.forEach(function (d, k) { d.classList.toggle('is-on', k === i); });
       stage.style.setProperty('--stage', slides[i].dataset.color); if (cur) cur.textContent = (i + 1 < 10 ? '0' : '') + (i + 1);
     }
-    function update() { ticking = false; var m = metrics(), p = Math.max(0, Math.min(0.9999, (window.scrollY - m.top) / Math.max(1, m.scrub))), i = Math.floor(p * n); set(i); var img = $('.slide__card img', slides[i]); if (img) img.style.transform = 'translateY(' + ((0.5 - (p * n - i)) * 22).toFixed(1) + 'px)'; }
+    function update() {
+      ticking = false;
+      var m = metrics(), p = Math.max(0, Math.min(0.9999, (window.scrollY - m.top) / Math.max(1, m.scrub))), i = Math.floor(p * n), q = p * n - i;
+      set(i);
+      var s = slides[i];
+      scrollSpin = (q - 0.5) * -58;            /* the pouch turns ~58° across its own scroll span */
+      lift = (0.5 - q) * 34;                   /* …and drifts upward as it goes */
+      s.classList.toggle('is-k1', q > KEYS[0]); s.classList.toggle('is-k2', q > KEYS[1]); s.classList.toggle('is-k3', q > KEYS[2]);
+      paint();
+    }
     function req() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
-    function goTo(i) { i = Math.max(0, Math.min(n - 1, i)); var m = metrics(); window.scrollTo({ top: m.top + (i + 0.5) * (m.scrub / n), behavior: 'smooth' }); }
+    function goTo(i) { i = Math.max(0, Math.min(n - 1, i)); var m = metrics(); window.scrollTo({ top: m.top + (i + 0.62) * (m.scrub / n), behavior: 'smooth' }); }
     $$('.showcase__arrow', sc).forEach(function (b) { b.addEventListener('click', function () { goTo(active + Number(b.dataset.dir)); }); });
     dots.forEach(function (d) { d.addEventListener('click', function () { goTo(Number(d.dataset.go)); }); });
     window.addEventListener('scroll', req, { passive: true }); window.addEventListener('resize', req); update();
-    /* pointer tilt: the product card follows the cursor, callouts drift in parallax, glare tracks */
+
+    /* pointer tilt: the pouch leans toward the cursor, the glare tracks it, the ingredient keys drift in parallax */
     function applyTilt(px, py) { var s = slides[active]; if (!s) return; var st = $('.slide__stage', s), r = st.getBoundingClientRect(); var x = (px - r.left) / r.width - .5, y = (py - r.top) / r.height - .5; x = Math.max(-.6, Math.min(.6, x)); y = Math.max(-.6, Math.min(.6, y));
-      s.style.setProperty('--ry', (x * 18).toFixed(2) + 'deg'); s.style.setProperty('--rx', (-y * 14).toFixed(2) + 'deg'); s.style.setProperty('--px', (x * 22).toFixed(1) + 'px'); s.style.setProperty('--py', (y * 22).toFixed(1) + 'px'); s.style.setProperty('--gx', (50 + x * 70).toFixed(1) + '%'); s.style.setProperty('--gy', (50 + y * 70).toFixed(1) + '%'); s.classList.add('is-tilting'); }
-    stage.addEventListener('pointermove', function (e) { if (e.pointerType === 'touch') return; applyTilt(e.clientX, e.clientY); });
-    stage.addEventListener('pointerleave', function () { slides.forEach(function (s) { ['--ry', '--rx', '--px', '--py', '--gx', '--gy'].forEach(function (v) { s.style.removeProperty(v); }); s.classList.remove('is-tilting'); }); });
+      s.style.setProperty('--ry', (x * 22).toFixed(2) + 'deg'); s.style.setProperty('--rx', (-y * 16).toFixed(2) + 'deg'); s.style.setProperty('--px', (x * 26).toFixed(1) + 'px'); s.style.setProperty('--py', (y * 26).toFixed(1) + 'px'); s.style.setProperty('--gx', (42 + x * 80).toFixed(1) + '%'); s.style.setProperty('--gy', (30 + y * 80).toFixed(1) + '%'); s.classList.add('is-tilting'); }
+    function clearTilt() { slides.forEach(function (s) { ['--ry', '--rx', '--px', '--py', '--gx', '--gy'].forEach(function (v) { s.style.removeProperty(v); }); s.classList.remove('is-tilting'); }); }
+
+    /* drag-to-spin with a spring: grab the pouch, throw it, and it swings back to its scroll position */
+    function spring() {
+      drag.raf = null; if (drag.on) return;
+      drag.vel += -drag.rot * 0.07; drag.vel *= 0.84; drag.rot += drag.vel;
+      if (Math.abs(drag.rot) < 0.08 && Math.abs(drag.vel) < 0.08) { drag.rot = 0; drag.vel = 0; paint(); return; }
+      paint(); drag.raf = requestAnimationFrame(spring);
+    }
+    stage.addEventListener('pointerdown', function (e) {
+      var pouch = e.target.closest('.pouch'); if (!pouch || e.button > 0) return;
+      if (drag.raf) { cancelAnimationFrame(drag.raf); drag.raf = null; }
+      drag.on = true; drag.el = pouch; drag.x0 = e.clientX; drag.last = e.clientX; drag.start = drag.rot; drag.vel = 0;
+      pouch.classList.add('is-drag'); clearTilt(); try { pouch.setPointerCapture(e.pointerId); } catch (_) {} e.preventDefault();
+    });
+    stage.addEventListener('pointermove', function (e) {
+      if (drag.on) { var r = drag.start + (e.clientX - drag.x0) * 0.55, lim = 75; if (Math.abs(r) > lim) r = Math.sign(r) * (lim + (Math.abs(r) - lim) * 0.22); drag.vel = Math.max(-14, Math.min(14, (e.clientX - drag.last) * 0.55)); drag.last = e.clientX; drag.rot = r; paint(); return; }
+      if (e.pointerType === 'touch') return; applyTilt(e.clientX, e.clientY);
+    });
+    function endDrag(e) { if (!drag.on) return; drag.on = false; if (drag.el) { drag.el.classList.remove('is-drag'); try { drag.el.releasePointerCapture(e.pointerId); } catch (_) {} } if (!drag.raf) drag.raf = requestAnimationFrame(spring); }
+    stage.addEventListener('pointerup', endDrag); stage.addEventListener('pointercancel', endDrag);
+    stage.addEventListener('pointerleave', function () { if (!drag.on) clearTilt(); });
   })();
 
   /* ---------- scroll reveal ---------- */
