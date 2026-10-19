@@ -10,7 +10,8 @@
   var money = function (n) { return '$' + n.toFixed(2); };
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var CFG = window.DOCO_COMMERCE || {};
-  var COMMERCE_ENABLED = !!CFG.enabled;
+  // Keep disabled: the imported checkout is a demo, not an order service.
+  var COMMERCE_ENABLED = false;
   var esc = function (s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); };
 
   /* ---------- type preview switcher: ?font=bricolage|unbounded|syne|space|anton (sticks for the session; ?font=default clears) ---------- */
@@ -63,7 +64,7 @@
       inside: 'One box of Calm + Stress (lemon) and one box of Sleep (cranberry).', gallery: ['assets/box-calm-sleep-sky.jpg', 'assets/box-calm-lemons.jpg', 'assets/box-sleep-sky-2.jpg'] },
     stack: { kind: 'bundle', includes: ['multi', 'sport', 'calm', 'sleep'], name: 'The Variety Pack', eyebrow: 'Best value', tag: 'All four formulas. Every part of your day.', strips: 120, price: 79.99, sub: 71.99, color: '#17130d', img: 'assets/crew-mockup.jpg', pouch: 'assets/pouch-stack.webp',
       desc: 'The fastest way to find your favorites and cover every part of your day — energy, focus, calm and sleep.',
-      pills: ['4 formulas', 'Save 33%', 'Free shipping'], benefits: ['All four formulas in one box', 'Save 33% vs. buying separately', 'Free shipping, always'],
+      pills: ['4 formulas', 'Save 33%', '120 strips'], benefits: ['All four formulas in one box', 'Save 33% vs. buying separately', 'One box of each formula'],
       inside: 'One box each of Multivitamin, Sports Energy, Calm + Stress and Sleep.', gallery: ['assets/box-grass-four.jpg', 'assets/box-calm-sleep-sky.jpg', 'assets/box-sport-berries.jpg'] }
   };
   var ORDER = ['multi', 'sport', 'calm', 'sleep', 'duo-domore', 'duo-relax', 'stack'];
@@ -130,13 +131,14 @@
   initModes(document);
 
   /* ---------- cart ---------- */
-  var cart = []; try { cart = JSON.parse(localStorage.getItem('doco_cart') || '[]'); } catch (e) {}
+  var cart = []; if (COMMERCE_ENABLED) { try { cart = JSON.parse(localStorage.getItem('doco_cart') || '[]'); } catch (e) {} }
   var bag = $('#bag'), bagScrim = $('#bagScrim'), bagItems = $('#bagItems'), bagSub = $('#bagSub'), bagCount = $('#bagCount'), headCount = $('#cartCount'), shipBar = $('#shipBar'), shipMsg = $('#shipMsg'), checkoutBtn = $('#checkoutBtn');
   function save() { try { localStorage.setItem('doco_cart', JSON.stringify(cart)); } catch (e) {} }
   function linePrice(l) { return l.mode === 'sub' ? P[l.sku].sub : P[l.sku].price; }
   function subtotal() { return cart.reduce(function (s, l) { return s + linePrice(l) * l.qty; }, 0); }
   function count() { return cart.reduce(function (s, l) { return s + l.qty; }, 0); }
   function renderCart() {
+    if (!COMMERCE_ENABLED) return;
     var c = count(), sub = subtotal();
     if (headCount) { headCount.textContent = c; headCount.classList.toggle('has', c > 0); }
     bagCount.textContent = c; bagSub.textContent = money(sub);
@@ -147,6 +149,7 @@
     bagItems.innerHTML = cart.map(function (l, i) { var p = P[l.sku]; return '<div class="line" style="--c:' + p.color + '"><div class="line__img"><img src="' + p.img + '" alt=""></div><div class="line__body"><div class="line__top"><b>' + p.name + '</b><span class="line__price">' + money(linePrice(l) * l.qty) + '</span></div><p class="line__meta">' + (l.mode === 'sub' ? 'Subscribe & save · ' + money(p.sub) + '/mo' : 'One-time · ' + money(p.price)) + '</p><div class="line__ctl"><div class="qty"><button type="button" aria-label="Decrease" data-line-qty="-1" data-i="' + i + '">−</button><span>' + l.qty + '</span><button type="button" aria-label="Increase" data-line-qty="1" data-i="' + i + '">+</button></div><button type="button" class="line__rm" data-rm="' + i + '">Remove</button></div></div></div>'; }).join('');
   }
   function addToCart(sku, mode, qty) {
+    if (!COMMERCE_ENABLED) return;
     if (!P[sku]) return; mode = mode === 'sub' ? 'sub' : 'once'; qty = Math.max(1, qty || 1);
     var i = -1; cart.forEach(function (l, k) { if (l.sku === sku && l.mode === mode) i = k; });
     if (i > -1) cart[i].qty += qty; else cart.push({ sku: sku, mode: mode, qty: qty });
@@ -154,7 +157,7 @@
     toast('<img src="' + P[sku].img + '" alt=""><div><b>Added to your bag</b><span>' + P[sku].name + (qty > 1 ? ' × ' + qty : '') + (mode === 'sub' ? ' · subscription' : '') + '</span></div><button type="button" data-bag-open>View bag</button>');
     if (headCount) { headCount.classList.remove('pop'); void headCount.offsetWidth; headCount.classList.add('pop'); }
   }
-  function openBag() { bag.classList.add('open'); bag.setAttribute('aria-hidden', 'false'); bagScrim.hidden = false; requestAnimationFrame(function () { bagScrim.classList.add('show'); }); lock(true); $('.bag__close', bag).focus(); }
+  function openBag() { if (!COMMERCE_ENABLED) return; bag.classList.add('open'); bag.setAttribute('aria-hidden', 'false'); bagScrim.hidden = false; requestAnimationFrame(function () { bagScrim.classList.add('show'); }); lock(true); $('.bag__close', bag).focus(); }
   function closeBag() { if (!bag.classList.contains('open')) return; bag.classList.remove('open'); bag.setAttribute('aria-hidden', 'true'); bagScrim.classList.remove('show'); lock(false); setTimeout(function () { bagScrim.hidden = true; }, 400); }
   bagScrim.addEventListener('click', closeBag);
   renderCart();
@@ -174,7 +177,7 @@
       .catch(function (err) { checkoutBtn.disabled = false; checkoutBtn.innerHTML = orig; toast('<div><b>Checkout is unavailable right now</b><span>Please try again in a moment. (' + esc(err.message) + ')</span></div>'); });
   }
   checkoutBtn.addEventListener('click', function () {
-    if (!cart.length) return;
+    if (!COMMERCE_ENABLED || !cart.length) return;
     if (CFG.checkoutEndpoint) { stripeCheckout(); return; }
     closeBag();
     var sub = subtotal(), ship = sub >= FREE_SHIP ? 0 : SHIP_FEE;
@@ -184,6 +187,7 @@
   });
   coForm.addEventListener('submit', function (e) {
     e.preventDefault();
+    if (!COMMERCE_ENABLED) return;
     if (!coForm.checkValidity()) { coForm.classList.add('was-validated'); coForm.reportValidity(); return; }
     $('#coNum').textContent = 'DOCO-' + Math.random().toString(36).slice(2, 8).toUpperCase(); $('#coEmail').textContent = $('#coEmailIn').value;
     coBody.hidden = true; coDone.hidden = false; cart = []; save(); renderCart();
@@ -199,7 +203,7 @@
       '<a class="pcard__media" href="product.html?sku=' + sku + '">' + media + '<span class="pcard__tag">' + esc(p.eyebrow) + '</span></a>' +
       '<div class="pcard__body"><div class="pcard__top"><h3><a href="product.html?sku=' + sku + '">' + esc(p.name) + '</a></h3><span class="pcard__price">' + money(p.price) + '</span></div>' +
       '<p class="pcard__tagline">' + esc(p.tag) + '</p>' +
-      '<div class="pcard__foot"><span class="pcard__sub">' + p.strips + ' strips · ' + money(p.sub) + '/mo subscribed</span><a class="pcard__link" href="product.html?sku=' + sku + '">View &rarr;</a></div></div></article>';
+      '<div class="pcard__foot"><span class="pcard__sub">Launching soon · online orders are not open yet</span><a class="pcard__link" href="product.html?sku=' + sku + '">View &rarr;</a></div></div></article>';
   }
   $$('[data-product-grid]').forEach(function (g) {
     var list = ORDER.filter(function (s) { return (!g.dataset.kind || P[s].kind === g.dataset.kind) && s !== g.dataset.exclude; });
@@ -262,7 +266,7 @@
   }
   var pdp = $('#pdp');
   if (pdp) {
-    var sku = (new URLSearchParams(location.search).get('sku') || 'multi'); if (!P[sku]) sku = 'multi';
+    var sku = (new URLSearchParams(location.search).get('sku') || 'multi'); if (ORDER.indexOf(sku) < 0) sku = 'multi';
     var p = P[sku], isB = p.kind === 'bundle'; document.title = p.name + ' — DOCO';
     pdp.style.setProperty('--c', p.color); pdp.dataset.sku = sku;
     var keys = isB ? [{ a: p.includes.length, n: 'formulas' }, { a: p.strips, n: 'strips' }, { a: 'Save ' + money(p.includes.length * P.multi.price - p.price), n: 'vs. singles' }] : p.ingredients.slice(0, 3).map(function (r) { return { a: r[1], n: r[0] }; });
@@ -274,6 +278,7 @@
       '<div class="pdp__thumbs"><button type="button" class="is-on is-stage" data-thumb="stage" aria-label="Product"><img src="' + p.pouch + '" alt=""></button>' + p.gallery.map(function (g, i) { return '<button type="button" data-thumb="' + g + '" aria-label="Image ' + (i + 2) + '"><img src="' + g + '" alt=""></button>'; }).join('') + '</div></div>' +
       '<div class="pdp__info"><p class="eyebrow">' + esc(p.eyebrow) + '</p><h1 class="display">' + esc(p.name) + '</h1><p class="serif-accent">' + esc(p.tag) + '</p>' +
       '<ul class="pdp__chips">' + (p.flavor ? '<li>' + esc(p.flavor) + ' flavor</li>' : '') + '<li>' + p.strips + ' strips</li>' + p.pills.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>' +
+      '<p class="pdp__desc"><b>' + money(p.price) + '</b> · planned launch price</p>' +
       '<p class="pdp__desc">' + p.desc + '</p>' +
       '<div class="pdp__keys">' + keys.map(function (k) { return '<div class="pdp__key"><b>' + esc(k.a) + '</b><span>' + esc(k.n) + '</span></div>'; }).join('') + '</div>' +
       '<a class="pdp__more" href="#inside">See the full panel ↓</a>' +
@@ -381,6 +386,7 @@
       '<div class="result__cta"><a class="btn btn--solid btn--lg" href="product.html?sku=' + ctaSku + '">View ' + (bundle ? P[sku].name : lead.name) + ' →</a>' + (picks.length > 1 ? '<a class="btn btn--chip" href="' + tweak + '">Tweak this stack</a>' : '<a class="btn btn--chip" href="shop.html">See all formulas</a>') + '<button type="button" class="btn btn--text" data-add="' + ctaSku + '">Add to bag</button></div>' +
       '<button type="button" class="result__retake" data-retake>Retake the quiz</button></div>';
     initModes(qStep);
+    applyCatalogMode(qStep);
   }
   function advance() { if (qi < QUESTIONS.length - 1) { qi++; renderQ('in'); } else renderResult(); }
   $$('[data-quiz-open]').forEach(function (b) { b.addEventListener('click', function (e) { e.preventDefault(); closeDrawer(); qi = 0; answers = []; renderQ(); openModal(quiz); }); });
@@ -526,13 +532,15 @@
 
   /* This launch is a product catalog, not a working store. Keep purchase
      controls inaccessible until a real checkout and fulfillment flow exists. */
-  if (!COMMERCE_ENABLED) {
-    $$('[data-add]').forEach(function (el) {
+  function applyCatalogMode(root) {
+    if (COMMERCE_ENABLED) return;
+    $$('[data-add]', root).forEach(function (el) {
       el.removeAttribute('data-add');
       el.disabled = true;
-      el.textContent = 'Orders opening at launch';
+      el.textContent = 'Launching soon';
       el.setAttribute('aria-label', 'Orders are not open yet');
     });
-    $$('.mode, [data-bag-open], #bag, #bagScrim, #checkout').forEach(function (el) { el.hidden = true; });
+    $$('.mode, .qty, [data-bag-open], #bag, #bagScrim, #checkout', root).forEach(function (el) { el.remove(); });
   }
+  applyCatalogMode(document);
 })();

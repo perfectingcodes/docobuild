@@ -1,0 +1,1 @@
+- [Launch scope](launch-scope.md) — The approved launch is marketing/catalog only, with buying disabled for now.
