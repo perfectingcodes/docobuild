@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="assets/favicon.png">
-<link rel="stylesheet" href="css/style.css?v=31">
+<link rel="stylesheet" href="css/style.css?v=33">
 </head>
 <body>
 
@@ -246,29 +246,39 @@
 </section>
 
 <!-- ===== SCIENCE ===== -->
-<section class="science" id="science">
-  <div class="container">
-    <p class="eyebrow">Why DOCO</p>
-    <h2 class="display">Made to be<br><span class="accent">actually absorbed.</span></h2>
-    <p class="serif-accent serif-accent--dark science__intro">Oral strips deliver straight through the lining of your mouth &mdash; no digestion, no waste.</p>
-    <div class="sci-grid">
-      <div class="sci reveal">
-        <div class="sci__check" aria-hidden="true">✓</div>
-        <h3><span class="sci__big">Seconds</span>, not 30+ minutes</h3>
-        <p>Dissolve-on-tongue delivery reaches you fast &mdash; pills and gummies crawl through digestion first.</p>
-      </div>
-      <div class="sci reveal" data-delay="1">
-        <div class="sci__check" aria-hidden="true">✓</div>
-        <h3><span class="sci__big">No</span> water, pills or bottles</h3>
-        <p>One pocket-sized strip. Nothing to swallow, nothing to carry, nothing to leave half-finished on a shelf.</p>
-      </div>
-      <div class="sci reveal" data-delay="2">
-        <div class="sci__check" aria-hidden="true">✓</div>
-        <h3><span class="sci__big">Clean</span>, considered formulas</h3>
-        <p>Thoughtfully dosed, great-tasting, and easy to stick with &mdash; the dose on the label is the dose on your tongue.</p>
+<section class="why" id="science">
+  <div class="container why__grid">
+    <div class="why__copy reveal">
+      <p class="eyebrow">Why DOCO</p>
+      <h2 class="display">Made to be<br><span class="accent">actually absorbed.</span></h2>
+      <p class="why__lead">A strip dissolves on your tongue and delivers through the lining of your mouth &mdash; no digestion to wait on, no bottle to carry, nothing to swallow.</p>
+      <ul class="why__race" aria-label="Time to start dissolving">
+        <li class="why__row why__row--doco"><span class="why__label"><img src="assets/mark-orange.png" alt="">DOCO strip</span><span class="why__bar"><i style="--w:9%"></i></span><b>~15 sec</b></li>
+        <li class="why__row"><span class="why__label">Pills &amp; capsules</span><span class="why__bar"><i style="--w:78%"></i></span><b>30+ min</b></li>
+        <li class="why__row"><span class="why__label">Gummies</span><span class="why__bar"><i style="--w:62%"></i></span><b>20&ndash;30 min</b></li>
+      </ul>
+      <p class="why__fine">Typical time before the format starts to break down. Individual results vary.</p>
+      <a href="#ritual" class="btn btn--ink">See how it works <span class="arr">&rarr;</span></a>
+    </div>
+    <div class="why__visual reveal" data-delay="1">
+      <div class="why__card">
+        <div class="why__pattern" aria-hidden="true"></div>
+        <img class="why__tongue" src="assets/tongue.webp" alt="A DOCO strip dissolving on the tongue" width="820" height="783" loading="lazy">
+        <img class="why__bolt" src="assets/step-go.webp" alt="" width="885" height="900" loading="lazy">
+        <span class="why__stick why__stick--a">No water</span>
+        <span class="why__stick why__stick--b">~15s to dissolve</span>
+        <span class="why__stick why__stick--c">Nothing to swallow</span>
+        <span class="why__stick why__stick--d">Pocket-sized</span>
       </div>
     </div>
-    <a href="#ritual" class="link-arrow">See how it works <span>→</span></a>
+  </div>
+  <div class="container">
+    <ul class="why__stats reveal" data-delay="2">
+      <li><b>~15s</b><span>on the tongue, then gone</span></li>
+      <li><b>0</b><span>water, pills or bottles</span></li>
+      <li><b>1</b><span>labeled dose per strip</span></li>
+      <li><b>30</b><span>strips in a pocket-sized box</span></li>
+    </ul>
   </div>
 </section>
 
@@ -456,6 +466,6 @@
 </footer>
 
 
-<script src="js/main.js?v=31"></script>
+<script src="js/main.js?v=33"></script>
 </body>
 </html>
