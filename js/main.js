@@ -14,45 +14,45 @@
 
   /* ---------- catalog ---------- */
   var P = {
-    multi: { kind: 'formula', name: 'Multivitamin', eyebrow: 'The daily foundation', tag: 'From someday to every day.', flavor: 'Cranberry', price: 24.99, sub: 21.24, color: '#f08a30', img: 'assets/multivitamin.jpg',
+    multi: { kind: 'formula', name: 'Multivitamin', eyebrow: 'The daily foundation', tag: 'From someday to every day.', flavor: 'Cranberry', price: 29.99, sub: 25.49, color: '#ef8120', img: 'assets/multivitamin.jpg',
       desc: 'Ten nutrients that support everyday body functions in one portable strip. The vitamin habit you can actually keep.',
       pills: ['10 nutrients', '30 strips', 'Cranberry'], callouts: ['10 nutrients', 'D3 800 IU', 'B12 1,500 mcg'],
       benefits: ['B5, B6 and biotin help your body use nutrients from food', 'B12 supports normal nerve function and red blood cell formation', 'D3 and K2 support bone health; vitamin A supports vision and immune function'],
       ingredients: [['Vitamin A', '900 mcg', 'Supports normal vision and immune function'], ['Vitamin D3', '800 IU', 'Helps calcium absorption'], ['Vitamin K2', '120 mcg', 'Supports normal bone health'], ['Vitamin B5', '5 mg', 'Energy metabolism'], ['Vitamin B6', '2 mg', 'Energy metabolism'], ['Biotin', '300 mcg', 'Energy metabolism'], ['Folate', '400 mcg', 'Supports DNA formation'], ['Vitamin B12', '1,500 mcg', 'Nerve function and red blood cell formation'], ['Iodine', '150 mcg', 'Helps make thyroid hormones'], ['Manganese', '2 mg', 'Cellular support']], other: 'Pullulan, cellulose, natural cranberry flavor, lecithin, mannitol, sorbitol syrup, erythritol, steviol glycosides.', chooseIf: 'you want an easy-to-carry vitamin habit with nutrients that support everyday functions.', strips: 30,
       inside: 'A daily blend of essential vitamins and minerals in a fast-dissolving oral strip. Cranberry flavored. The full panel is printed on every box.',
       gallery: ['assets/multivitamin.jpg', 'assets/hero-lifestyle.jpg', 'assets/crew-mockup.jpg'] },
-    sport: { kind: 'formula', name: 'Sports Energy', eyebrow: 'Fuel the grind', tag: 'Energy now. No crash later.', flavor: 'Strawberry + mint', price: 24.99, sub: 21.24, color: '#d63a30', img: 'assets/sports-energy.jpg',
+    sport: { kind: 'formula', name: 'Sports Energy', eyebrow: 'Fuel the grind', tag: 'Energy now. No crash later.', flavor: 'Strawberry + mint', price: 29.99, sub: 25.49, color: '#d63a30', img: 'assets/sports-energy.jpg',
       desc: 'A labeled 80 mg of natural caffeine with L-theanine and B12 — a measured option for the gym, the office, the next move. No drink to carry.',
       pills: ['80 mg caffeine', 'L-theanine', 'Strawberry-mint'], callouts: ['80 mg caffeine', 'L-theanine 30 mg', 'Vitamin B12'],
       benefits: ['A labeled 80 mg of natural caffeine for alertness — you know the amount you’re choosing', 'L-theanine 30 mg included alongside the caffeine', 'Vitamin B12 1,500 mcg supports normal nerves and red blood cells'],
       ingredients: [['Natural caffeine', '80 mg', 'The formula’s stimulant for alertness'], ['L-theanine', '30 mg', 'A tea-associated amino acid included alongside caffeine'], ['Vitamin B12', '1,500 mcg', 'Supports normal nerves and red blood cells — not a stimulant']], other: 'Pullulan, cellulose, mannitol, monk fruit extract, erythritol, natural strawberry flavor, sunflower lecithin, menthol crystals, spearmint flavor, peppermint flavor, steviol glycosides.', chooseIf: 'you want a portable caffeine option for your active-day routine.', strips: 30,
       inside: 'Caffeine paired with L-Theanine for smooth, focused energy, in a strawberry + mint strip. Take 15–20 minutes before you need it.',
       gallery: ['assets/sports-energy.jpg', 'assets/pair-domore.jpg', 'assets/hero-lifestyle.jpg'] },
-    calm: { kind: 'formula', name: 'Calm + Stress', eyebrow: 'Clarity on demand', tag: 'From chaos to calm.', flavor: 'Lemon', price: 24.99, sub: 21.24, color: '#2592c9', img: 'assets/calm-stress.jpg',
+    calm: { kind: 'formula', name: 'Calm + Stress', eyebrow: 'Clarity on demand', tag: 'From chaos to calm.', flavor: 'Lemon', price: 29.99, sub: 25.49, color: '#2592c9', img: 'assets/calm-stress.jpg',
       desc: 'SunTheanine® L-theanine with holy basil, passionflower and lemon balm in a lemon strip — your cue to step away, breathe, and reset.',
       pills: ['L-theanine 50 mg', '6 botanicals', 'Lemon'], callouts: ['L-theanine 50 mg', 'Holy basil 30 mg', 'Lemon flavor'],
       benefits: ['SunTheanine® L-theanine 50 mg — an amino acid studied for relaxation', 'Holy basil, passionflower and lemon balm, traditionally used in calming routines', 'Ashwagandha and chamomile — botanicals used in stress and relaxation routines'],
       ingredients: [['SunTheanine® L-theanine', '50 mg', 'An amino acid studied for relaxation'], ['Holy basil', '30 mg', 'Traditionally used in stress-management routines'], ['Passionflower', '20 mg', 'Traditionally used in relaxation routines'], ['Lemon balm', '10 mg', 'Often included in calming blends'], ['Ashwagandha', '5 mg', 'Used in stress and relaxation routines'], ['Chamomile', '5 mg', 'Used in stress and relaxation routines']], other: 'Pullulan, cellulose, monk fruit extract, medium-chain triglycerides, pectin, natural lemon flavor, sunflower lecithin, steviol glycosides.', chooseIf: 'you want a portable addition to your pause-and-reset ritual.', strips: 30,
       inside: 'Ashwagandha and calming botanicals in a lemon-flavored strip. Non-drowsy — built for the middle of a busy day.',
       gallery: ['assets/calm-stress.jpg', 'assets/pair-relax.jpg', 'assets/hero-lifestyle.jpg'] },
-    sleep: { kind: 'formula', name: 'Sleep', eyebrow: 'Recover to win', tag: 'From restless to rested.', flavor: 'Cranberry', price: 24.99, sub: 21.24, color: '#6a4fc9', img: 'assets/sleep.jpg',
+    sleep: { kind: 'formula', name: 'Sleep', eyebrow: 'Recover to win', tag: 'From restless to rested.', flavor: 'Cranberry', price: 29.99, sub: 25.49, color: '#6a4fc9', img: 'assets/sleep.jpg',
       desc: 'Tart cherry, saffron and B6 in a cranberry strip — your cue to set the phone aside, lower the lights and begin the wind-down. No added melatonin.',
       pills: ['Tart cherry', 'Saffron', 'No melatonin'], callouts: ['Tart cherry 50 mg', 'Saffron 14 mg', 'No melatonin'],
       benefits: ['Tart cherry 50 mg — a source of plant compounds studied in sleep research', 'Saffron 14 mg — studied for sleep quality in standardized extracts', 'Vitamin B6 1.4 mg supports normal nervous system function — no added melatonin'],
       ingredients: [['Tart cherry', '50 mg', 'A source of plant compounds; studied in sleep research'], ['Saffron', '14 mg', 'Studied for sleep quality in certain standardized extracts'], ['Vitamin B6', '1.4 mg', 'Supports normal nervous system function and neurotransmitter production']], other: 'Pullulan, cellulose, mannitol, sunflower lecithin, pectin, natural cranberry flavor, steviol glycosides.', chooseIf: 'you want to make winding down a more intentional part of your day.', strips: 30, note: 'No added melatonin in the formula.',
       inside: 'A gentle nighttime blend in a cranberry strip. Take it about 30 minutes before bed — no water needed.',
       gallery: ['assets/sleep.jpg', 'assets/pair-relax.jpg', 'assets/crew-mockup.jpg'] },
-    'duo-domore': { kind: 'bundle', includes: ['multi', 'sport'], name: 'The Do More Duo', eyebrow: 'Perfect pair', tag: 'Daily nutrients plus clean energy.', strips: 60, price: 44.99, sub: 38.24, color: '#f08a30', img: 'assets/pair-domore.jpg',
+    'duo-domore': { kind: 'bundle', includes: ['multi', 'sport'], name: 'The Do More Duo', eyebrow: 'Perfect pair', tag: 'Daily nutrients plus clean energy.', strips: 60, price: 44.99, sub: 38.24, color: '#ef8120', img: 'assets/pair-domore.jpg',
       desc: 'Multivitamin for the baseline, Sports Energy for the push. The combo for getting after it.',
-      pills: ['Multivitamin', 'Sports Energy', 'Save $5'], benefits: ['Your daily foundation plus a clean lift', 'Two formulas, one simple routine', 'Save $5 vs. buying separately'],
+      pills: ['Multivitamin', 'Sports Energy', 'Save $15'], benefits: ['Your daily foundation plus a clean lift', 'Two formulas, one simple routine', 'Save $15 vs. buying separately'],
       inside: 'One box of Multivitamin (cranberry) and one box of Sports Energy (strawberry + mint).', gallery: ['assets/pair-domore.jpg', 'assets/multivitamin.jpg', 'assets/sports-energy.jpg'] },
     'duo-relax': { kind: 'bundle', includes: ['calm', 'sleep'], name: 'The Relaxation Duo', eyebrow: 'Perfect pair', tag: 'Calm for the day, deep rest for the night.', strips: 60, price: 44.99, sub: 38.24, color: '#2592c9', img: 'assets/pair-relax.jpg',
       desc: 'Calm + Stress to stay composed, Sleep to recover fully. Wind down and come back stronger.',
-      pills: ['Calm + Stress', 'Sleep', 'Save $5'], benefits: ['Composure by day, recovery by night', 'Two formulas, one simple routine', 'Save $5 vs. buying separately'],
+      pills: ['Calm + Stress', 'Sleep', 'Save $15'], benefits: ['Composure by day, recovery by night', 'Two formulas, one simple routine', 'Save $15 vs. buying separately'],
       inside: 'One box of Calm + Stress (lemon) and one box of Sleep (cranberry).', gallery: ['assets/pair-relax.jpg', 'assets/calm-stress.jpg', 'assets/sleep.jpg'] },
     stack: { kind: 'bundle', includes: ['multi', 'sport', 'calm', 'sleep'], name: 'The Variety Pack', eyebrow: 'Best value', tag: 'All four formulas. Every part of your day.', strips: 120, price: 79.99, sub: 71.99, color: '#17130d', img: 'assets/crew-mockup.jpg',
       desc: 'The fastest way to find your favorites and cover every part of your day — energy, focus, calm and sleep.',
-      pills: ['4 formulas', 'Save 20%', 'Free shipping'], benefits: ['All four formulas in one box', 'Save 20% vs. buying separately', 'Free shipping, always'],
+      pills: ['4 formulas', 'Save 33%', 'Free shipping'], benefits: ['All four formulas in one box', 'Save 33% vs. buying separately', 'Free shipping, always'],
       inside: 'One box each of Multivitamin, Sports Energy, Calm + Stress and Sleep.', gallery: ['assets/crew-mockup.jpg', 'assets/hero-lifestyle.jpg', 'assets/pair-domore.jpg'] }
   };
   var ORDER = ['multi', 'sport', 'calm', 'sleep', 'duo-domore', 'duo-relax', 'stack'];
@@ -329,6 +329,34 @@
     function endDrag(e) { if (!drag.on) return; drag.on = false; if (drag.el) { drag.el.classList.remove('is-drag'); try { drag.el.releasePointerCapture(e.pointerId); } catch (_) {} } if (!drag.raf) drag.raf = requestAnimationFrame(spring); }
     stage.addEventListener('pointerup', endDrag); stage.addEventListener('pointercancel', endDrag);
     stage.addEventListener('pointerleave', function () { if (!drag.on) clearTilt(); });
+  })();
+
+  /* ---------- build your stack: pick formulas → duo / variety pricing ---------- */
+  (function () {
+    var b = $('[data-builder]'); if (!b) return;
+    var picks = $$('.pick', b), UNIT = P.multi.price;
+    var el = { name: $('[data-b-name]', b), count: $('[data-b-count]', b), strips: $('[data-b-strips]', b), price: $('[data-b-price]', b), was: $('[data-b-was]', b), save: $('[data-b-save]', b), note: $('[data-b-note]', b), cta: $('[data-b-cta]', b) };
+    function calc() {
+      var on = picks.filter(function (p) { return p.classList.contains('is-on'); }).map(function (p) { return p.dataset.pick; }), n = on.length, sku = null;
+      if (n === 4) sku = 'stack';
+      else if (n === 2) { if (on.indexOf('multi') > -1 && on.indexOf('sport') > -1) sku = 'duo-domore'; else if (on.indexOf('calm') > -1 && on.indexOf('sleep') > -1) sku = 'duo-relax'; }
+      else if (n === 1) sku = on[0];
+      var full = n * UNIT, price = sku ? P[sku].price : full, bundle = sku && P[sku].kind === 'bundle';
+      el.name.textContent = n === 0 ? 'Pick a formula to start' : sku ? P[sku].name : n + ' formulas, your way';
+      el.count.textContent = n; el.strips.textContent = n * 30;
+      el.price.textContent = n ? money(price) : '$0';
+      el.was.hidden = !(price < full); el.was.textContent = money(full);
+      el.save.hidden = !(price < full); el.save.textContent = 'Save ' + money(full - price);
+      el.note.textContent = n === 0 ? 'Tap any pouch to add it to your routine.'
+        : sku === 'stack' ? 'All four formulas in one box — the best value in the lineup.'
+        : bundle ? 'A matched pair at the duo price — ' + P[sku].tag
+        : n === 1 ? P[sku].tag + ' Add a matching formula to unlock a duo price.'
+        : 'Add the matching formula to unlock a duo, or take all four for the Variety Pack.';
+      el.cta.href = sku ? 'product.html?sku=' + sku : 'shop.html';
+      el.cta.innerHTML = (sku ? 'View ' + esc(P[sku].name) : n ? 'Shop these formulas' : 'Browse all formulas') + ' <span class="arr">&rarr;</span>';
+    }
+    picks.forEach(function (p) { p.addEventListener('click', function () { p.classList.toggle('is-on'); p.setAttribute('aria-pressed', p.classList.contains('is-on')); calc(); }); });
+    calc();
   })();
 
   /* ---------- scroll reveal ---------- */
