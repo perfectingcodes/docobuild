@@ -25,28 +25,28 @@
 
   /* ---------- catalog ---------- */
   var P = {
-    multi: { kind: 'formula', name: 'Multivitamin', eyebrow: 'The daily foundation', tag: 'From someday to every day.', flavor: 'Cranberry', price: 29.99, sub: 25.49, color: '#ef8120', img: 'assets/multivitamin.jpg', pouch: 'assets/pouch-multi.webp',
+    multi: { kind: 'formula', name: 'Multivitamin', eyebrow: 'The daily foundation', tag: 'From someday to every day.', flavor: 'Cranberry', price: 29.99, sub: 25.49, color: '#ef8120', img: 'assets/multivitamin.jpg', pouch: 'assets/pouch-multi.webp', strip: 'assets/strip-multi.webp',
       desc: 'Ten nutrients that support everyday body functions in one portable strip. The vitamin habit you can actually keep.',
       pills: ['10 nutrients', '30 strips', 'Cranberry'], callouts: ['10 nutrients', 'D3 800 IU', 'B12 1,500 mcg'],
       benefits: ['B5, B6 and biotin help your body use nutrients from food', 'B12 supports normal nerve function and red blood cell formation', 'D3 and K2 support bone health; vitamin A supports vision and immune function'],
       ingredients: [['Vitamin A', '900 mcg', 'Supports normal vision and immune function'], ['Vitamin D3', '800 IU', 'Helps calcium absorption'], ['Vitamin K2', '120 mcg', 'Supports normal bone health'], ['Vitamin B5', '5 mg', 'Energy metabolism'], ['Vitamin B6', '2 mg', 'Energy metabolism'], ['Biotin', '300 mcg', 'Energy metabolism'], ['Folate', '400 mcg', 'Supports DNA formation'], ['Vitamin B12', '1,500 mcg', 'Nerve function and red blood cell formation'], ['Iodine', '150 mcg', 'Helps make thyroid hormones'], ['Manganese', '2 mg', 'Cellular support']], other: 'Pullulan, cellulose, natural cranberry flavor, lecithin, mannitol, sorbitol syrup, erythritol, steviol glycosides.', chooseIf: 'you want an easy-to-carry vitamin habit with nutrients that support everyday functions.', strips: 30,
       inside: 'A daily blend of essential vitamins and minerals in a fast-dissolving oral strip. Cranberry flavored. The full panel is printed on every box.',
       gallery: ['assets/multivitamin.jpg', 'assets/hero-lifestyle.jpg', 'assets/crew-mockup.jpg'] },
-    sport: { kind: 'formula', name: 'Sports Energy', eyebrow: 'Fuel the grind', tag: 'Energy now. No crash later.', flavor: 'Strawberry + mint', price: 29.99, sub: 25.49, color: '#d63a30', img: 'assets/sports-energy.jpg', pouch: 'assets/pouch-sport.webp',
+    sport: { kind: 'formula', name: 'Sports Energy', eyebrow: 'Fuel the grind', tag: 'Energy now. No crash later.', flavor: 'Strawberry + mint', price: 29.99, sub: 25.49, color: '#d63a30', img: 'assets/sports-energy.jpg', pouch: 'assets/pouch-sport.webp', strip: 'assets/strip-sport.webp',
       desc: 'A labeled 80 mg of natural caffeine with L-theanine and B12 — a measured option for the gym, the office, the next move. No drink to carry.',
       pills: ['80 mg caffeine', 'L-theanine', 'Strawberry-mint'], callouts: ['80 mg caffeine', 'L-theanine 30 mg', 'Vitamin B12'],
       benefits: ['A labeled 80 mg of natural caffeine for alertness — you know the amount you’re choosing', 'L-theanine 30 mg included alongside the caffeine', 'Vitamin B12 1,500 mcg supports normal nerves and red blood cells'],
       ingredients: [['Natural caffeine', '80 mg', 'The formula’s stimulant for alertness'], ['L-theanine', '30 mg', 'A tea-associated amino acid included alongside caffeine'], ['Vitamin B12', '1,500 mcg', 'Supports normal nerves and red blood cells — not a stimulant']], other: 'Pullulan, cellulose, mannitol, monk fruit extract, erythritol, natural strawberry flavor, sunflower lecithin, menthol crystals, spearmint flavor, peppermint flavor, steviol glycosides.', chooseIf: 'you want a portable caffeine option for your active-day routine.', strips: 30,
       inside: 'Caffeine paired with L-Theanine for smooth, focused energy, in a strawberry + mint strip. Take 15–20 minutes before you need it.',
       gallery: ['assets/sports-energy.jpg', 'assets/pair-domore.jpg', 'assets/hero-lifestyle.jpg'] },
-    calm: { kind: 'formula', name: 'Calm + Stress', eyebrow: 'Clarity on demand', tag: 'From chaos to calm.', flavor: 'Lemon', price: 29.99, sub: 25.49, color: '#2592c9', img: 'assets/calm-stress.jpg', pouch: 'assets/pouch-calm.webp',
+    calm: { kind: 'formula', name: 'Calm + Stress', eyebrow: 'Clarity on demand', tag: 'From chaos to calm.', flavor: 'Lemon', price: 29.99, sub: 25.49, color: '#2592c9', img: 'assets/calm-stress.jpg', pouch: 'assets/pouch-calm.webp', strip: 'assets/strip-calm.webp',
       desc: 'SunTheanine® L-theanine with holy basil, passionflower and lemon balm in a lemon strip — your cue to step away, breathe, and reset.',
       pills: ['L-theanine 50 mg', '6 botanicals', 'Lemon'], callouts: ['L-theanine 50 mg', 'Holy basil 30 mg', 'Lemon flavor'],
       benefits: ['SunTheanine® L-theanine 50 mg — an amino acid studied for relaxation', 'Holy basil, passionflower and lemon balm, traditionally used in calming routines', 'Ashwagandha and chamomile — botanicals used in stress and relaxation routines'],
       ingredients: [['SunTheanine® L-theanine', '50 mg', 'An amino acid studied for relaxation'], ['Holy basil', '30 mg', 'Traditionally used in stress-management routines'], ['Passionflower', '20 mg', 'Traditionally used in relaxation routines'], ['Lemon balm', '10 mg', 'Often included in calming blends'], ['Ashwagandha', '5 mg', 'Used in stress and relaxation routines'], ['Chamomile', '5 mg', 'Used in stress and relaxation routines']], other: 'Pullulan, cellulose, monk fruit extract, medium-chain triglycerides, pectin, natural lemon flavor, sunflower lecithin, steviol glycosides.', chooseIf: 'you want a portable addition to your pause-and-reset ritual.', strips: 30,
       inside: 'Ashwagandha and calming botanicals in a lemon-flavored strip. Non-drowsy — built for the middle of a busy day.',
       gallery: ['assets/calm-stress.jpg', 'assets/pair-relax.jpg', 'assets/hero-lifestyle.jpg'] },
-    sleep: { kind: 'formula', name: 'Sleep', eyebrow: 'Recover to win', tag: 'From restless to rested.', flavor: 'Cranberry', price: 29.99, sub: 25.49, color: '#6a4fc9', img: 'assets/sleep.jpg', pouch: 'assets/pouch-sleep.webp',
+    sleep: { kind: 'formula', name: 'Sleep', eyebrow: 'Recover to win', tag: 'From restless to rested.', flavor: 'Cranberry', price: 29.99, sub: 25.49, color: '#6a4fc9', img: 'assets/sleep.jpg', pouch: 'assets/pouch-sleep.webp', strip: 'assets/strip-sleep.webp',
       desc: 'Tart cherry, saffron and B6 in a cranberry strip — your cue to set the phone aside, lower the lights and begin the wind-down. No added melatonin.',
       pills: ['Tart cherry', 'Saffron', 'No melatonin'], callouts: ['Tart cherry 50 mg', 'Saffron 14 mg', 'No melatonin'],
       benefits: ['Tart cherry 50 mg — a source of plant compounds studied in sleep research', 'Saffron 14 mg — studied for sleep quality in standardized extracts', 'Vitamin B6 1.4 mg supports normal nervous system function — no added melatonin'],
@@ -269,7 +269,7 @@
     var first = isB ? P[p.includes[0]] : p, timing = TIMING[isB ? p.includes[0] : sku];
     var html =
       '<div class="pdp__hero"><div class="container pdp__crumbs"><a href="index.html">Home</a> / <a href="shop.html">Shop</a> / <span>' + esc(p.name) + '</span></div>' +
-      '<div class="container pdp__grid"><div class="pdp__gallery"><div class="pdp__main"><div class="pstage' + (isB ? ' pstage--bundle' : '') + '" id="pdpStage"><div class="pstage__pattern"></div><img class="pstage__pouch" src="' + p.pouch + '" alt="' + esc(p.name) + '">' +
+      '<div class="container pdp__grid"><div class="pdp__gallery"><div class="pdp__main"><div class="pstage' + (isB ? ' pstage--bundle' : '') + '" id="pdpStage"><div class="pstage__pattern"></div><img class="pstage__pouch" src="' + p.pouch + '" alt="' + esc(p.name) + '">' + (p.strip ? '<img class="pstage__strip" src="' + p.strip + '" alt="">' : '') +
       keys.map(function (k, i) { return '<span class="pstage__key pstage__key--' + (i + 1) + '"><b>' + esc(k.a) + '</b><span>' + esc(k.n) + '</span></span>'; }).join('') + '</div><img id="pdpMain" src="' + p.gallery[0] + '" alt="' + esc(p.name) + '" hidden></div>' +
       '<div class="pdp__thumbs"><button type="button" class="is-on is-stage" data-thumb="stage" aria-label="Product"><img src="' + p.pouch + '" alt=""></button>' + p.gallery.map(function (g, i) { return '<button type="button" data-thumb="' + g + '" aria-label="Image ' + (i + 2) + '"><img src="' + g + '" alt=""></button>'; }).join('') + '</div></div>' +
       '<div class="pdp__info"><p class="eyebrow">' + esc(p.eyebrow) + '</p><h1 class="display">' + esc(p.name) + '</h1><p class="serif-accent">' + esc(p.tag) + '</p>' +
@@ -284,7 +284,7 @@
     /* inside your strip */
     if (!isB) {
       html += '<section class="psec psec--tint" id="inside"><div class="container"><div class="psec__head"><div><p class="eyebrow">Inside your strip</p><h2 class="display">What’s in ' + esc(p.name) + '</h2></div><p>' + esc(p.inside) + '</p></div>' +
-        '<div class="spots' + (p.ingredients.length > 6 ? ' spots--many' : '') + '">' + p.ingredients.map(function (r, i) { return '<div class="spot"><span class="spot__idx">' + (i + 1 < 10 ? '0' : '') + (i + 1) + '</span><span class="spot__amt">' + r[1] + '</span><span class="spot__name">' + r[0] + '</span><span class="spot__note">' + r[2] + '</span></div>'; }).join('') + '</div>' +
+        '<div class="spots' + (p.ingredients.length > 6 ? ' spots--many' : '') + '"><div class="spot spot--strip"><div class="dissolve"><img src="' + p.strip + '" alt=""><i></i></div><span class="spot__name">One strip, one labeled dose</span><span class="spot__note">Rests on the tongue and dissolves in about 15 seconds. Nothing to swallow.</span><span class="dissolve__t">~15s</span></div>' + p.ingredients.map(function (r, i) { return '<div class="spot"><span class="spot__idx">' + (i + 1 < 10 ? '0' : '') + (i + 1) + '</span><span class="spot__amt">' + r[1] + '</span><span class="spot__name">' + r[0] + '</span><span class="spot__note">' + r[2] + '</span></div>'; }).join('') + '</div>' +
         (p.note ? '<p class="ingr__note" style="margin-top:18px">✓ ' + p.note + '</p>' : '') + '</div></section>';
       html += '<section class="psec"><div class="container facts-wrap">' + factsHTML(p) +
         '<div class="facts-note"><h3>Read the label with us</h3><p>Every amount above is printed on the box. We list actives in plain numbers so you know exactly what you are choosing — nothing hidden in a blend.</p><ul>' + p.benefits.map(function (b) { return '<li>' + b + '</li>'; }).join('') + '</ul></div></div></section>';
@@ -423,6 +423,7 @@
       var s = slides[i];
       scrollSpin = (q - 0.5) * -58;            /* the pouch turns ~58° across its own scroll span */
       lift = (0.5 - q) * 34;                   /* …and drifts upward as it goes */
+      s.style.setProperty('--strip', (-Math.max(0, Math.min(1, (q - 0.1) / 0.45)) * 92).toFixed(1) + '%');   /* the strip slides up out of the pouch */
       s.classList.toggle('is-k1', q > KEYS[0]); s.classList.toggle('is-k2', q > KEYS[1]); s.classList.toggle('is-k3', q > KEYS[2]);
       paint();
     }
