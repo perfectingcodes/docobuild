@@ -12,30 +12,40 @@
   var COMMERCE_ENABLED = false;
   var esc = function (s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); };
 
+  /* ---------- type preview switcher: ?font=bricolage|unbounded|syne|space|anton (sticks for the session; ?font=default clears) ---------- */
+  (function () {
+    var FONTS = { unbounded: 'Unbounded:wght@700;800', syne: 'Syne:wght@700;800', space: 'Space+Grotesk:wght@700', anton: 'Anton' };
+    var q = new URLSearchParams(location.search).get('font'), f;
+    try { if (q) { if (q === 'default' || q === 'bricolage') localStorage.removeItem('doco_font'); else localStorage.setItem('doco_font', q); } f = localStorage.getItem('doco_font'); } catch (_) { f = q; }
+    if (!f || !FONTS[f]) return;
+    document.documentElement.dataset.font = f;
+    var l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'https://fonts.googleapis.com/css2?family=' + FONTS[f] + '&display=swap'; document.head.appendChild(l);
+  })();
+
   /* ---------- catalog ---------- */
   var P = {
-    multi: { kind: 'formula', name: 'Multivitamin', eyebrow: 'The daily foundation', tag: 'From someday to every day.', flavor: 'Cranberry', price: 29.99, sub: 25.49, color: '#ef8120', img: 'assets/multivitamin.jpg',
+    multi: { kind: 'formula', name: 'Multivitamin', eyebrow: 'The daily foundation', tag: 'From someday to every day.', flavor: 'Cranberry', price: 29.99, sub: 25.49, color: '#ef8120', img: 'assets/multivitamin.jpg', pouch: 'assets/pouch-multi.webp',
       desc: 'Ten nutrients that support everyday body functions in one portable strip. The vitamin habit you can actually keep.',
       pills: ['10 nutrients', '30 strips', 'Cranberry'], callouts: ['10 nutrients', 'D3 800 IU', 'B12 1,500 mcg'],
       benefits: ['B5, B6 and biotin help your body use nutrients from food', 'B12 supports normal nerve function and red blood cell formation', 'D3 and K2 support bone health; vitamin A supports vision and immune function'],
       ingredients: [['Vitamin A', '900 mcg', 'Supports normal vision and immune function'], ['Vitamin D3', '800 IU', 'Helps calcium absorption'], ['Vitamin K2', '120 mcg', 'Supports normal bone health'], ['Vitamin B5', '5 mg', 'Energy metabolism'], ['Vitamin B6', '2 mg', 'Energy metabolism'], ['Biotin', '300 mcg', 'Energy metabolism'], ['Folate', '400 mcg', 'Supports DNA formation'], ['Vitamin B12', '1,500 mcg', 'Nerve function and red blood cell formation'], ['Iodine', '150 mcg', 'Helps make thyroid hormones'], ['Manganese', '2 mg', 'Cellular support']], other: 'Pullulan, cellulose, natural cranberry flavor, lecithin, mannitol, sorbitol syrup, erythritol, steviol glycosides.', chooseIf: 'you want an easy-to-carry vitamin habit with nutrients that support everyday functions.', strips: 30,
       inside: 'A daily blend of essential vitamins and minerals in a fast-dissolving oral strip. Cranberry flavored. The full panel is printed on every box.',
       gallery: ['assets/multivitamin.jpg', 'assets/hero-lifestyle.jpg', 'assets/crew-mockup.jpg'] },
-    sport: { kind: 'formula', name: 'Sports Energy', eyebrow: 'Fuel the grind', tag: 'Energy now. No crash later.', flavor: 'Strawberry + mint', price: 29.99, sub: 25.49, color: '#d63a30', img: 'assets/sports-energy.jpg',
+    sport: { kind: 'formula', name: 'Sports Energy', eyebrow: 'Fuel the grind', tag: 'Energy now. No crash later.', flavor: 'Strawberry + mint', price: 29.99, sub: 25.49, color: '#d63a30', img: 'assets/sports-energy.jpg', pouch: 'assets/pouch-sport.webp',
       desc: 'A labeled 80 mg of natural caffeine with L-theanine and B12 — a measured option for the gym, the office, the next move. No drink to carry.',
       pills: ['80 mg caffeine', 'L-theanine', 'Strawberry-mint'], callouts: ['80 mg caffeine', 'L-theanine 30 mg', 'Vitamin B12'],
       benefits: ['A labeled 80 mg of natural caffeine for alertness — you know the amount you’re choosing', 'L-theanine 30 mg included alongside the caffeine', 'Vitamin B12 1,500 mcg supports normal nerves and red blood cells'],
       ingredients: [['Natural caffeine', '80 mg', 'The formula’s stimulant for alertness'], ['L-theanine', '30 mg', 'A tea-associated amino acid included alongside caffeine'], ['Vitamin B12', '1,500 mcg', 'Supports normal nerves and red blood cells — not a stimulant']], other: 'Pullulan, cellulose, mannitol, monk fruit extract, erythritol, natural strawberry flavor, sunflower lecithin, menthol crystals, spearmint flavor, peppermint flavor, steviol glycosides.', chooseIf: 'you want a portable caffeine option for your active-day routine.', strips: 30,
       inside: 'Caffeine paired with L-Theanine for smooth, focused energy, in a strawberry + mint strip. Take 15–20 minutes before you need it.',
       gallery: ['assets/sports-energy.jpg', 'assets/pair-domore.jpg', 'assets/hero-lifestyle.jpg'] },
-    calm: { kind: 'formula', name: 'Calm + Stress', eyebrow: 'Clarity on demand', tag: 'From chaos to calm.', flavor: 'Lemon', price: 29.99, sub: 25.49, color: '#2592c9', img: 'assets/calm-stress.jpg',
+    calm: { kind: 'formula', name: 'Calm + Stress', eyebrow: 'Clarity on demand', tag: 'From chaos to calm.', flavor: 'Lemon', price: 29.99, sub: 25.49, color: '#2592c9', img: 'assets/calm-stress.jpg', pouch: 'assets/pouch-calm.webp',
       desc: 'SunTheanine® L-theanine with holy basil, passionflower and lemon balm in a lemon strip — your cue to step away, breathe, and reset.',
       pills: ['L-theanine 50 mg', '6 botanicals', 'Lemon'], callouts: ['L-theanine 50 mg', 'Holy basil 30 mg', 'Lemon flavor'],
       benefits: ['SunTheanine® L-theanine 50 mg — an amino acid studied for relaxation', 'Holy basil, passionflower and lemon balm, traditionally used in calming routines', 'Ashwagandha and chamomile — botanicals used in stress and relaxation routines'],
       ingredients: [['SunTheanine® L-theanine', '50 mg', 'An amino acid studied for relaxation'], ['Holy basil', '30 mg', 'Traditionally used in stress-management routines'], ['Passionflower', '20 mg', 'Traditionally used in relaxation routines'], ['Lemon balm', '10 mg', 'Often included in calming blends'], ['Ashwagandha', '5 mg', 'Used in stress and relaxation routines'], ['Chamomile', '5 mg', 'Used in stress and relaxation routines']], other: 'Pullulan, cellulose, monk fruit extract, medium-chain triglycerides, pectin, natural lemon flavor, sunflower lecithin, steviol glycosides.', chooseIf: 'you want a portable addition to your pause-and-reset ritual.', strips: 30,
       inside: 'Ashwagandha and calming botanicals in a lemon-flavored strip. Non-drowsy — built for the middle of a busy day.',
       gallery: ['assets/calm-stress.jpg', 'assets/pair-relax.jpg', 'assets/hero-lifestyle.jpg'] },
-    sleep: { kind: 'formula', name: 'Sleep', eyebrow: 'Recover to win', tag: 'From restless to rested.', flavor: 'Cranberry', price: 29.99, sub: 25.49, color: '#6a4fc9', img: 'assets/sleep.jpg',
+    sleep: { kind: 'formula', name: 'Sleep', eyebrow: 'Recover to win', tag: 'From restless to rested.', flavor: 'Cranberry', price: 29.99, sub: 25.49, color: '#6a4fc9', img: 'assets/sleep.jpg', pouch: 'assets/pouch-sleep.webp',
       desc: 'Tart cherry, saffron and B6 in a cranberry strip — your cue to set the phone aside, lower the lights and begin the wind-down. No added melatonin.',
       pills: ['Tart cherry', 'Saffron', 'No melatonin'], callouts: ['Tart cherry 50 mg', 'Saffron 14 mg', 'No melatonin'],
       benefits: ['Tart cherry 50 mg — a source of plant compounds studied in sleep research', 'Saffron 14 mg — studied for sleep quality in standardized extracts', 'Vitamin B6 1.4 mg supports normal nervous system function — no added melatonin'],
@@ -168,13 +178,12 @@
 
   /* ---------- product grid + tabs ---------- */
   function cardHTML(sku) {
-    var p = P[sku], pills = p.kind === 'bundle' ? p.includes.map(function (s) { return P[s].name; }) : p.pills;
-    return '<article class="pcard" data-kind="' + p.kind + '" style="--c:' + p.color + '">' +
-      '<a class="pcard__media" href="product.html?sku=' + sku + '"><img src="' + p.img + '" alt="' + esc(p.name) + '" loading="lazy"><span class="pcard__tag">' + esc(p.eyebrow) + '</span></a>' +
+    var p = P[sku], media = p.pouch ? '<img class="pcard__pouch" src="' + p.pouch + '" alt="' + esc(p.name) + '" loading="lazy">' : '<img src="' + p.img + '" alt="' + esc(p.name) + '" loading="lazy">';
+    return '<article class="pcard pcard--' + p.kind + '" data-kind="' + p.kind + '" style="--c:' + p.color + '">' +
+      '<a class="pcard__media" href="product.html?sku=' + sku + '">' + media + '<span class="pcard__tag">' + esc(p.eyebrow) + '</span></a>' +
       '<div class="pcard__body"><div class="pcard__top"><h3><a href="product.html?sku=' + sku + '">' + esc(p.name) + '</a></h3><span class="pcard__price">' + money(p.price) + '</span></div>' +
-      '<p class="pcard__tagline">' + esc(p.tag) + '</p><p class="pcard__sub">or ' + money(p.sub) + '/mo · subscribe &amp; save</p>' +
-      '<ul class="pcard__pills">' + pills.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>' +
-      '<div class="pcard__actions"><button type="button" class="btn btn--solid btn--sm" data-add="' + sku + '" data-mode="once">Add to bag</button><a class="btn btn--chip" href="product.html?sku=' + sku + '">Details →</a></div></div></article>';
+      '<p class="pcard__tagline">' + esc(p.tag) + '</p>' +
+      '<div class="pcard__foot"><span class="pcard__sub">' + p.strips + ' strips · ' + money(p.sub) + '/mo subscribed</span><a class="pcard__link" href="product.html?sku=' + sku + '">View &rarr;</a></div></div></article>';
   }
   $$('[data-product-grid]').forEach(function (g) {
     var list = ORDER.filter(function (s) { return (!g.dataset.kind || P[s].kind === g.dataset.kind) && s !== g.dataset.exclude; });
@@ -273,7 +282,7 @@
   /* ---------- showcase v3: scroll-pinned stage · scroll-scrubbed spin · drag-to-spin spring · pointer tilt · ingredient reveals ---------- */
   (function () {
     var sc = $('#showcase'); if (!sc) return;
-    var stage = $('.showcase__stage', sc), slides = $$('.slide', sc), dots = $$('.showcase__dots button', sc), cur = $('.showcase__cur', sc), n = slides.length, active = -1, ticking = false;
+    var stage = $('.showcase__stage', sc), slides = $$('.slide', sc), dots = $$('.showcase__dots button, .showcase__tabs button', sc), cur = $('.showcase__cur', sc), wipe = $('.showcase__wipe', sc), n = slides.length, active = -1, ticking = false;
     var KEYS = [0.08, 0.26, 0.44];            /* sub-progress at which ingredient 1 / 2 / 3 pop in */
     var scrollSpin = 0, lift = 0;
     var drag = { on: false, x0: 0, last: 0, start: 0, rot: 0, vel: 0, raf: null, el: null };
@@ -282,10 +291,12 @@
     function paint() { var s = slides[active]; if (!s) return; var a = Math.max(-84, Math.min(84, scrollSpin + drag.rot)); s.style.setProperty('--spin', a.toFixed(2) + 'deg'); s.style.setProperty('--lift', lift.toFixed(1) + 'px'); }
     function set(i) {
       if (i === active) return;
+      var prev = active;
       if (active > -1) { slides[active].style.removeProperty('--spin'); slides[active].style.removeProperty('--lift'); }
       active = i;
       slides.forEach(function (s, k) { s.classList.toggle('is-active', k === i); s.classList.toggle('is-before', k < i); s.classList.toggle('is-after', k > i); });
       dots.forEach(function (d, k) { d.classList.toggle('is-on', k === i); });
+      if (wipe && prev > -1) { wipe.style.background = slides[i].dataset.color; wipe.classList.remove('is-run'); void wipe.offsetWidth; wipe.classList.add('is-run'); }
       stage.style.setProperty('--stage', slides[i].dataset.color); if (cur) cur.textContent = (i + 1 < 10 ? '0' : '') + (i + 1);
     }
     function update() {

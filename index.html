@@ -7,9 +7,9 @@
 <meta name="description" content="DOCO fast-dissolving wellness strips. Four clean formulas — Multivitamin, Sports Energy, Calm + Stress, Sleep. Absorbs in seconds, no water, no bottles. Do More. Be More.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,600;1,800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="assets/favicon.png">
-<link rel="stylesheet" href="css/style.css?v=22">
+<link rel="stylesheet" href="css/style.css?v=25">
 </head>
 <body>
 
@@ -117,10 +117,11 @@
 <section class="showcase" id="showcase" aria-label="Formula showcase">
   <div class="showcase__stage">
     <div class="showcase__bg" aria-hidden="true"></div>
+    <div class="showcase__wipe" aria-hidden="true"></div>
     <div class="showcase__pattern" aria-hidden="true"></div>
 
     <div class="container showcase__top">
-      <span class="showcase__counter"><b class="showcase__cur">01</b><i>/</i>04</span>
+      <ul class="showcase__tabs" aria-label="Jump to a formula"><li><button type="button" data-go="0" class="is-on">Multivitamin</button></li><li><button type="button" data-go="1">Sports Energy</button></li><li><button type="button" data-go="2">Calm + Stress</button></li><li><button type="button" data-go="3">Sleep</button></li></ul>
       <span class="showcase__label">Scroll to explore <i>&darr;</i></span>
     </div>
 
@@ -276,18 +277,17 @@
   <div class="container">
     <div class="ritual__head reveal">
       <div>
-      <p class="eyebrow eyebrow--light">The ritual</p>
-      <h2 class="display display--light">Three seconds.<br><span class="accent">That&rsquo;s the whole routine.</span></h2>
-    </div>
-    <img class="ritual__tongue" src="assets/tongue.webp" alt="A DOCO strip dissolving on the tongue" width="820" height="783" loading="lazy">
+        <p class="eyebrow eyebrow--light">The ritual</p>
+        <h2 class="display display--light">Peel. Place. <span class="accent">Go.</span></h2>
+        <p class="ritual__sub">Three seconds, no water, no pills. The whole routine fits in a pocket.</p>
+      </div>
+      <img class="ritual__tongue" src="assets/tongue.webp" alt="A DOCO strip dissolving on the tongue" width="820" height="783" loading="lazy">
     </div>
     <ol class="rsteps">
-      <li class="rstep reveal"><span class="rstep__n" aria-hidden="true">01</span><h3>Peel.</h3><p>Tear open a single pocket-sized strip. Travel-ready, mess-free, gone in a snap.</p><span class="rstep__t">1 second</span></li>
-      <li class="rstep reveal" data-delay="1"><span class="rstep__n" aria-hidden="true">02</span><h3>Place.</h3><p>Rest it on your tongue. Nothing to swallow, nothing to carry, nothing left on a shelf.</p><span class="rstep__t">2 seconds</span></li>
-      <li class="rstep reveal" data-delay="2"><span class="rstep__n" aria-hidden="true">03</span><h3>Go.</h3><p>It dissolves in seconds and gets to work. One better choice, done &mdash; now go do more.</p><span class="rstep__t">~15 seconds</span></li>
+      <li class="rstep reveal"><span class="rstep__n">01</span><div><h3>Peel</h3><p>Tear open a single pocket-sized strip.</p></div><span class="rstep__t">1 sec</span></li>
+      <li class="rstep reveal" data-delay="1"><span class="rstep__n">02</span><div><h3>Place</h3><p>Rest it on your tongue. Nothing to swallow.</p></div><span class="rstep__t">2 sec</span></li>
+      <li class="rstep reveal" data-delay="2"><span class="rstep__n">03</span><div><h3>Go</h3><p>It dissolves in seconds and gets to work.</p></div><span class="rstep__t">~15 sec</span></li>
     </ol>
-    <div class="ritual__track" aria-hidden="true"><i></i></div>
-    <ul class="ritual__facts reveal" data-delay="2"><li><b>0</b>water</li><li><b>0</b>pills</li><li><b>~15s</b>to dissolve</li><li><b>1</b>better choice a day</li></ul>
   </div>
 </section>
 
@@ -295,30 +295,27 @@
 <section class="reviews" id="reviews">
   <div class="container">
     <div class="reviews__head reveal">
-      <p class="eyebrow">The doers</p>
-      <h2 class="display">Made for people<br>who <span class="accent">get things done.</span></h2>
+      <div><p class="eyebrow">Early feedback</p><h2 class="display">Made for people<br>who <span class="accent">get things done.</span></h2></div>
+      <p class="reviews__note">Notes from our pre-launch testers. Public reviews open with the first orders.</p>
     </div>
     <div class="rgrid">
-      <figure class="rcard reveal">
-        <div class="rcard__stars">★★★★★</div>
+      <figure class="rcard reveal" style="--c:#d63a30">
+        <div class="rcard__top"><span class="rcard__stars" aria-label="5 out of 5">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="rcard__tag"><i></i>Sports Energy</span></div>
         <h3 class="rcard__title">My afternoon fuel</h3>
-        <blockquote>&ldquo;Sports Energy is my new pre-workout. No shaker, no crash — I grab one on the way out the door.&rdquo;</blockquote>
-        <figcaption><b>Maya R.</b><span>Marathoner &amp; founder</span></figcaption>
-        <a href="#showcase" class="rcard__shop">Shop Energy →</a>
+        <blockquote>&ldquo;Sports Energy is my new pre-workout. No shaker, no crash &mdash; I grab one on the way out the door.&rdquo;</blockquote>
+        <figcaption><span class="rcard__avatar">MR</span><span><b>Maya R.</b><small>Marathoner &amp; founder</small></span></figcaption>
       </figure>
-      <figure class="rcard reveal" data-delay="1">
-        <div class="rcard__stars">★★★★★</div>
+      <figure class="rcard reveal" data-delay="1" style="--c:#2592c9">
+        <div class="rcard__top"><span class="rcard__stars" aria-label="5 out of 5">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="rcard__tag"><i></i>Calm + Stress</span></div>
         <h3 class="rcard__title">Actually present</h3>
         <blockquote>&ldquo;Calm + Stress lives in my bag. Two minutes before a big meeting and I&rsquo;m present. It fits my day instead of fighting it.&rdquo;</blockquote>
-        <figcaption><b>Devin K.</b><span>Product lead</span></figcaption>
-        <a href="#showcase" class="rcard__shop">Shop Calm →</a>
+        <figcaption><span class="rcard__avatar">DK</span><span><b>Devin K.</b><small>Product lead</small></span></figcaption>
       </figure>
-      <figure class="rcard reveal" data-delay="2">
-        <div class="rcard__stars">★★★★★</div>
+      <figure class="rcard reveal" data-delay="2" style="--c:#6a4fc9">
+        <div class="rcard__top"><span class="rcard__stars" aria-label="5 out of 5">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="rcard__tag"><i></i>Sleep</span></div>
         <h3 class="rcard__title">A habit I kept</h3>
-        <blockquote>&ldquo;Finally a wellness habit I&rsquo;ve actually kept. The Sleep strip is part of my wind-down now — no water glass by the bed.&rdquo;</blockquote>
-        <figcaption><b>Priya S.</b><span>Nurse &amp; mom of two</span></figcaption>
-        <a href="#showcase" class="rcard__shop">Shop Sleep →</a>
+        <blockquote>&ldquo;Finally a wellness habit I&rsquo;ve actually kept. The Sleep strip is part of my wind-down now &mdash; no water glass by the bed.&rdquo;</blockquote>
+        <figcaption><span class="rcard__avatar">PS</span><span><b>Priya S.</b><small>Nurse &amp; mom of two</small></span></figcaption>
       </figure>
     </div>
   </div>
@@ -369,10 +366,8 @@
       </div>
     </div>
     <aside class="story__side reveal" data-delay="1">
-      <div class="brandcard">
-        <div class="brandcard__pattern" aria-hidden="true"></div>
-        <div class="brandcard__glow" aria-hidden="true"></div>
-        <img src="assets/logo-stacked-white.png" alt="DOCO — The Do Company" class="brandcard__logo">
+      <div class="story__photo">
+        <img src="assets/lifestyle-desk.jpg" alt="Two people taking DOCO strips at a desk" loading="lazy" width="880" height="1168">
         <span class="brandcard__tag brandcard__tag--br">Do more. Be more.</span>
       </div>
       <ul class="swatches" aria-label="The four DOCO formula colors">
@@ -393,6 +388,7 @@
     <div class="faq__head reveal">
       <p class="eyebrow">Quick answers</p>
       <h2 class="display">Got<br>questions?</h2>
+      <img class="faq__tongue" src="assets/tongue.webp" alt="" width="820" height="783" loading="lazy">
       <p class="serif-accent serif-accent--dark">Everything you need to know before your first strip.</p>
     </div>
     <div class="faq__list reveal" data-delay="1">
@@ -441,7 +437,7 @@
 <footer class="footer">
   <div class="container">
     <div class="footer__cta reveal">
-      <h2 class="footer__big">Do more.<br>Be more.</h2>
+      <div class="footer__bigwrap"><img class="footer__tongue" src="assets/tongue.webp" alt="" width="820" height="783" loading="lazy"><h2 class="footer__big">Do more.<br>Be more.</h2></div>
       <div class="signup">
         <p class="signup__label">Want launch updates? Email us and we&rsquo;ll keep you posted.</p>
         <div class="signup__row"><a class="btn btn--solid" href="mailto:joyce@docostrips.com?subject=DOCO%20launch%20updates">Email for launch updates →</a></div>
@@ -468,6 +464,6 @@
 </footer>
 
 
-<script src="js/main.js?v=22"></script>
+<script src="js/main.js?v=25"></script>
 </body>
 </html>
