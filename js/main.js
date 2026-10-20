@@ -342,16 +342,12 @@
       else if (n === 2) { if (on.indexOf('multi') > -1 && on.indexOf('sport') > -1) sku = 'duo-domore'; else if (on.indexOf('calm') > -1 && on.indexOf('sleep') > -1) sku = 'duo-relax'; }
       else if (n === 1) sku = on[0];
       var full = n * UNIT, price = sku ? P[sku].price : full, bundle = sku && P[sku].kind === 'bundle';
-      el.name.textContent = n === 0 ? 'Pick a formula to start' : sku ? P[sku].name : n + ' formulas, your way';
+      el.name.textContent = n === 0 ? 'Nothing picked yet' : sku ? P[sku].name : n + ' formulas, your way';
       el.count.textContent = n; el.strips.textContent = n * 30;
       el.price.textContent = n ? money(price) : '$0';
       el.was.hidden = !(price < full); el.was.textContent = money(full);
       el.save.hidden = !(price < full); el.save.textContent = 'Save ' + money(full - price);
-      el.note.textContent = n === 0 ? 'Tap any pouch to add it to your routine.'
-        : sku === 'stack' ? 'All four formulas in one box — the best value in the lineup.'
-        : bundle ? 'A matched pair at the duo price — ' + P[sku].tag
-        : n === 1 ? P[sku].tag + ' Add a matching formula to unlock a duo price.'
-        : 'Add the matching formula to unlock a duo, or take all four for the Variety Pack.';
+      el.note.textContent = n === 0 ? 'tap a formula above' : sku === 'stack' ? 'the best value in the lineup' : bundle ? 'duo price unlocked' : n === 1 ? 'pair it to unlock a duo price' : n === 3 ? 'add the fourth for the Variety Pack price' : 'pair Multivitamin + Sports Energy or Calm + Sleep for a duo price';
       el.cta.href = sku ? 'product.html?sku=' + sku : 'shop.html';
       el.cta.innerHTML = (sku ? 'View ' + esc(P[sku].name) : n ? 'Shop these formulas' : 'Browse all formulas') + ' <span class="arr">&rarr;</span>';
     }
