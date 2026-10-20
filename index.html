@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="assets/favicon.png">
-<link rel="stylesheet" href="css/style.css?v=25">
+<link rel="stylesheet" href="css/style.css?v=27">
 </head>
 <body>
 
@@ -276,18 +276,16 @@
 <section class="ritual" id="ritual">
   <div class="container">
     <div class="ritual__head reveal">
-      <div>
-        <p class="eyebrow eyebrow--light">The ritual</p>
-        <h2 class="display display--light">Peel. Place. <span class="accent">Go.</span></h2>
-        <p class="ritual__sub">Three seconds, no water, no pills. The whole routine fits in a pocket.</p>
-      </div>
-      <img class="ritual__tongue" src="assets/tongue.webp" alt="A DOCO strip dissolving on the tongue" width="820" height="783" loading="lazy">
+      <p class="eyebrow eyebrow--light">The ritual</p>
+      <h2 class="display display--light">Peel. Place. <span class="accent">Go.</span></h2>
+      <p class="ritual__sub">Three seconds. No water, no pills, nothing to swallow &mdash; the whole routine fits in a pocket.</p>
     </div>
     <ol class="rsteps">
-      <li class="rstep reveal"><span class="rstep__n">01</span><div><h3>Peel</h3><p>Tear open a single pocket-sized strip.</p></div><span class="rstep__t">1 sec</span></li>
-      <li class="rstep reveal" data-delay="1"><span class="rstep__n">02</span><div><h3>Place</h3><p>Rest it on your tongue. Nothing to swallow.</p></div><span class="rstep__t">2 sec</span></li>
-      <li class="rstep reveal" data-delay="2"><span class="rstep__n">03</span><div><h3>Go</h3><p>It dissolves in seconds and gets to work.</p></div><span class="rstep__t">~15 sec</span></li>
+      <li class="rstep reveal" style="--c:#d63a30"><div class="rstep__art"><img src="assets/step-peel.webp" alt="Hands opening a DOCO pouch" width="900" height="763" loading="lazy"></div><span class="rstep__n">Step 01</span><h3>Peel</h3><p>Tear open a single pocket-sized strip. Travel-ready, mess-free.</p><span class="rstep__t">1 second</span></li>
+      <li class="rstep reveal" data-delay="1" style="--c:#ef8120"><div class="rstep__art"><img src="assets/step-place.webp" alt="Placing a strip on the tongue" width="900" height="774" loading="lazy"></div><span class="rstep__n">Step 02</span><h3>Place</h3><p>Rest it on your tongue. Nothing to swallow, nothing to carry.</p><span class="rstep__t">2 seconds</span></li>
+      <li class="rstep rstep--go reveal" data-delay="2" style="--c:#ffd23e"><div class="rstep__art"><img src="assets/step-go.webp" alt="A lightning bolt" width="885" height="900" loading="lazy"></div><span class="rstep__n">Step 03</span><h3>Go</h3><p>It dissolves in seconds and gets to work. Now go do more.</p><span class="rstep__t">~15 seconds</span></li>
     </ol>
+    <ul class="ritual__facts reveal" data-delay="2"><li><b>0</b>water</li><li><b>0</b>pills</li><li><b>~15s</b>to dissolve</li><li><b>1</b>better choice a day</li></ul>
   </div>
 </section>
 
@@ -364,19 +362,13 @@
         <span class="defn__pos">/doo/ &middot; verb</span>
         <p>To take action. To get it done. The word we built a company on &mdash; <strong>DOCO, The Do Company.</strong></p>
       </div>
+      <ul class="story__facts reveal" data-delay="2"><li><b>~15s</b>to dissolve</li><li><b>0</b>water needed</li><li><b>4</b>formulas, one ritual</li></ul>
     </div>
     <aside class="story__side reveal" data-delay="1">
       <div class="story__photo">
         <img src="assets/lifestyle-desk.jpg" alt="Two people taking DOCO strips at a desk" loading="lazy" width="880" height="1168">
-        <span class="brandcard__tag brandcard__tag--br">Do more. Be more.</span>
+        <div class="story__photo-bar"><span class="story__chip"><i style="--c:#ef8120"></i><i style="--c:#d63a30"></i><i style="--c:#2592c9"></i><i style="--c:#6a4fc9"></i></span><span class="brandcard__tag brandcard__tag--br">Do more. Be more.</span></div>
       </div>
-      <ul class="swatches" aria-label="The four DOCO formula colors">
-        <li style="--c:#ef8120"><span></span>Multivitamin</li>
-        <li style="--c:#d63a30"><span></span>Sports Energy</li>
-        <li style="--c:#2592c9"><span></span>Calm + Stress</li>
-        <li style="--c:#6a4fc9"><span></span>Sleep</li>
-      </ul>
-      <ul class="story__facts"><li><b>DO</b>short for The Do Company</li><li><b>~15s</b>to dissolve, no water</li><li><b>4</b>formulas, one ritual</li></ul>
     </aside>
   </div>
 </section>
@@ -464,6 +456,6 @@
 </footer>
 
 
-<script src="js/main.js?v=25"></script>
+<script src="js/main.js?v=27"></script>
 </body>
 </html>

@@ -199,26 +199,92 @@
   });
 
   /* ---------- product detail page ---------- */
+  /* ---------- product page v2: ingredient-first ---------- */
+  var OTHER = [
+    ['pullulan', 'Pullulan', 'A plant-based film made by fermentation — it is what forms the strip itself.'],
+    ['cellulose', 'Cellulose', 'Plant fiber that gives the strip its structure.'],
+    ['mannitol', 'Mannitol', 'A sugar alcohol for gentle sweetness and a smooth mouthfeel.'],
+    ['erythritol', 'Erythritol', 'A low-calorie sugar alcohol used for sweetness.'],
+    ['sorbitol', 'Sorbitol syrup', 'A sugar alcohol that keeps the strip flexible.'],
+    ['steviol', 'Steviol glycosides', 'Sweetener from the stevia leaf.'],
+    ['monk fruit', 'Monk fruit extract', 'Fruit-derived sweetener with no sugar.'],
+    ['lecithin', 'Lecithin', 'Helps the ingredients blend evenly through the strip.'],
+    ['pectin', 'Pectin', 'Fruit fiber that supports the strip’s texture.'],
+    ['medium-chain', 'Medium-chain triglycerides', 'A coconut-derived carrier oil that helps disperse the botanicals.'],
+    ['menthol', 'Menthol crystals', 'The cooling note in the mint flavor.'],
+    ['spearmint', 'Spearmint flavor', 'Natural mint flavor.'],
+    ['peppermint', 'Peppermint flavor', 'Natural mint flavor.'],
+    ['cranberry', 'Natural cranberry flavor', 'Natural fruit flavor.'],
+    ['strawberry', 'Natural strawberry flavor', 'Natural fruit flavor.'],
+    ['lemon', 'Natural lemon flavor', 'Natural citrus flavor.']
+  ];
+  var TIMING = {
+    multi: { when: 'Any time of day', how: 'Make it part of a routine you already keep — with breakfast, at your desk, or on the way out the door. One strip a day.' },
+    sport: { when: '15–20 minutes before', how: 'Take one strip before training, a long session or an afternoon that needs a push. It carries a labeled 80 mg of natural caffeine, so count it toward your daily caffeine.' },
+    calm: { when: 'When you need a pause', how: 'Before a meeting, after a hard conversation, or whenever the day gets loud. Non-drowsy and built for the middle of a busy day.' },
+    sleep: { when: 'About 30 minutes before bed', how: 'Make it the first step of winding down — phone away, lights lower, strip on the tongue. No added melatonin.' }
+  };
+  var PFAQ = {
+    multi: [['Can I take it with food?', 'Yes. Take it whenever it fits your routine; a consistent time each day is what makes the habit stick.'], ['Is it a replacement for a balanced diet?', 'No. It is a convenient daily addition that supports everyday functions alongside the food you eat.']],
+    sport: [['How much caffeine is in one strip?', 'A labeled 80 mg of natural caffeine per strip — roughly a small cup of coffee. Count it toward your daily caffeine, and skip it late in the day if you are sensitive.'], ['Why L-theanine?', 'L-theanine is a tea-associated amino acid included alongside caffeine in many focus formulas. It is not a stimulant.']],
+    calm: [['Will it make me drowsy?', 'It is designed as a non-drowsy daytime option. Everyone responds differently, so try it first when you have a quiet moment.'], ['What is SunTheanine®?', 'A branded, pure form of L-theanine produced by fermentation and studied for relaxation.']],
+    sleep: [['Does it contain melatonin?', 'No. There is no added melatonin in the formula — it relies on tart cherry, saffron and vitamin B6.'], ['Can I take it every night?', 'It is designed for nightly routines. As with any supplement, read the box directions and ask a health professional if you take medication.']]
+  };
+  function factsHTML(p) {
+    return '<div class="facts"><div class="facts__h">Supplement Facts</div><div class="facts__serv"><span>Serving size: 1 strip</span><span>Servings per box: ' + p.strips + '</span></div>' +
+      '<table><tr><th>Amount per strip</th><th></th></tr>' + p.ingredients.map(function (r) { return '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td></tr>'; }).join('') + '</table>' +
+      (p.other ? '<p class="facts__other"><b>Other ingredients:</b> ' + p.other + '</p>' : '') +
+      '<p class="facts__legal">These statements have not been evaluated by the Food and Drug Administration. This product is not intended to diagnose, treat, cure, or prevent any disease.</p></div>';
+  }
+  function otherHTML(p) {
+    var parts = (p.other || '').toLowerCase(), seen = {}, items = [];
+    OTHER.forEach(function (o) { if (parts.indexOf(o[0]) > -1 && !seen[o[1]]) { seen[o[1]] = 1; items.push('<li><b>' + o[1] + '</b><span>' + o[2] + '</span></li>'); } });
+    return items.join('');
+  }
+  function howHTML() {
+    return '<ol class="hsteps"><li class="hstep"><img src="assets/step-peel.webp" alt="" loading="lazy"><b>Peel</b><span>Open one strip when you’re ready.</span></li><li class="hstep"><img src="assets/step-place.webp" alt="" loading="lazy"><b>Place</b><span>Rest it on your tongue. No water.</span></li><li class="hstep"><img src="assets/step-go.webp" alt="" loading="lazy"><b>Go</b><span>It dissolves in about 15 seconds.</span></li></ol>';
+  }
   var pdp = $('#pdp');
   if (pdp) {
     var sku = (new URLSearchParams(location.search).get('sku') || 'multi'); if (!P[sku]) sku = 'multi';
-    var p = P[sku]; document.title = p.name + ' — DOCO';
+    var p = P[sku], isB = p.kind === 'bundle'; document.title = p.name + ' — DOCO';
     pdp.style.setProperty('--c', p.color); pdp.dataset.sku = sku;
-    pdp.innerHTML =
-      '<div class="container pdp__crumbs"><a href="index.html">Home</a> / <a href="shop.html">Shop</a> / <span>' + esc(p.name) + '</span></div>' +
+    var keys = isB ? p.includes.map(function (s) { return { a: P[s].ingredients[0][1], n: P[s].name }; }) : p.ingredients.slice(0, 3).map(function (r) { return { a: r[1], n: r[0] }; });
+    var first = isB ? P[p.includes[0]] : p, timing = TIMING[isB ? p.includes[0] : sku];
+    var html =
+      '<div class="pdp__hero"><div class="container pdp__crumbs"><a href="index.html">Home</a> / <a href="shop.html">Shop</a> / <span>' + esc(p.name) + '</span></div>' +
       '<div class="container pdp__grid"><div class="pdp__gallery"><div class="pdp__main"><img id="pdpMain" src="' + p.gallery[0] + '" alt="' + esc(p.name) + '"></div>' +
       '<div class="pdp__thumbs">' + p.gallery.map(function (g, i) { return '<button type="button" class="' + (i ? '' : 'is-on') + '" data-thumb="' + g + '" aria-label="Image ' + (i + 1) + '"><img src="' + g + '" alt=""></button>'; }).join('') + '</div></div>' +
       '<div class="pdp__info"><p class="eyebrow">' + esc(p.eyebrow) + '</p><h1 class="display">' + esc(p.name) + '</h1><p class="serif-accent">' + esc(p.tag) + '</p>' +
-      '<ul class="pdp__chips">' + (p.flavor ? '<li>' + esc(p.flavor) + ' flavor</li>' : '') + p.pills.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>' +
+      '<ul class="pdp__chips">' + (p.flavor ? '<li>' + esc(p.flavor) + ' flavor</li>' : '') + '<li>' + p.strips + ' strips</li>' + p.pills.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>' +
       '<p class="pdp__desc">' + p.desc + '</p>' +
-      '<div class="mode mode--light" role="radiogroup" aria-label="Purchase option"><button type="button" class="mode__opt is-on" data-mode="once" role="radio">One-time <b>' + money(p.price) + '</b></button><button type="button" class="mode__opt" data-mode="sub" role="radio">Subscribe &amp; save <b>' + money(p.sub) + '/mo</b></button></div>' +
+      '<div class="pdp__keys">' + keys.map(function (k) { return '<div class="pdp__key"><b>' + esc(k.a) + '</b><span>' + esc(k.n) + '</span></div>'; }).join('') + '</div>' +
+      '<a class="pdp__more" href="#inside">See the full panel ↓</a>' +
+      '<div class="mode mode--light" role="radiogroup" aria-label="Purchase option" style="margin-top:18px"><button type="button" class="mode__opt is-on" data-mode="once" role="radio">One-time <b>' + money(p.price) + '</b></button><button type="button" class="mode__opt" data-mode="sub" role="radio">Subscribe &amp; save <b>' + money(p.sub) + '/mo</b></button></div>' +
       '<div class="pdp__buy"><div class="qty qty--lg"><button type="button" data-qty-step="-1" aria-label="Decrease">−</button><span data-qty-val>1</span><button type="button" data-qty-step="1" aria-label="Increase">+</button></div>' +
       '<button type="button" class="btn btn--solid btn--lg" data-add="' + sku + '">Add to bag — <span data-price></span></button></div>' +
-      '<ul class="pdp__perks"><li>Free shipping over $45</li><li>60-day guarantee</li><li>Cancel anytime</li></ul>' +
-      '<details class="qa" open><summary>Inside your strip<span class="qa__ic"></span></summary><div class="ingr">' + (p.ingredients ? '<table class="ingr__t">' + p.ingredients.map(function (r) { return '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td><td>' + r[2] + '</td></tr>'; }).join('') + '</table>' : '<p>' + p.inside + '</p>') + (p.note ? '<p class="ingr__note">\u2713 ' + p.note + '</p>' : '') + (p.other ? '<p class="ingr__other"><b>Other ingredients:</b> ' + p.other + '</p>' : '') + '<p class="ingr__meta"><b>' + p.strips + ' strips per box.</b>' + (p.chooseIf ? ' Choose this if ' + p.chooseIf : ' Bundles are shopping options, not directions to use products together.') + '</p></div></details>' +
-      '<details class="qa"><summary>Why you\u2019ll feel it<span class="qa__ic"></span></summary><ul class="result__why">' + p.benefits.map(function (b) { return '<li>' + b + '</li>'; }).join('') + '</ul></details>' +
-      '<details class="qa"><summary>How to use<span class="qa__ic"></span></summary><ol class="howto"><li><b>Choose your moment.</b> Pick the product that fits your routine and read the directions on the box.</li><li><b>Open your packet.</b> Open one strip when you\u2019re ready; keep the rest sealed in the original packaging.</li><li><b>Let it dissolve.</b> Place the strip in your mouth as directed \u2014 no water, nothing to swallow.</li><li><b>Keep it where life happens.</b> Your bag, your desk, your travel kit.</li></ol><p class="ingr__meta">Ask a health professional before starting a supplement if pregnant, nursing, taking medication, or managing a health condition.</p></details>' +
-      '<details class="qa"><summary>Shipping &amp; returns<span class="qa__ic"></span></summary><p>Free shipping on orders over $45 ($5.99 otherwise). Not feeling it? Reach out within 60 days for a full refund.</p></details></div></div>';
+      '<ul class="pdp__perks"><li>Dissolves in ~15 seconds</li><li>No water needed</li><li>' + p.strips + ' strips per box</li></ul></div></div></div>';
+    /* inside your strip */
+    if (!isB) {
+      html += '<section class="psec psec--tint" id="inside"><div class="container"><div class="psec__head"><div><p class="eyebrow">Inside your strip</p><h2 class="display">What’s in ' + esc(p.name) + '</h2></div><p>' + esc(p.inside) + '</p></div>' +
+        '<div class="spots' + (p.ingredients.length > 6 ? ' spots--many' : '') + '">' + p.ingredients.map(function (r, i) { return '<div class="spot"><span class="spot__idx">' + (i + 1 < 10 ? '0' : '') + (i + 1) + '</span><span class="spot__amt">' + r[1] + '</span><span class="spot__name">' + r[0] + '</span><span class="spot__note">' + r[2] + '</span></div>'; }).join('') + '</div>' +
+        (p.note ? '<p class="ingr__note" style="margin-top:18px">✓ ' + p.note + '</p>' : '') + '</div></section>';
+      html += '<section class="psec"><div class="container facts-wrap">' + factsHTML(p) +
+        '<div class="facts-note"><h3>Read the label with us</h3><p>Every amount above is printed on the box. We list actives in plain numbers so you know exactly what you are choosing — nothing hidden in a blend.</p><ul>' + p.benefits.map(function (b) { return '<li>' + b + '</li>'; }).join('') + '</ul></div></div></section>';
+      html += '<section class="psec psec--tint"><div class="container"><div class="psec__head"><div><p class="eyebrow">The rest of the strip</p><h2 class="display">Other ingredients, explained</h2></div><p>The supporting ingredients that form, sweeten, flavor and stabilize a strip — and why each one is there.</p></div><ul class="oth">' + otherHTML(p) + '</ul></div></section>';
+    } else {
+      html += '<section class="psec psec--tint" id="inside"><div class="container"><div class="psec__head"><div><p class="eyebrow">What’s in the box</p><h2 class="display">' + p.includes.length + ' formulas, one box</h2></div><p>' + esc(p.inside) + ' Bundles are shopping options, not directions to use products together.</p></div>' +
+        '<div class="bundle-inc">' + p.includes.map(function (s) { var q = P[s]; return '<div class="inc" style="--c:' + q.color + '"><img src="' + q.pouch + '" alt="" loading="lazy"><div><b>' + esc(q.name) + '</b><span>' + q.ingredients.slice(0, 3).map(function (r) { return r[0] + ' ' + r[1]; }).join(' · ') + '</span><a href="product.html?sku=' + s + '">Full panel →</a></div></div>'; }).join('') + '</div></div></section>';
+      html += '<section class="psec"><div class="container"><div class="psec__head"><div><p class="eyebrow">Supplement facts</p><h2 class="display">Every panel, side by side</h2></div><p>Each formula’s full label, exactly as printed on its box.</p></div><div class="facts-grid">' + p.includes.map(function (s) { return '<div style="--c:' + P[s].color + '"><p class="eyebrow" style="margin-bottom:8px">' + esc(P[s].name) + '</p>' + factsHTML(P[s]) + '</div>'; }).join('') + '</div></div></section>';
+    }
+    /* when & how */
+    html += '<section class="psec"><div class="container when"><div class="when__tile"><p class="eyebrow">When to take it</p><h3>' + esc(timing.when) + '</h3><p>' + timing.how + '</p><p class="ingr__meta">Ask a health professional before starting a supplement if pregnant, nursing, taking medication, or managing a health condition. Use only as directed on the box.</p></div><div><div class="psec__head" style="margin-bottom:18px"><div><p class="eyebrow">How to take it</p><h2 class="display">Peel. Place. Go.</h2></div></div>' + howHTML() + '</div></div></section>';
+    /* why a strip */
+    html += '<section class="psec psec--dark"><div class="container"><div class="psec__head"><div><p class="eyebrow eyebrow--light">Why a strip</p><h2 class="display display--light">Built to actually get taken</h2></div><p>The best formula is the one you keep using. A strip removes every excuse.</p></div><ul class="whystrip"><li><b>~15s</b><span>Dissolves on the tongue in seconds — no glass of water, nothing to swallow.</span></li><li><b>30 strips</b><span>A whole box fits a pocket, a gym bag, a carry-on. No bottles rattling around.</span></li><li><b>1 strip</b><span>One labeled dose per strip. No scoops, no guessing.</span></li></ul></div></section>';
+    /* good to know */
+    var faqs = isB ? [].concat.apply([], p.includes.map(function (s) { return PFAQ[s].slice(0, 1); })) : PFAQ[sku];
+    html += '<section class="psec psec--tint"><div class="container pfaq"><div><p class="eyebrow">Good to know</p><h2 class="display" style="font-size:clamp(1.9rem,3.6vw,3rem)">Questions about ' + esc(p.name) + '</h2></div><div class="faq__list">' + faqs.map(function (f) { return '<details class="qa"><summary>' + f[0] + '<span class="qa__ic"></span></summary><p>' + f[1] + '</p></details>'; }).join('') + '<details class="qa"><summary>Can I combine it with other DOCO formulas?<span class="qa__ic"></span></summary><p>Check each label and ask a health professional before combining supplements or medications. Our bundles are shopping options, not directions to use products together.</p></details></div></div></section>';
+    pdp.innerHTML = html;
     initModes(pdp);
     pdp.addEventListener('click', function (e) { var t = e.target.closest('[data-thumb]'); if (!t) return; $('#pdpMain').src = t.dataset.thumb; $$('[data-thumb]', pdp).forEach(function (x) { x.classList.toggle('is-on', x === t); }); });
     var rel = $('[data-related]'); if (rel) { var list = ORDER.filter(function (s) { return s !== sku; }); if (p.kind === 'bundle') list = p.includes.concat(list.filter(function (s) { return p.includes.indexOf(s) < 0; })); rel.innerHTML = list.slice(0, 3).map(cardHTML).join(''); }
