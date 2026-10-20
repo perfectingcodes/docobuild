@@ -423,7 +423,8 @@
       var s = slides[i];
       scrollSpin = (q - 0.5) * -58;            /* the pouch turns ~58° across its own scroll span */
       lift = (0.5 - q) * 34;                   /* …and drifts upward as it goes */
-      s.style.setProperty('--strip', (-Math.max(0, Math.min(1, (q - 0.1) / 0.45)) * 92).toFixed(1) + '%');   /* the strip slides up out of the pouch */
+      var st = Math.max(0, Math.min(1, (q - 0.08) / 0.42)); st = 1 - Math.pow(1 - st, 2);   /* the strip comes forward out of the pouch */
+      s.style.setProperty('--st', st.toFixed(3));
       s.classList.toggle('is-k1', q > KEYS[0]); s.classList.toggle('is-k2', q > KEYS[1]); s.classList.toggle('is-k3', q > KEYS[2]);
       paint();
     }

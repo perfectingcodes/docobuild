@@ -782,7 +782,7 @@ section[id]{scroll-margin-top:calc(var(--ticker-h) + var(--header-h))}
   transform:translateY(var(--lift,0px)) rotateX(var(--rx,0deg)) rotateY(calc(var(--spin,0deg) + var(--ry,0deg)));transition:transform .55s var(--ease)}
 .slide.is-tilting .pouch__spin,.pouch.is-drag .pouch__spin{transition:transform .07s linear}
 .pouch__img{position:relative;z-index:1;display:block;width:100%;height:auto;pointer-events:none}
-.pouch__strip{position:absolute;z-index:0;left:24%;top:16%;width:52%;height:auto;pointer-events:none;transform:translateY(var(--strip,0%)) rotate(-10deg);transition:transform .6s var(--ease);filter:drop-shadow(0 0 2px rgba(255,255,255,.9)) drop-shadow(0 16px 18px rgba(0,0,0,.4))}
+.pouch__strip{position:absolute;z-index:2;left:22%;top:34%;width:92%;height:auto;pointer-events:none;opacity:calc(var(--st,0) * 1.2);transform:translate(calc(var(--st,0) * 36%),calc(var(--st,0) * 50%)) rotate(calc(-24deg + var(--st,0) * 12deg)) scale(calc(.4 + var(--st,0) * .6));transition:transform .5s var(--ease),opacity .3s;filter:drop-shadow(0 0 3px rgba(255,255,255,.95)) drop-shadow(0 22px 22px rgba(0,0,0,.45))}
 .pouch__glare{position:absolute;inset:0;z-index:2;pointer-events:none;opacity:.75;mix-blend-mode:screen;transition:opacity .3s;
   -webkit-mask-size:contain;mask-size:contain;-webkit-mask-position:center;mask-position:center;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
   background:radial-gradient(circle at var(--gx,38%) var(--gy,22%),rgba(255,255,255,.85),rgba(255,255,255,.18) 30%,rgba(255,255,255,0) 58%)}
@@ -1305,5 +1305,5 @@ section[id]{scroll-margin-top:calc(var(--ticker-h) + var(--header-h))}
 @keyframes dissolve{0%,12%{opacity:1;transform:scale(1) rotate(-8deg);filter:drop-shadow(0 14px 18px rgba(0,0,0,.5)) blur(0)}75%{opacity:.08;transform:scale(.62) rotate(-2deg);filter:drop-shadow(0 0 0 rgba(0,0,0,0)) blur(4px)}88%{opacity:0;transform:scale(.6)}100%{opacity:1;transform:scale(1) rotate(-8deg)}}
 @keyframes dissolvebar{0%{transform:scaleX(0)}75%{transform:scaleX(1)}100%{transform:scaleX(1)}}
 .dissolve__t{position:absolute;top:14px;right:16px;font-family:var(--anton);font-weight:var(--dw);font-size:1.2rem;letter-spacing:var(--dls);color:var(--accent)}
-@media(max-width:700px){.pouch__strip{width:46%}.pstage__strip{width:30%;right:4%}}
-@media(prefers-reduced-motion:reduce){.pouch__strip{transform:translateY(-80%) rotate(-10deg)}.dissolve img{animation:none}}
+@media(max-width:700px){.pstage__strip{width:30%;right:4%}}
+@media(prefers-reduced-motion:reduce){.pouch__strip{--st:1}.dissolve img{animation:none}}
