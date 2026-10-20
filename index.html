@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="assets/favicon.png">
-<link rel="stylesheet" href="css/style.css?v=35">
+<link rel="stylesheet" href="css/style.css?v=36">
 </head>
 <body>
 
@@ -408,27 +408,29 @@
 
 <!-- ===== QUIZ CTA ===== -->
 <section class="quiz" id="quiz">
+  <div class="quiz__pattern" aria-hidden="true"></div>
   <div class="container quiz__grid">
     <div class="quiz__text reveal">
       <p class="eyebrow eyebrow--onorange">60-second match</p>
       <h2 class="quiz__head">Not sure where<br>to start?</h2>
-      <p class="serif-accent quiz__sub">Five quick questions. One formula built for your day.</p>
-      <button type="button" class="btn btn--ink btn--lg" data-quiz-open>Take the quiz <span class="arr">&rarr;</span></button>
-      <ul class="quiz__perks"><li>About a minute</li><li>Instant match</li><li>No email needed</li></ul>
+      <p class="quiz__sub">Five quick questions. Pick everything that applies and we&rsquo;ll build your stack &mdash; one formula or a bundle that saves you money.</p>
+      <div class="quiz__cta"><button type="button" class="btn btn--ink btn--lg" data-quiz-open>Take the quiz <span class="arr">&rarr;</span></button><a class="quiz__alt" href="#stack">or build it yourself &darr;</a></div>
+      <ul class="quiz__stickers" aria-label="What to expect"><li>About a minute</li><li class="is-yellow">Multi-select</li><li>No email needed</li><li class="is-ink">Instant stack</li></ul>
     </div>
     <div class="quiz__preview reveal" data-delay="1" aria-hidden="true">
       <div class="qp">
-        <div class="qp__head"><img src="assets/mark-orange.png" alt=""><span>Find your formula</span><em>2 / 5</em></div>
+        <div class="qp__head"><img src="assets/mark-orange.png" alt=""><span>Your stack</span><em>5 / 5</em></div>
         <div class="qp__bar"><i></i></div>
-        <p class="qp__q">When does your day hit a wall?</p>
-        <div class="qp__opts">
-          <span><b>A</b>First thing in the morning</span>
-          <span class="is-on"><b>B</b>The mid-afternoon slump<i>&check;</i></span>
-          <span><b>C</b>Evening &mdash; I can&rsquo;t switch off</span>
-          <span><b>D</b>At night &mdash; I can&rsquo;t fall asleep</span>
-        </div>
+        <p class="qp__name">The Relaxation Duo</p>
+        <p class="qp__line">Calm + Stress for a clearer day, Sleep for better nights.</p>
+        <ul class="qp__stack">
+          <li style="--c:#2592c9"><img src="assets/pouch-calm.webp" alt=""><div><b>Calm + Stress</b><small>When you need a pause</small></div><span>Lead</span></li>
+          <li style="--c:#6a4fc9"><img src="assets/pouch-sleep.webp" alt=""><div><b>Sleep</b><small>30 min before bed</small></div><span>Support</span></li>
+        </ul>
+        <div class="qp__price"><b>$44.99</b><s>$59.98</s><i>Save $14.99</i></div>
       </div>
-      <div class="qp__result"><img src="assets/sports-energy.jpg" alt=""><div><span>Your match</span><b>Sports Energy</b></div></div>
+      <img class="qp__bolt" src="assets/step-go.webp" alt="" width="885" height="900" loading="lazy">
+      <span class="qp__stamp">Built for<br>your day</span>
     </div>
   </div>
 </section>
@@ -466,6 +468,7 @@
 </footer>
 
 
-<script src="js/main.js?v=35"></script>
+<script src="js/commerce-config.js?v=36"></script>
+<script src="js/main.js?v=36"></script>
 </body>
 </html>

@@ -9,7 +9,8 @@
   var $$ = function (s, r) { return [].slice.call((r || document).querySelectorAll(s)); };
   var money = function (n) { return '$' + n.toFixed(2); };
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var COMMERCE_ENABLED = false;
+  var CFG = window.DOCO_COMMERCE || {};
+  var COMMERCE_ENABLED = !!CFG.enabled;
   var esc = function (s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); };
 
   /* ---------- type preview switcher: ?font=bricolage|unbounded|syne|space|anton (sticks for the session; ?font=default clears) ---------- */
@@ -66,7 +67,7 @@
       inside: 'One box each of Multivitamin, Sports Energy, Calm + Stress and Sleep.', gallery: ['assets/crew-mockup.jpg', 'assets/hero-lifestyle.jpg', 'assets/pair-domore.jpg'] }
   };
   var ORDER = ['multi', 'sport', 'calm', 'sleep', 'duo-domore', 'duo-relax', 'stack'];
-  var FREE_SHIP = 45, SHIP_FEE = 5.99;
+  var FREE_SHIP = (CFG.freeShippingOver || 45), SHIP_FEE = (CFG.shippingFee || 5.99);
 
   /* ---------- overlays (injected so every page has them) ---------- */
   document.body.insertAdjacentHTML('beforeend',
@@ -88,7 +89,7 @@
       '<div class="field__row"><div class="field"><label for="coCity">City</label><input id="coCity" required autocomplete="address-level2"></div><div class="field"><label for="coZip">ZIP</label><input id="coZip" required inputmode="numeric" autocomplete="postal-code"></div></div>' +
       '<div class="field"><label>Payment</label><div class="co__pay"><span>&bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; 4242</span><em>Demo card</em></div></div>' +
       '<button type="submit" class="btn btn--solid btn--lg btn--block">Place order <span class="arr">&rarr;</span></button>' +
-      '<p class="co__fine">&check; Free shipping over $45 &nbsp;&middot;&nbsp; &check; 60-day guarantee &nbsp;&middot;&nbsp; &check; Cancel anytime</p></form>' +
+      '<p class="co__fine">&check; Free shipping over $45 &nbsp;&middot;&nbsp; &check; Secure checkout &nbsp;&middot;&nbsp; &check; Cancel subscriptions anytime</p></form>' +
       '<aside class="co__sum"><h4>Order summary</h4><div class="co__items" id="coItems"></div><div class="co__row"><span>Subtotal</span><b id="coSub"></b></div><div class="co__row"><span>Shipping</span><b id="coShip"></b></div><div class="co__row co__row--total"><span>Total</span><b id="coTotal"></b></div></aside></div>' +
       '<div class="co__done" id="coDone" hidden><div class="co__check">&check;</div><p class="eyebrow">Order placed</p><h3 class="co__title">You&rsquo;re in. Now go do more.</h3><p class="co__done-meta">Order <b id="coNum"></b> &middot; confirmation sent to <b id="coEmail"></b></p><button type="button" class="btn btn--solid" data-modal-close>Back to the site</button></div></div></div>' +
     '<div class="modal modal--quiz" id="quiz-modal" aria-hidden="true" role="dialog" aria-label="Find your formula"><div class="modal__scrim"></div><div class="modal__panel modal__panel--quiz">' +
@@ -162,8 +163,20 @@
   var co = $('#checkout'), coForm = $('#coForm'), coDone = $('#coDone'), coBody = $('#coBody');
   function openModal(m) { m.classList.add('open'); m.setAttribute('aria-hidden', 'false'); lock(true); var f = $('input, button', m); if (f) setTimeout(function () { f.focus(); }, 50); }
   function closeModal(m) { if (!m.classList.contains('open')) return; m.classList.remove('open'); m.setAttribute('aria-hidden', 'true'); lock(false); }
+  /* Stripe Checkout handoff: POST the cart to the Replit endpoint, redirect to the session URL */
+  function stripeCheckout() {
+    var items = cart.map(function (l) { var p = P[l.sku], pr = (CFG.prices || {})[l.sku] || {}; return { sku: l.sku, mode: l.mode, qty: l.qty, price_id: pr[l.mode] || '', name: p.name + (l.mode === 'sub' ? ' (monthly)' : ''), unit_amount: Math.round(linePrice(l) * 100) }; });
+    var abs = function (u) { return /^https?:/.test(u) ? u : location.origin + location.pathname.replace(/[^/]*$/, '') + u; };
+    checkoutBtn.disabled = true; var orig = checkoutBtn.innerHTML; checkoutBtn.innerHTML = 'Taking you to secure checkout\u2026';
+    return fetch(CFG.checkoutEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ items: items, success_url: abs(CFG.successUrl || 'thanks.html'), cancel_url: abs(CFG.cancelUrl || 'shop.html'), currency: CFG.currency || 'usd' }) })
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function (d) { if (!d || !d.url) throw new Error('No checkout URL'); location.href = d.url; })
+      .catch(function (err) { checkoutBtn.disabled = false; checkoutBtn.innerHTML = orig; toast('<div><b>Checkout is unavailable right now</b><span>Please try again in a moment. (' + esc(err.message) + ')</span></div>'); });
+  }
   checkoutBtn.addEventListener('click', function () {
-    if (!cart.length) return; closeBag();
+    if (!cart.length) return;
+    if (CFG.checkoutEndpoint) { stripeCheckout(); return; }
+    closeBag();
     var sub = subtotal(), ship = sub >= FREE_SHIP ? 0 : SHIP_FEE;
     $('#coItems').innerHTML = cart.map(function (l) { var p = P[l.sku]; return '<div class="co__line"><img src="' + p.img + '" alt=""><div><b>' + p.name + '</b><span>' + (l.mode === 'sub' ? 'Subscription' : 'One-time') + ' × ' + l.qty + '</span></div><em>' + money(linePrice(l) * l.qty) + '</em></div>'; }).join('');
     $('#coSub').textContent = money(sub); $('#coShip').textContent = ship ? money(ship) : 'Free'; $('#coTotal').textContent = money(sub + ship);
@@ -175,6 +188,9 @@
     $('#coNum').textContent = 'DOCO-' + Math.random().toString(36).slice(2, 8).toUpperCase(); $('#coEmail').textContent = $('#coEmailIn').value;
     coBody.hidden = true; coDone.hidden = false; cart = []; save(); renderCart();
   });
+
+  /* ---------- order confirmation page (Stripe success_url) ---------- */
+  if ($('.thanks')) { var sid = new URLSearchParams(location.search).get('session_id'); if (sid) { cart = []; save(); renderCart(); var ts = $('#thanksSession'); if (ts && sid.length > 10) ts.textContent = ' \u00b7 ref ' + sid.slice(-8).toUpperCase(); } }
 
   /* ---------- product grid + tabs ---------- */
   function cardHTML(sku) {
