@@ -93,7 +93,7 @@
       '<div class="co__done" id="coDone" hidden><div class="co__check">&check;</div><p class="eyebrow">Order placed</p><h3 class="co__title">You&rsquo;re in. Now go do more.</h3><p class="co__done-meta">Order <b id="coNum"></b> &middot; confirmation sent to <b id="coEmail"></b></p><button type="button" class="btn btn--solid" data-modal-close>Back to the site</button></div></div></div>' +
     '<div class="modal modal--quiz" id="quiz-modal" aria-hidden="true" role="dialog" aria-label="Find your formula"><div class="modal__scrim"></div><div class="modal__panel modal__panel--quiz">' +
       '<div class="qm__head"><div class="qm__brand"><img src="assets/mark-orange.png" alt=""><span>Find your formula</span></div><span class="qm__count" id="qCount">1 / 5</span><button type="button" class="modal__close" data-modal-close aria-label="Close">&times;</button></div>' +
-      '<div class="qm__bar"><i id="qBar"></i></div><div class="qm__step" id="qStep"></div><div class="qm__foot"><button type="button" class="qm__back" id="qBack" hidden>&larr; Back</button></div></div></div>' +
+      '<div class="qm__bar"><i id="qBar"></i></div><div class="qm__step" id="qStep"></div><div class="qm__foot"><button type="button" class="qm__back" id="qBack" hidden>&larr; Back</button><button type="button" class="qm__next" id="qNext" hidden>Continue &rarr;</button></div></div></div>' +
     '<div class="toast" id="toast" role="status" aria-live="polite"></div>');
 
   /* ---------- scroll lock · toast · header · drawer ---------- */
@@ -304,45 +304,63 @@
   $$('.modal__scrim').forEach(function (s) { s.addEventListener('click', function () { closeModal(s.closest('.modal')); }); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { closeDrawer(); closeBag(); $$('.modal.open').forEach(closeModal); } });
 
-  /* ---------- quiz ---------- */
+  /* ---------- quiz v2: multi-select where it makes sense → a recommended stack ---------- */
   var QUESTIONS = [
-    { q: 'What’s your #1 goal right now?', sub: 'Pick the one that matters most this month.', opts: [
+    { q: 'What are you working on right now?', sub: 'Pick everything that applies.', multi: true, opts: [
       { t: 'Energy for training', d: 'Gym, runs, game day', s: { sport: 3, multi: 1 } }, { t: 'Focus for work', d: 'Deep work, long days', s: { sport: 2, calm: 1 } },
       { t: 'Less stress', d: 'Stay cool under pressure', s: { calm: 3 } }, { t: 'Better sleep', d: 'Fall asleep faster, wake up ready', s: { sleep: 3 } }, { t: 'A daily health baseline', d: 'Cover the basics, every day', s: { multi: 3 } } ] },
-    { q: 'When does your day hit a wall?', opts: [ { t: 'First thing in the morning', s: { sport: 2, multi: 1 } }, { t: 'The mid-afternoon slump', s: { sport: 2 } }, { t: 'Evening — I can’t switch off', s: { calm: 2, sleep: 1 } }, { t: 'At night — I can’t fall asleep', s: { sleep: 2 } }, { t: 'I don’t crash — I want consistency', s: { multi: 2 } } ] },
+    { q: 'When does your day hit a wall?', sub: 'Choose one or more.', multi: true, opts: [ { t: 'First thing in the morning', s: { sport: 2, multi: 1 } }, { t: 'The mid-afternoon slump', s: { sport: 2 } }, { t: 'Evening — I can’t switch off', s: { calm: 2, sleep: 1 } }, { t: 'At night — I can’t fall asleep', s: { sleep: 2 } }, { t: 'I don’t crash — I want consistency', s: { multi: 2 } } ] },
     { q: 'How’s your sleep lately?', opts: [ { t: 'Great, honestly', s: { multi: 1 } }, { t: 'Fine, but it could be deeper', s: { sleep: 1, calm: 1 } }, { t: 'Rough — I lie awake', s: { sleep: 3 } }, { t: 'Short — I’m up early by choice', s: { sport: 1, multi: 1 } } ] },
     { q: 'Describe your typical day.', opts: [ { t: 'Nonstop & physical', s: { sport: 2, multi: 1 } }, { t: 'Nonstop & mental', s: { calm: 2, sport: 1 } }, { t: 'Steady — I want to do more', s: { multi: 2, sport: 1 } }, { t: 'Honestly, overwhelming', s: { calm: 3 } } ] },
-    { q: 'How do you feel about caffeine?', opts: [ { t: 'Love it', s: { sport: 2 } }, { t: 'A little is fine', s: { sport: 1, multi: 1 } }, { t: 'No thanks — jitters', s: { calm: 2, sleep: 1, sport: -3 } } ] }
+    { q: 'How do you feel about caffeine?', opts: [ { t: 'Love it', s: { sport: 2 } }, { t: 'A little is fine', s: { sport: 1, multi: 1 } }, { t: 'No thanks — jitters', s: { calm: 2, sleep: 1, sport: -4 } } ] }
   ];
-  var quiz = $('#quiz-modal'), qStep = $('#qStep'), qBar = $('#qBar'), qCount = $('#qCount'), qBack = $('#qBack'), qi = 0, answers = [];
+  var ROLE = { multi: 'your daily baseline', sport: 'clean energy when you need it', calm: 'a calmer, clearer day', sleep: 'better nights' };
+  var QWHEN = { multi: 'Any time, daily', sport: '15–20 min before', calm: 'When you need a pause', sleep: '30 min before bed' };
+  var quiz = $('#quiz-modal'), qStep = $('#qStep'), qBar = $('#qBar'), qCount = $('#qCount'), qBack = $('#qBack'), qNext = $('#qNext'), qi = 0, answers = [];
+  function picked(k) { var a = answers[k]; return a == null ? [] : (Array.isArray(a) ? a : [a]); }
   function renderQ(dir) {
-    var q = QUESTIONS[qi]; qBar.style.width = (qi / QUESTIONS.length * 100) + '%'; qCount.textContent = (qi + 1) + ' / ' + QUESTIONS.length; qBack.hidden = qi === 0;
-    qStep.innerHTML = '<div class="q' + (dir ? ' q--' + dir : '') + '"><p class="q__kicker">Question ' + (qi + 1) + '</p><h3 class="q__title">' + q.q + '</h3>' + (q.sub ? '<p class="q__sub">' + q.sub + '</p>' : '') + '<div class="q__opts">' + q.opts.map(function (o, k) { return '<button type="button" class="q__opt' + (answers[qi] === k ? ' is-on' : '') + '" data-opt="' + k + '"><span class="q__n">' + String.fromCharCode(65 + k) + '</span><span><b>' + o.t + '</b>' + (o.d ? '<small>' + o.d + '</small>' : '') + '</span></button>'; }).join('') + '</div></div>';
+    var q = QUESTIONS[qi], sel = picked(qi);
+    qBar.style.width = (qi / QUESTIONS.length * 100) + '%'; qCount.textContent = (qi + 1) + ' / ' + QUESTIONS.length; qBack.hidden = qi === 0;
+    qNext.hidden = !q.multi; qNext.disabled = q.multi && !sel.length; qNext.textContent = sel.length ? 'Continue →' : 'Pick at least one';
+    qStep.innerHTML = '<div class="q' + (dir ? ' q--' + dir : '') + '"><p class="q__kicker">Question ' + (qi + 1) + (q.multi ? ' · multiple choice' : '') + '</p><h3 class="q__title">' + q.q + '</h3>' + (q.sub ? '<p class="q__sub">' + q.sub + '</p>' : '') +
+      '<div class="q__opts' + (q.multi ? ' q__opts--multi' : '') + '" role="' + (q.multi ? 'group' : 'radiogroup') + '">' + q.opts.map(function (o, k) { var on = sel.indexOf(k) > -1; return '<button type="button" class="q__opt' + (on ? ' is-on' : '') + '" data-opt="' + k + '" role="' + (q.multi ? 'checkbox' : 'radio') + '" aria-checked="' + on + '"><span class="q__n">' + (q.multi ? '' : String.fromCharCode(65 + k)) + '</span><span><b>' + o.t + '</b>' + (o.d ? '<small>' + o.d + '</small>' : '') + '</span></button>'; }).join('') + '</div></div>';
+    qStep.scrollTop = 0;
   }
   function renderResult() {
     var s = { multi: 0, sport: 0, calm: 0, sleep: 0 };
-    answers.forEach(function (a, k) { var o = QUESTIONS[k].opts[a]; for (var key in o.s) s[key] += o.s[key]; });
-    var order = Object.keys(s).sort(function (a, b) { return s[b] - s[a]; }), top = order[0], second = order[1], p = P[top];
-    qBar.style.width = '100%'; qCount.textContent = 'Your match'; qBack.hidden = false;
-    var pair = null;
-    if (s[second] >= s[top] - 1 && s[second] > 0) { if ([top, second].sort().join() === 'multi,sport') pair = 'duo-domore'; if ([top, second].sort().join() === 'calm,sleep') pair = 'duo-relax'; }
-    var up = pair || (s[order[0]] - s[order[3]] <= 3 ? 'stack' : null);
-    qStep.innerHTML = '<div class="q q--in result" style="--c:' + p.color + '" data-sku="' + top + '" data-mode="once">' +
-      '<div class="result__media"><img src="' + p.img + '" alt="' + p.name + '"><span class="result__stamp">Your match</span></div>' +
-      '<div class="result__body"><p class="q__kicker">Built for your day</p><h3 class="result__name">' + p.name + '</h3><p class="serif-accent result__tag">' + p.tag + '</p>' +
-      '<ul class="result__why">' + p.benefits.map(function (w) { return '<li>' + w + '</li>'; }).join('') + '</ul>' +
-      '<div class="mode mode--light" role="radiogroup" aria-label="Purchase option"><button type="button" class="mode__opt is-on" data-mode="once" role="radio">One-time <b>' + money(p.price) + '</b></button><button type="button" class="mode__opt" data-mode="sub" role="radio">Subscribe &amp; save <b>' + money(p.sub) + '/mo</b></button></div>' +
-      '<div class="result__cta"><button type="button" class="btn btn--solid btn--lg" data-add="' + top + '">Add to bag →</button><a class="btn btn--text" href="product.html?sku=' + top + '">See details</a></div>' +
-      (up ? '<div class="result__up"><img src="' + P[up].img + '" alt=""><div><span>Also a strong fit</span><b>' + P[up].name + '</b><small>' + P[up].tag + ' · ' + money(P[up].price) + '</small></div><button type="button" class="btn btn--chip" data-add="' + up + '" data-mode="once">Add</button></div>' : '') +
-      '<button type="button" class="result__retake" data-retake>Retake the quiz</button></div></div>';
+    answers.forEach(function (a, k) { picked(k).forEach(function (i) { var o = QUESTIONS[k].opts[i]; for (var key in o.s) s[key] += o.s[key]; }); });
+    var order = Object.keys(s).sort(function (a, b) { return s[b] - s[a]; }), top = order[0], topS = Math.max(1, s[top]);
+    var picks = order.filter(function (k, i) { return i === 0 || (s[k] >= 3 && s[k] >= topS * 0.55); }).slice(0, 4);
+    var sku = null, key = picks.slice().sort().join();
+    if (picks.length >= 3) sku = 'stack'; else if (picks.length === 2) { if (key === 'multi,sport') sku = 'duo-domore'; else if (key === 'calm,sleep') sku = 'duo-relax'; } else sku = top;
+    if (sku === 'stack') picks = ['multi', 'sport', 'calm', 'sleep'].sort(function (a, b) { return s[b] - s[a]; });
+    var full = picks.length * P.multi.price, price = sku ? P[sku].price : full, bundle = sku && P[sku].kind === 'bundle';
+    var name = sku ? P[sku].name : picks.map(function (k) { return P[k].name; }).join(' + ');
+    var lead = P[top], line = picks.length === 1 ? lead.tag : picks.slice(0, 3).map(function (k, i) { return (i ? P[k].name : P[k].name) + ' for ' + ROLE[k]; }).join(', ') + '.';
+    qBar.style.width = '100%'; qCount.textContent = 'Your match'; qBack.hidden = false; qNext.hidden = true;
+    var ctaSku = sku || top, tweak = 'index.html?stack=' + picks.join(',') + '#stack';
+    qStep.innerHTML = '<div class="q q--in result" style="--c:' + lead.color + '" data-sku="' + ctaSku + '" data-mode="once">' +
+      '<div class="result__head"><p class="q__kicker">' + (picks.length > 1 ? 'Your stack' : 'Your match') + '</p><h3 class="result__name">' + name + '</h3><p class="result__tag">' + line + '</p></div>' +
+      '<ul class="rstack">' + picks.map(function (k, i) { var f = P[k]; return '<li style="--c:' + f.color + '"><img src="' + f.pouch + '" alt=""><div><b>' + f.name + '</b><small>' + QWHEN[k] + '</small></div><span class="rstack__badge">' + (i ? 'Support' : 'Lead') + '</span></li>'; }).join('') + '</ul>' +
+      '<div class="result__price"><div class="result__pricebox"><span class="result__k">' + (bundle ? P[sku].strips + ' strips · bundle price' : picks.length * 30 + ' strips') + '</span><b>' + money(price) + '</b>' + (price < full ? '<s>' + money(full) + '</s><i>Save ' + money(full - price) + '</i>' : '') + '</div>' +
+      '<div class="mode mode--light" role="radiogroup" aria-label="Purchase option"><button type="button" class="mode__opt is-on" data-mode="once" role="radio">One-time</button><button type="button" class="mode__opt" data-mode="sub" role="radio">Subscribe <b>' + money(P[ctaSku].sub) + '/mo</b></button></div></div>' +
+      '<ul class="result__why">' + lead.benefits.slice(0, 3).map(function (w) { return '<li>' + w + '</li>'; }).join('') + '</ul>' +
+      '<div class="result__cta"><a class="btn btn--solid btn--lg" href="product.html?sku=' + ctaSku + '">View ' + (bundle ? P[sku].name : lead.name) + ' →</a>' + (picks.length > 1 ? '<a class="btn btn--chip" href="' + tweak + '">Tweak this stack</a>' : '<a class="btn btn--chip" href="shop.html">See all formulas</a>') + '<button type="button" class="btn btn--text" data-add="' + ctaSku + '">Add to bag</button></div>' +
+      '<button type="button" class="result__retake" data-retake>Retake the quiz</button></div>';
     initModes(qStep);
   }
+  function advance() { if (qi < QUESTIONS.length - 1) { qi++; renderQ('in'); } else renderResult(); }
   $$('[data-quiz-open]').forEach(function (b) { b.addEventListener('click', function (e) { e.preventDefault(); closeDrawer(); qi = 0; answers = []; renderQ(); openModal(quiz); }); });
   qStep.addEventListener('click', function (e) {
     var o = e.target.closest('[data-opt]');
-    if (o) { answers[qi] = +o.dataset.opt; o.classList.add('is-on'); setTimeout(function () { if (qi < QUESTIONS.length - 1) { qi++; renderQ('in'); } else renderResult(); }, 260); return; }
+    if (o) {
+      var q = QUESTIONS[qi], k = +o.dataset.opt;
+      if (q.multi) { var sel = picked(qi), at = sel.indexOf(k); if (at > -1) sel.splice(at, 1); else sel.push(k); answers[qi] = sel; o.classList.toggle('is-on', at < 0); o.setAttribute('aria-checked', at < 0); qNext.disabled = !sel.length; qNext.textContent = sel.length ? 'Continue →' : 'Pick at least one'; return; }
+      answers[qi] = k; $$('[data-opt]', qStep).forEach(function (x) { x.classList.toggle('is-on', x === o); }); setTimeout(advance, 240); return;
+    }
     if (e.target.closest('[data-retake]')) { qi = 0; answers = []; renderQ('in'); }
   });
+  qNext.addEventListener('click', advance);
   qBack.addEventListener('click', function () { if (qCount.textContent === 'Your match') qi = QUESTIONS.length - 1; else if (qi > 0) qi--; renderQ('back'); });
 
   /* ---------- showcase v3: scroll-pinned stage · scroll-scrubbed spin · drag-to-spin spring · pointer tilt · ingredient reveals ---------- */
@@ -428,6 +446,8 @@
       el.cta.href = sku ? 'product.html?sku=' + sku : 'shop.html';
       el.cta.innerHTML = (sku ? 'View ' + esc(P[sku].name) : n ? 'Shop these formulas' : 'Browse all formulas') + ' <span class="arr">&rarr;</span>';
     }
+    var pre = new URLSearchParams(location.search).get('stack');
+    if (pre) { var want = pre.split(','); picks.forEach(function (p) { var on = want.indexOf(p.dataset.pick) > -1; p.classList.toggle('is-on', on); p.setAttribute('aria-pressed', on); }); }
     picks.forEach(function (p) { p.addEventListener('click', function () { p.classList.toggle('is-on'); p.setAttribute('aria-pressed', p.classList.contains('is-on')); calc(); }); });
     calc();
   })();
