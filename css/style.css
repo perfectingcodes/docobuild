@@ -1346,3 +1346,176 @@ section[id]{scroll-margin-top:calc(var(--ticker-h) + var(--header-h))}
 .rcard__top{margin-top:16px}
 @media(hover:none){.pcard__photo{display:none}}
 @media(max-width:700px){.rcard__photo{height:150px}}
+
+/* =====================================================================
+   PHONE PASS — shorter, smoother, built to convert (≤700px)
+   ===================================================================== */
+@media(max-width:700px){
+  /* rendering: skip layout work for sections far below the fold */
+  .lineup,.wild,.why,.ritual,.reviews,.stack,.story,.faq,.quiz{content-visibility:auto;contain-intrinsic-size:1px 900px}
+  /* hero: one screen, CTA above the fold, image short */
+  .hero{padding-top:calc(var(--ticker-h) + var(--header-h) + 18px);padding-bottom:26px}
+  .hero__grid{gap:18px}
+  .hero__text{display:flex;flex-direction:column}
+  .rating{font-size:.74rem;margin-bottom:8px}
+  .hero__title{font-size:clamp(2.6rem,13vw,3.4rem);line-height:.92}
+  .hero__text .serif-accent{font-size:1.25rem;margin:8px 0 14px}
+  .hero__body{display:none}
+  .hero__cta{flex-direction:row;align-items:center;gap:10px 16px;margin-bottom:0}
+  .hero__cta .btn--solid{flex:1;justify-content:center;text-align:center}
+  .hero__chips{display:none}
+  .hero__media{max-width:none}
+  .hero__media>img{aspect-ratio:5/4;object-fit:cover;object-position:50% 40%;box-shadow:5px 5px 0 var(--ink)}
+  .hero__badge{width:84px;height:84px;top:-12px;left:-8px}
+  .hero__badge-mid{font-size:1.05rem}
+  .hero__badge text{font-size:15px}
+  .hero__float{right:8px;bottom:12px;padding:8px 10px;border-radius:12px}
+  .hero__float strong{font-size:.82rem}
+  .hero__float-ic{width:36px}
+  .valuestrip__grid{padding:22px 0;gap:14px 12px}
+  .vitem strong{font-size:1.5rem}
+  .vitem span{font-size:.78rem}
+  /* showcase: swipe carousel, one screen tall */
+  .showcase{height:auto;--stage:#ef8120}
+  .showcase__stage{position:relative;height:auto;overflow:hidden;display:block;padding-bottom:6px}
+  .showcase__top{padding-top:22px;flex-direction:row;align-items:center;gap:10px}
+  .showcase__tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;width:100%;padding-bottom:2px}
+  .showcase__tabs::-webkit-scrollbar{display:none}
+  .showcase__tabs button{flex:none;min-height:36px;font-size:.62rem;padding:0 13px}
+  .showcase__label{display:none}
+  .showcase__slides{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;min-height:0;flex:none}
+  .showcase__slides::-webkit-scrollbar{display:none}
+  .slide{position:relative;inset:auto;flex:0 0 100%;scroll-snap-align:start;opacity:1;pointer-events:auto;padding:10px 0 12px;transition:none;display:block}
+  .slide__grid{gap:8px}
+  .slide__stage{transform:none!important;opacity:1!important;order:-1;height:auto;min-height:0;padding:14px 0 4px;width:min(100%,320px);margin:0 auto}
+  .slide__text>*{transform:none!important;opacity:1!important}
+  .slide.is-active .slide__text>*{transition:none}
+  .key{opacity:1!important;transform:none!important}
+  .pouch{transform:none!important;opacity:1!important;width:min(44%,150px)}
+  .pouch__float{animation-play-state:running}
+  .pouch__strip{--st:1}
+  .orbit{animation:none}
+  .key::after{animation:none}
+  .slide__idx{display:none}
+  .slide__hint{display:none!important}
+  .slide__inside li:nth-child(n+4){display:none}
+  .slide__foot{margin-top:4px}
+  .showcase__nav{padding:6px 0 18px;gap:14px}
+  .showcase__arrow{width:44px;height:44px}
+  .showcase__dots{gap:12px}
+  .showcase__dots button{width:12px;height:12px;box-sizing:content-box;padding:6px;background-clip:content-box}
+  .showcase__dots button.is-on{transform:scale(1.15)}
+  /* lineup: tighter cards */
+  .lineup{padding:50px 0 56px}
+  .lineup__head{margin-bottom:18px}
+  .lineup__more{margin-top:22px}
+  .pcard__tagline,.pcard__sub{display:none}
+  .pcard__foot{padding-top:8px}
+  /* why: compact */
+  .why{padding:50px 0 56px}
+  .why__card{max-width:none}
+  .why__bolt{display:none}
+  .why__lead{font-size:.98rem;margin:12px 0 18px}
+  .why__fine{margin-bottom:16px}
+  .why__stats{margin-top:30px;padding-top:20px}
+  /* ritual: swipe the three steps */
+  .ritual{padding:50px 0 44px}
+  .rsteps{display:flex;grid-template-columns:none;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;gap:14px;margin:96px -20px 0;padding:0 20px 8px}
+  .rsteps::-webkit-scrollbar{display:none}
+  .rstep{flex:0 0 76%;scroll-snap-align:center;padding:92px 18px 22px}
+  .rstep__art{top:-76px;width:min(62%,180px);height:160px}
+  .rstep:not(:last-child)::after{display:none}
+  .rstep h3{font-size:1.7rem}
+  .rstep p{font-size:.9rem;margin-bottom:12px}
+  .ritual__facts{margin-top:22px}
+  /* reviews: swipe */
+  .reviews{padding:50px 0 56px}
+  .reviews__head{margin-bottom:18px}
+  .rgrid{display:flex;grid-template-columns:none;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;gap:14px;margin:0 -20px;padding:4px 20px 10px}
+  .rgrid::-webkit-scrollbar{display:none}
+  .rcard{flex:0 0 82%;scroll-snap-align:center}
+  .rcard__photo{height:140px}
+  /* stack: 2×2 picks */
+  .stack{padding:50px 0 56px}
+  .builder__picks{grid-template-columns:1fr 1fr;gap:8px}
+  .pick{padding:10px 10px;gap:8px;flex-direction:column;align-items:flex-start;position:relative}
+  .pick__img{width:34px}
+  .pick__check{position:absolute;top:10px;right:10px}
+  .pick__name{white-space:normal;font-size:.95rem}
+  .stack__how{display:none}
+  /* story: shorter */
+  .story{padding:50px 0 56px}
+  .story__facts{display:none}
+  .story__photo{aspect-ratio:4/3}
+  /* faq / quiz / footer: drop the extras */
+  .faq{padding:50px 0 56px}
+  .faq__tongue{display:none}
+  .qa summary{padding:16px 16px;font-size:.95rem}
+  .qa p{padding:0 16px 16px}
+  .quiz{padding:50px 0 56px}
+  .quiz__preview{display:none}
+  .quiz__sub{margin-bottom:18px}
+  .quiz__stickers{margin-top:18px}
+  .footer{padding-top:44px}
+  .footer__cta{padding-bottom:28px;gap:18px}
+  .footer__tongue{display:none}
+  .footer__big{font-size:2.2rem}
+  .footer__links{grid-template-columns:1fr 1fr;gap:22px 16px;padding:28px 0}
+  .footer__brandcol{grid-column:1/-1}
+  .footer__brandline{display:none}
+  .footer__logo{height:64px}
+  .footer__col a{padding:7px 0}
+  .footer__bottom{padding:18px 0 96px}
+  /* sticky conversion bar */
+  .mcta{position:fixed;left:0;right:0;bottom:0;z-index:150;display:flex;gap:10px;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:2px solid var(--ink);transform:translateY(110%);transition:transform .35s var(--ease)}
+  .mcta.is-on{transform:none}
+  .mcta .btn{padding:13px 16px;font-size:.78rem;justify-content:center;text-align:center;box-shadow:3px 3px 0 var(--ink)}
+  .mcta .btn--solid{flex:1}
+  .mcta .btn--ink{box-shadow:3px 3px 0 var(--accent)}
+  .toast{bottom:calc(76px + env(safe-area-inset-bottom))}
+}
+@media(max-width:560px){
+  .footer__links{grid-template-columns:1fr 1fr}
+}
+@media(max-width:700px){
+  /* product page: denser sections on phones */
+  .pdp__hero{padding-bottom:28px}
+  .pdp__thumbs{gap:8px}
+  .pdp__thumbs button{width:64px;height:64px}
+  .psec{padding:44px 0}
+  .psec__head{margin-bottom:18px}
+  .psec__head .display{font-size:1.7rem}
+  .spots,.spots--many{grid-template-columns:1fr 1fr;gap:10px}
+  .spot{padding:14px 14px 12px;border-radius:16px;gap:3px}
+  .spot--strip{grid-column:1/-1}
+  .spot__amt{font-size:1.45rem}
+  .spot__name{font-size:.9rem}
+  .spot__note{font-size:.78rem}
+  .spot__idx{top:10px;right:12px}
+  .facts{padding:12px 12px 10px}
+  .facts__h{font-size:1.5rem}
+  .facts-note h3{font-size:1.3rem}
+  .oth{grid-template-columns:1fr 1fr;gap:8px}
+  .oth li{padding:10px 12px;border-radius:12px}
+  .oth b{font-size:.82rem}
+  .oth span{font-size:.72rem}
+  .when{gap:20px}
+  .when__tile{padding:20px;box-shadow:5px 5px 0 var(--c)}
+  .hsteps{grid-template-columns:repeat(3,1fr);gap:8px}
+  .hstep{padding:10px 6px 12px;border-radius:14px}
+  .hstep img{width:min(90%,86px)}
+  .hstep b{font-size:.85rem}
+  .hstep span{font-size:.68rem}
+  .whystrip{gap:10px}
+  .whystrip li{padding:14px 16px;display:flex;align-items:baseline;gap:12px}
+  .whystrip b{font-size:1.3rem;margin:0;flex:none;min-width:4.2em}
+  .whystrip span{font-size:.82rem}
+  .deals{gap:12px}
+  .deal{box-shadow:4px 4px 0 var(--ink)}
+  .cmp{font-size:.8rem;min-width:560px}
+  .cmp th,.cmp td{padding:10px 12px}
+  .pfaq{gap:16px}
+  .pdp__related{padding:44px 0}
+  .pdp__related .pgrid--3{grid-template-columns:1fr 1fr;gap:12px}
+  .pdp__related .lineup__head{margin-bottom:16px}
+}
