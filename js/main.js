@@ -270,7 +270,7 @@
     var html =
       '<div class="pdp__hero"><div class="container pdp__crumbs"><a href="index.html">Home</a> / <a href="shop.html">Shop</a> / <span>' + esc(p.name) + '</span></div>' +
       '<div class="container pdp__grid"><div class="pdp__gallery"><div class="pdp__main"><div class="pstage' + (isB ? ' pstage--bundle' : '') + '" id="pdpStage"><div class="pstage__pattern"></div><img class="pstage__pouch" src="' + p.pouch + '" alt="' + esc(p.name) + '">' + (p.strip ? '<img class="pstage__strip" src="' + p.strip + '" alt="">' : '') +
-      keys.map(function (k, i) { return '<span class="pstage__key pstage__key--' + (i + 1) + '"><b>' + esc(k.a) + '</b><span>' + esc(k.n) + '</span></span>'; }).join('') + '</div><img id="pdpMain" src="' + p.gallery[0] + '" alt="' + esc(p.name) + '" hidden></div>' +
+      keys.map(function (k, i) { return '<span class="pstage__key pstage__key--' + (i + 1) + '"><b>' + esc(k.a) + '</b><span>' + esc(k.n) + '</span></span>'; }).join('') + '</div><img class="pdp__blur" id="pdpBlur" src="' + p.gallery[0] + '" alt="" hidden><img id="pdpMain" src="' + p.gallery[0] + '" alt="' + esc(p.name) + '" hidden></div>' +
       '<div class="pdp__thumbs"><button type="button" class="is-on is-stage" data-thumb="stage" aria-label="Product"><img src="' + p.pouch + '" alt=""></button>' + p.gallery.map(function (g, i) { return '<button type="button" data-thumb="' + g + '" aria-label="Image ' + (i + 2) + '"><img src="' + g + '" alt=""></button>'; }).join('') + '</div></div>' +
       '<div class="pdp__info"><p class="eyebrow">' + esc(p.eyebrow) + '</p><h1 class="display">' + esc(p.name) + '</h1><p class="serif-accent">' + esc(p.tag) + '</p>' +
       '<ul class="pdp__chips">' + (p.flavor ? '<li>' + esc(p.flavor) + ' flavor</li>' : '') + '<li>' + p.strips + ' strips</li>' + p.pills.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>' +
@@ -319,7 +319,7 @@
     initModes(pdp);
     var bar = document.createElement('div'); bar.className = 'pdp__sticky'; bar.innerHTML = '<img src="' + p.pouch + '" alt=""><div><b>' + esc(p.name) + '</b><small>' + money(p.price) + ' · ' + p.strips + ' strips</small></div><button type="button" class="btn btn--solid btn--sm" data-add="' + sku + '">Add to bag</button>'; document.body.appendChild(bar);
     var buyBox = $('.pdp__buy', pdp); if (buyBox && 'IntersectionObserver' in window) { new IntersectionObserver(function (es) { bar.classList.toggle('is-on', !es[0].isIntersecting && es[0].boundingClientRect.top < 0); }).observe(buyBox); }
-    pdp.addEventListener('click', function (e) { var t = e.target.closest('[data-thumb]'); if (!t) return; var st = t.dataset.thumb === 'stage', m = $('#pdpMain'); $('#pdpStage').hidden = !st; m.hidden = st; if (!st) m.src = t.dataset.thumb; $$('[data-thumb]', pdp).forEach(function (x) { x.classList.toggle('is-on', x === t); }); });
+    pdp.addEventListener('click', function (e) { var t = e.target.closest('[data-thumb]'); if (!t) return; var st = t.dataset.thumb === 'stage', m = $('#pdpMain'), bl = $('#pdpBlur'); $('#pdpStage').hidden = !st; m.hidden = st; bl.hidden = st; if (!st) { m.src = t.dataset.thumb; bl.src = t.dataset.thumb; } $$('[data-thumb]', pdp).forEach(function (x) { x.classList.toggle('is-on', x === t); }); });
     var rel = $('[data-related]'); if (rel) { var list = ORDER.filter(function (s) { return s !== sku; }); if (p.kind === 'bundle') list = p.includes.concat(list.filter(function (s) { return p.includes.indexOf(s) < 0; })); rel.innerHTML = list.slice(0, 3).map(cardHTML).join(''); }
   }
 
