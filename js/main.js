@@ -194,7 +194,7 @@
 
   /* ---------- product grid + tabs ---------- */
   function cardHTML(sku) {
-    var p = P[sku], media = p.pouch ? '<img class="pcard__pouch" src="' + p.pouch + '" alt="' + esc(p.name) + '" loading="lazy">' : '<img src="' + p.img + '" alt="' + esc(p.name) + '" loading="lazy">';
+    var p = P[sku], media = (p.pouch ? '<img class="pcard__pouch" src="' + p.pouch + '" alt="' + esc(p.name) + '" loading="lazy">' : '<img src="' + p.img + '" alt="' + esc(p.name) + '" loading="lazy">') + (p.gallery && p.gallery[0] ? '<img class="pcard__photo" src="' + p.gallery[0] + '" alt="" loading="lazy">' : '');
     return '<article class="pcard pcard--' + p.kind + '" data-kind="' + p.kind + '" style="--c:' + p.color + '">' +
       '<a class="pcard__media" href="product.html?sku=' + sku + '">' + media + '<span class="pcard__tag">' + esc(p.eyebrow) + '</span></a>' +
       '<div class="pcard__body"><div class="pcard__top"><h3><a href="product.html?sku=' + sku + '">' + esc(p.name) + '</a></h3><span class="pcard__price">' + money(p.price) + '</span></div>' +

@@ -1314,7 +1314,7 @@ section[id]{scroll-margin-top:calc(var(--ticker-h) + var(--header-h))}
 .wild{padding:clamp(50px,7vw,90px) 0 clamp(60px,8vw,100px);background:var(--paper);overflow:hidden}
 .wild__head{margin-bottom:clamp(22px,3vw,34px)}
 .wild__head .display{font-size:clamp(2rem,3.8vw,3.2rem)}
-.wild__scroller{overflow:hidden}
+.wild__scroller{overflow:hidden;padding:6px 0 34px}
 .wild__track{list-style:none;display:flex;gap:16px;width:max-content;animation:wild 60s linear infinite;padding:0 16px}
 .wild__scroller:hover .wild__track{animation-play-state:paused}
 .wild__track li{flex:none;height:clamp(300px,34vw,420px);border-radius:20px;overflow:hidden;border:2px solid var(--ink);box-shadow:5px 5px 0 var(--ink);background:var(--paper-2);transition:transform .3s var(--ease)}
@@ -1333,3 +1333,16 @@ section[id]{scroll-margin-top:calc(var(--ticker-h) + var(--header-h))}
   .shophero__photo{display:none}
 }
 @media(prefers-reduced-motion:reduce){.wild__track{animation:none}}
+
+/* ---- more real photos: card hover swap, review photo headers ---- */
+.pcard__media{overflow:hidden}
+.pcard__photo{position:absolute;inset:0;width:100%!important;height:100%!important;object-fit:cover;object-position:50% 58%;border-radius:0!important;opacity:0;transition:opacity .4s var(--ease),transform .6s var(--ease)!important;transform:scale(1.04)}
+.pcard:hover .pcard__photo{opacity:1;transform:scale(1)}
+.pcard:hover .pcard__media .pcard__pouch{transform:scale(.9) rotate(-2deg);opacity:0}
+.rcard{padding-top:0;overflow:hidden}
+.rcard__photo{margin:0 -26px 10px;height:170px;overflow:hidden;border-bottom:1.5px solid var(--line)}
+.rcard__photo img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s var(--ease)}
+.rcard:hover .rcard__photo img{transform:scale(1.04)}
+.rcard__top{margin-top:16px}
+@media(hover:none){.pcard__photo{display:none}}
+@media(max-width:700px){.rcard__photo{height:150px}}
