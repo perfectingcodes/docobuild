@@ -410,23 +410,6 @@
     var scrollSpin = 0, lift = 0;
     var drag = { on: false, x0: 0, last: 0, start: 0, rot: 0, vel: 0, raf: null, el: null };
     if (reduced) { slides.forEach(function (s) { s.classList.add('is-active', 'is-k1', 'is-k2', 'is-k3'); }); return; }
-    var phone = window.matchMedia('(max-width:700px)').matches, rail = $('.showcase__slides', sc);
-    if (phone) {
-      /* phones: native swipe carousel — the rail scrolls horizontally with snap points */
-      var cur2 = -1;
-      function setM(i) {
-        if (i === cur2 || !slides[i]) return; var prev = cur2; cur2 = i;
-        slides.forEach(function (s, k) { s.classList.toggle('is-active', k === i); s.classList.add('is-k1', 'is-k2', 'is-k3'); });
-        dots.forEach(function (d, k) { d.classList.toggle('is-on', k === i); });
-        if (wipe && prev > -1) { wipe.style.background = slides[i].dataset.color; wipe.classList.remove('is-run'); void wipe.offsetWidth; wipe.classList.add('is-run'); }
-        stage.style.setProperty('--stage', slides[i].dataset.color); if (cur) cur.textContent = (i + 1 < 10 ? '0' : '') + (i + 1);
-      }
-      rail.addEventListener('scroll', function () { setM(Math.round(rail.scrollLeft / rail.clientWidth)); }, { passive: true });
-      function goM(i) { i = Math.max(0, Math.min(n - 1, i)); rail.scrollTo({ left: i * rail.clientWidth, behavior: 'smooth' }); }
-      $$('.showcase__arrow', sc).forEach(function (b) { b.addEventListener('click', function () { goM(cur2 + Number(b.dataset.dir)); }); });
-      dots.forEach(function (d) { d.addEventListener('click', function () { goM(Number(d.dataset.go)); }); });
-      setM(0); return;
-    }
     function metrics() { return { top: sc.getBoundingClientRect().top + window.scrollY, scrub: sc.offsetHeight - window.innerHeight }; }
     function paint() { var s = slides[active]; if (!s) return; var a = Math.max(-84, Math.min(84, scrollSpin + drag.rot)); s.style.setProperty('--spin', a.toFixed(2) + 'deg'); s.style.setProperty('--lift', lift.toFixed(1) + 'px'); }
     function set(i) {
@@ -516,11 +499,12 @@
     var bar = document.createElement('div'); bar.className = 'mcta';
     bar.innerHTML = '<a class="btn btn--solid" href="#lineup">Shop formulas <span class="arr">\u2192</span></a><button type="button" class="btn btn--ink" data-quiz-open>Quiz</button>';
     document.body.appendChild(bar);
-    var pastHero = false, nearEnd = false;
-    function paint() { bar.classList.toggle('is-on', pastHero && !nearEnd && !document.body.classList.contains('is-locked')); }
+    var pastHero = false, nearEnd = false, inShow = false;
+    function paint() { bar.classList.toggle('is-on', pastHero && !nearEnd && !inShow && !document.body.classList.contains('is-locked')); }
     if ('IntersectionObserver' in window) {
       new IntersectionObserver(function (es) { pastHero = !es[0].isIntersecting && es[0].boundingClientRect.bottom < 0; paint(); }).observe(hero);
       var end = $('.footer'); if (end) new IntersectionObserver(function (es) { nearEnd = es[0].isIntersecting; paint(); }).observe(end);
+      var show = $('#showcase'); if (show) new IntersectionObserver(function (es) { inShow = es[0].isIntersecting; paint(); }, { rootMargin: '-40% 0px -40% 0px' }).observe(show);
     }
     document.addEventListener('doco:lock', paint);
   })();
