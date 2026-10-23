@@ -1,10 +1,12 @@
 ---
 name: Launch scope
-description: The user's approved scope for the public DOCO launch.
+description: Approved commerce scope and shipping rules for DOCO.
 ---
 
-Launch as a marketing and product catalog site only; disable buying for now.
+The user approved connecting the website to real Stripe payments, including one-time purchases and monthly subscriptions. This supersedes the earlier catalog-only launch restriction.
 
-**Why:** The user explicitly chose "Marketing and product catalog only; disable buying for now."
+Shipping is US only, costs $5.99, and is free on orders over $45.
 
-**How to apply:** Keep ordering unavailable unless the user asks to add real commerce. Do not turn the imported demo checkout back on as a way to make the site live.
+**Why:** The user explicitly approved real Stripe checkout, selected one-time purchases and monthly subscriptions, and confirmed these shipping rules.
+
+**How to apply:** Enable only real payment flows after configuration and verification. Never re-enable the imported demo checkout as a substitute. Preserve the strict “over $45” free-shipping threshold.

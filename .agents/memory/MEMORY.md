@@ -1,1 +1,1 @@
-- [Launch scope](launch-scope.md) — The approved launch is marketing/catalog only, with buying disabled for now.
+- [Launch scope](launch-scope.md) — Real Stripe sales now approved: one-time and monthly subscriptions; US-only, $5.99 shipping, free over $45.
