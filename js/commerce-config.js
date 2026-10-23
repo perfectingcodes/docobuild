@@ -1,5 +1,5 @@
 /* ============================================================
-   DOCO commerce config — the only file to touch when Stripe goes live.
+   DOCO commerce UI config. Real prices and payment readiness come from the backend.
    Loaded before js/main.js on every page.
 
    How it works:
@@ -8,24 +8,23 @@
    • enabled:true + checkoutEndpoint → the bag's Checkout button POSTs the
                       cart to the endpoint and redirects to the Stripe
                       Checkout URL the server returns.
-   • enabled:true, no endpoint → the in-page demo checkout (no payment).
+   • No endpoint or failed server readiness check → buying stays disabled.
 
-   Server contract (implement on Replit, see replit.md → "Stripe"):
+   Server contract:
      POST {checkoutEndpoint}
-     body: { items:[{ sku, mode:"once"|"sub", qty, price_id, name, unit_amount }],
-             success_url, cancel_url, currency }
+     body: { items:[{ sku, mode:"once"|"sub", qty }] }
      200:  { url: "https://checkout.stripe.com/c/pay/..." }
    ============================================================ */
 window.DOCO_COMMERCE = {
-  enabled: false,
-  checkoutEndpoint: '',                 /* e.g. '/api/create-checkout-session' */
+  enabled: true,
+  checkoutEndpoint: '/api/create-checkout-session',
   successUrl: 'thanks.html?session_id={CHECKOUT_SESSION_ID}',
   cancelUrl: 'shop.html?checkout=canceled',
   currency: 'usd',
   freeShippingOver: 45,
   shippingFee: 5.99,
-  /* Stripe Price IDs — one-time and monthly subscription price per SKU.
-     Create them in the Stripe dashboard (Products → Add product) and paste here. */
+  /* Retained for compatibility only. Checkout resolves approved Stripe Prices
+     server-side; never trusts IDs or amounts from the browser. */
   prices: {
     'multi':      { once: '', sub: '' },
     'sport':      { once: '', sub: '' },

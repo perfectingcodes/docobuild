@@ -1,17 +1,17 @@
 # DOCO storefront
 
 ## Project
-Existing static website built with HTML, CSS, and vanilla JavaScript. Preserve the existing structure and stack.
+Existing HTML/CSS/vanilla JavaScript website, with a small Express payment backend. Preserve the existing frontend design and structure.
 
 ## Run on Replit
 Use the **Start application** workflow (or the Run button).
 
-Command: `bash build.sh && python3 -m http.server 5000 --bind 0.0.0.0 --directory dist`
+Command: `bash build.sh && node server/index.mjs`
 
-The preview server uses Python's standard library; no package installation or secrets are required. Run rebuilds the static site into `dist/`, then serves that directory. Restart the workflow after source changes.
+Requires Node 22, `npm ci`, Replit PostgreSQL, the connected Stripe integration, and SESSION_SECRET. Run rebuilds the public website into `dist/` and serves only that directory plus `/api`. Restart after source changes.
 
 ## Publish
-Publishing is configured as a **Static** deployment, with build command `bash build.sh` and public directory `dist`. The build copies only the HTML pages, CSS, JavaScript, and images; workspace files and Git metadata are not published. The Python server is for preview only and is not used in production.
+Publishing is configured as **Autoscale** because checkout needs a backend. Build: `npm ci && bash build.sh`. Run: `node server/index.mjs`. Production uses NODE_ENV=production and refuses to start with the wrong Stripe account or payments disabled. The known public URL is https://docobuild.replit.app; if the domain changes, update the server's allowed checkout origin and managed webhook URL after checking publishing information.
 
 Use Replit's Publish action to put the site live. Changes to the source require republishing to update the live site.
 
@@ -22,36 +22,24 @@ Use Replit's Publish action to put the site live. Changes to the source require 
 
 Styles are in `css/style.css`, behavior and product data in `js/main.js`, and images in `assets/`.
 
-## Existing limitations
-Commerce is disabled for the catalog-only launch. The retained cart code uses localStorage when enabled; demo checkout does not take payment or submit real orders. Google Fonts requires an internet connection.
+## Stripe checkout
+- The user approved real one-time and monthly subscription purchases, superseding the original catalog-only launch.
+- Development uses the Replit-managed Stripe sandbox. The separate Stripe MCP connection to the live DOCO account does not supply website runtime authentication.
+- Connect the live DOCO account through the Publishing pane's Stripe setup before republishing. Do not mix manually copied API keys with the managed connector.
+- The server uses the connectors SDK for credential-free transport of Stripe SDK requests. No Stripe API key enters the public website.
+- Stripe data is synced with stripe-replit-sync into its managed schema. Products/Prices are not duplicated into application tables.
+- Catalog initialization reuses existing matching products/prices or idempotently creates missing ones in the connected account. All prices are USD: individual formulas $29.99 / $25.49 monthly; duos $44.99 / $38.24 monthly; Variety Pack $79.99 / $71.99 monthly.
+- Shipping is US-only, $5.99, free when the shipment's product subtotal is strictly over $45. Subscription shipping renews monthly; mixed carts use a first-invoice shipping discount if the initial shipment qualifies but subsequent shipments do not.
+- The browser sends SKU, purchase mode and quantity only. The server resolves active Stripe Price IDs and ignores client amounts, redirect URLs and price IDs.
+- Checkout requests are idempotent. The thank-you page requires a server-verified paid Stripe session plus a signed confirmation proof before clearing the bag.
+- Footer subscription management opens Stripe's secure email-login billing portal. Customers can cancel at period end, update payment methods and view invoices.
+- Production registers the public `/api/stripe/webhook` using stripe-replit-sync; signatures are checked on raw request bodies. The private development preview is intentionally not a webhook destination.
+- Fulfill physical orders and handle refunds in Stripe Dashboard/manual operations. No automatic shipping-label, inventory, tax collection or warehouse fulfillment service is connected; the website does not promise automatic receipts or tracking emails.
+- Launch-update email links are manual mailto links, not an automated mailing list.
 
-## Stripe integration (planned)
-The upstream storefront includes a client-side Stripe Checkout scaffold. This is future reference, not a requirement for publishing the catalog. Before enabling real sales:
-
-1. Create one Product per SKU in Stripe with two Prices each: a one-time price and a monthly
-   recurring price. SKUs: `multi`, `sport`, `calm`, `sleep` ($29.99 / $25.49 mo),
-   `duo-domore`, `duo-relax` ($44.99 / $38.24 mo), `stack` ($79.99 / $71.99 mo).
-2. Paste the Price IDs into `js/commerce-config.js` → `prices`.
-3. Add a small backend (any language) that exposes `POST /api/create-checkout-session`:
-   - reads `{ items, success_url, cancel_url, currency }` from the JSON body
-     (`items[]` = `{ sku, mode: "once"|"sub", qty, price_id, name, unit_amount }`),
-   - creates a Stripe Checkout Session with `line_items: [{ price: price_id, quantity: qty }]`,
-     `mode: "subscription"` if any item has `mode: "sub"`, else `"payment"`,
-     `shipping_address_collection` + `shipping_options` (free over $45, otherwise $5.99),
-     `success_url` / `cancel_url` passed through (`{CHECKOUT_SESSION_ID}` is already in success_url),
-   - returns `{ "url": session.url }` with status 200.
-   Secrets: `STRIPE_SECRET_KEY` (Replit Secrets). Never put the secret key in client files.
-4. Only after real commerce is requested and tested, configure `checkoutEndpoint` and
-   `enabled` in `js/commerce-config.js`, then deliberately update the catalog-only
-   guard in `js/main.js`. Configuration alone does not enable ordering for this launch.
-5. `thanks.html` is the success page — it clears the visitor's bag and shows the last
-   8 characters of the session id as a reference. `shop.html?checkout=canceled` is the cancel page.
-6. For fulfillment, add a webhook endpoint for `checkout.session.completed` and verify it
-   with `STRIPE_WEBHOOK_SECRET`.
-
-## Launch behavior
-The site is a marketing and product catalog launch. Cart, purchase options, quantities, and demo checkout are inaccessible. All purchase buttons say "Launching soon" and are disabled, including quiz recommendations. Launch-update links open the visitor's email app and address the existing business contact; there is no automated newsletter signup.
-
-The imported checkout code is still a demo. Do not enable commerce without replacing it with a real order/payment service and testing fulfillment, subscriptions, shipping, and returns.
+## Verification
+`npm test` covers cart validation, server-authoritative prices, shipping boundaries, all seven SKUs and both purchase modes, recurring shipping and mixed-cart first-shipment discounts.
+`npm run test:checkout` exercises the running sandbox API, including Stripe session totals, idempotency, invalid requests, confirmation proofs and private-file protection. `npm run test:browser` exercises the mobile cart and real Stripe redirect; set PLAYWRIGHT_CHROMIUM_EXECUTABLE to an available Chromium binary. Generated screenshots are excluded from Git and publishing.
+Browser and API checks must use the sandbox only. Never submit a live charge as a test.
 
 Google Fonts requires an internet connection.

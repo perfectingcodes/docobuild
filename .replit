@@ -1,4 +1,4 @@
-modules = ["web", "python-base-3.13"]
+modules = ["web", "python-base-3.13", "nodejs-22"]
 
 [nix]
 channel = "stable-25_05"
@@ -27,7 +27,7 @@ outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "bash build.sh && python3 -m http.server 5000 --bind 0.0.0.0 --directory dist"
+args = "bash build.sh && node server/index.mjs"
 waitForPort = 5000
 
 [[ports]]
@@ -35,6 +35,12 @@ localPort = 5000
 externalPort = 80
 
 [deployment]
-deploymentTarget = "static"
-build = ["bash", "build.sh"]
+deploymentTarget = "autoscale"
+build = ["sh", "-c", "npm ci && bash build.sh"]
 publicDir = "dist"
+run = ["node", "server/index.mjs"]
+
+[userenv]
+
+[userenv.production]
+NODE_ENV = "production"

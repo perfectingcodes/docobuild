@@ -128,6 +128,7 @@ section[id]{scroll-margin-top:calc(var(--ticker-h) + var(--header-h))}
 .mainnav a::after{content:"";position:absolute;left:0;right:100%;bottom:-3px;height:2px;background:var(--accent);transition:right .3s var(--ease)}
 .mainnav a:hover::after{right:0}
 .site-header__actions{display:flex;align-items:center;gap:16px}
+#cartBtn{display:inline-flex}
 .iconbtn{position:relative;color:var(--ink);display:inline-flex;align-items:center}
 .iconbtn__count{position:absolute;top:-7px;right:-9px;background:var(--accent);color:var(--ink);font-size:.6rem;font-weight:800;
   min-width:17px;height:17px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 4px;border:1.5px solid var(--ink)}

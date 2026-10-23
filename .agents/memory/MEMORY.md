@@ -1,1 +1,2 @@
 - [Launch scope](launch-scope.md) — Real Stripe sales now approved: one-time and monthly subscriptions; US-only, $5.99 shipping, free over $45.
+- [Stripe environment constraints](stripe-environments.md) — Agent live-account access is separate from website sandbox authentication; verify live setup before publishing.

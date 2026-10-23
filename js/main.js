@@ -3,15 +3,44 @@
    catalog · overlays (bag / checkout / quiz / toast) · header
    showcase (scroll-pinned + pointer tilt) · product grid · PDP
    ============================================================ */
-(function () {
+(async function () {
   'use strict';
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return [].slice.call((r || document).querySelectorAll(s)); };
   var money = function (n) { return '$' + n.toFixed(2); };
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var CFG = window.DOCO_COMMERCE || {};
-  // Keep disabled: the imported checkout is a demo, not an order service.
-  var COMMERCE_ENABLED = false;
+  var commerce = { enabled: false, testMode: false };
+  try {
+    var readiness = await fetch('/api/commerce', { signal: AbortSignal.timeout(12000) });
+    if (!readiness.ok) throw new Error('Checkout is unavailable');
+    commerce = await readiness.json();
+  } catch (_) { /* Fail closed: keep the catalog usable when checkout is down. */ }
+  var COMMERCE_ENABLED = !!(CFG.enabled && CFG.checkoutEndpoint && commerce.enabled);
+  var notice = $('.launch-notice');
+  if (!notice) {
+    notice = document.createElement('p'); notice.className = 'launch-notice';
+    document.body.prepend(notice);
+  }
+  notice.textContent = COMMERCE_ENABLED
+    ? (commerce.testMode ? 'Test store — no real payments. Use Stripe test cards only.' : 'US shipping $5.99 · Free on orders over $45 · Secure Stripe checkout')
+    : 'Checkout is currently unavailable. Browse the collection or contact us.';
+  if (COMMERCE_ENABLED) {
+    var actions = $('.site-header__actions');
+    if (actions && !$('#cartBtn')) actions.insertAdjacentHTML('beforeend',
+      '<button type="button" class="btn btn--chip btn--sm" id="cartBtn" data-bag-open aria-label="Open your bag">Bag (<span id="cartCount">0</span>)</button>');
+    $$('.slide[data-sku]').forEach(function (slide) {
+      var button = $('.slide__foot button', slide);
+      if (button) { button.disabled = false; button.dataset.add = slide.dataset.sku; button.textContent = 'Add to bag →'; }
+    });
+    $$('.builder__launch').forEach(function (el) { el.textContent = 'One-time or monthly · US shipping'; });
+    $$('.shophero .serif-accent').forEach(function (el) { el.textContent = 'Pick your edge. Free US shipping over $45.'; });
+    if (commerce.portalUrl && /^https:\/\/billing\.stripe\.com\//.test(commerce.portalUrl)) {
+      $$('.footer__col').filter(function (el) { return $('h5', el)?.textContent === 'Support'; }).forEach(function (el) {
+        var link = document.createElement('a'); link.href = commerce.portalUrl; link.textContent = 'Manage subscriptions'; el.appendChild(link);
+      });
+    }
+  }
   var esc = function (s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); };
 
   /* ---------- type preview switcher: ?font=bricolage|unbounded|syne|space|anton (sticks for the session; ?font=default clears) ---------- */
@@ -81,18 +110,6 @@
       '<p class="bag__note">Shipping &amp; taxes calculated at checkout. Subscriptions ship monthly &mdash; cancel anytime.</p>' +
       '<button type="button" class="btn btn--solid btn--block btn--lg" id="checkoutBtn">Checkout <span class="arr">&rarr;</span></button>' +
       '<button type="button" class="btn btn--text btn--block" data-bag-close>Continue shopping</button></div></aside>' +
-    '<div class="modal" id="checkout" aria-hidden="true" role="dialog" aria-label="Checkout"><div class="modal__scrim"></div><div class="modal__panel modal__panel--wide">' +
-      '<button type="button" class="modal__close" data-modal-close aria-label="Close">&times;</button>' +
-      '<div class="co" id="coBody"><form class="co__form" id="coForm" novalidate><p class="eyebrow">Checkout</p><h3 class="co__title">Almost there.</h3><p class="co__demo">Demo checkout &mdash; no payment is taken.</p>' +
-      '<div class="field"><label for="coName">Full name</label><input id="coName" required autocomplete="name" placeholder="Jordan Doe"></div>' +
-      '<div class="field"><label for="coEmailIn">Email</label><input id="coEmailIn" type="email" required autocomplete="email" placeholder="you@example.com"></div>' +
-      '<div class="field"><label for="coAddr">Address</label><input id="coAddr" required autocomplete="street-address" placeholder="123 Momentum Ave"></div>' +
-      '<div class="field__row"><div class="field"><label for="coCity">City</label><input id="coCity" required autocomplete="address-level2"></div><div class="field"><label for="coZip">ZIP</label><input id="coZip" required inputmode="numeric" autocomplete="postal-code"></div></div>' +
-      '<div class="field"><label>Payment</label><div class="co__pay"><span>&bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; 4242</span><em>Demo card</em></div></div>' +
-      '<button type="submit" class="btn btn--solid btn--lg btn--block">Place order <span class="arr">&rarr;</span></button>' +
-      '<p class="co__fine">&check; Free shipping over $45 &nbsp;&middot;&nbsp; &check; Secure checkout &nbsp;&middot;&nbsp; &check; Cancel subscriptions anytime</p></form>' +
-      '<aside class="co__sum"><h4>Order summary</h4><div class="co__items" id="coItems"></div><div class="co__row"><span>Subtotal</span><b id="coSub"></b></div><div class="co__row"><span>Shipping</span><b id="coShip"></b></div><div class="co__row co__row--total"><span>Total</span><b id="coTotal"></b></div></aside></div>' +
-      '<div class="co__done" id="coDone" hidden><div class="co__check">&check;</div><p class="eyebrow">Order placed</p><h3 class="co__title">You&rsquo;re in. Now go do more.</h3><p class="co__done-meta">Order <b id="coNum"></b> &middot; confirmation sent to <b id="coEmail"></b></p><button type="button" class="btn btn--solid" data-modal-close>Back to the site</button></div></div></div>' +
     '<div class="modal modal--quiz" id="quiz-modal" aria-hidden="true" role="dialog" aria-label="Find your formula"><div class="modal__scrim"></div><div class="modal__panel modal__panel--quiz">' +
       '<div class="qm__head"><div class="qm__brand"><img src="assets/mark-orange.png" alt=""><span>Find your formula</span></div><span class="qm__count" id="qCount">1 / 5</span><button type="button" class="modal__close" data-modal-close aria-label="Close">&times;</button></div>' +
       '<div class="qm__bar"><i id="qBar"></i></div><div class="qm__step" id="qStep"></div><div class="qm__foot"><button type="button" class="qm__back" id="qBack" hidden>&larr; Back</button><button type="button" class="qm__next" id="qNext" hidden>Continue &rarr;</button></div></div></div>' +
@@ -131,7 +148,12 @@
   initModes(document);
 
   /* ---------- cart ---------- */
-  var cart = []; if (COMMERCE_ENABLED) { try { cart = JSON.parse(localStorage.getItem('doco_cart') || '[]'); } catch (e) {} }
+  var cart = []; if (COMMERCE_ENABLED) { try {
+    var stored = JSON.parse(localStorage.getItem('doco_cart') || '[]');
+    if (Array.isArray(stored)) cart = stored.filter(function (l) {
+      return l && ORDER.indexOf(l.sku) >= 0 && ['once', 'sub'].indexOf(l.mode) >= 0 && Number.isInteger(l.qty) && l.qty > 0 && l.qty <= 20;
+    }).slice(0, 20);
+  } catch (e) {} }
   var bag = $('#bag'), bagScrim = $('#bagScrim'), bagItems = $('#bagItems'), bagSub = $('#bagSub'), bagCount = $('#bagCount'), headCount = $('#cartCount'), shipBar = $('#shipBar'), shipMsg = $('#shipMsg'), checkoutBtn = $('#checkoutBtn');
   function save() { try { localStorage.setItem('doco_cart', JSON.stringify(cart)); } catch (e) {} }
   function linePrice(l) { return l.mode === 'sub' ? P[l.sku].sub : P[l.sku].price; }
@@ -143,16 +165,20 @@
     if (headCount) { headCount.textContent = c; headCount.classList.toggle('has', c > 0); }
     bagCount.textContent = c; bagSub.textContent = money(sub);
     shipBar.style.width = Math.min(100, sub / FREE_SHIP * 100) + '%';
-    shipMsg.innerHTML = sub >= FREE_SHIP ? '<b>You’ve unlocked free shipping.</b> ✓' : 'Add <b>' + money(FREE_SHIP - sub) + '</b> more for free shipping';
+    shipMsg.innerHTML = sub > FREE_SHIP ? '<b>You’ve unlocked free US shipping on this shipment.</b>' : 'US shipping is $5.99. Free on orders over <b>$45</b>.';
+    var recurring = cart.reduce(function (sum, l) { return sum + (l.mode === 'sub' ? Math.round(linePrice(l) * 100) * l.qty : 0); }, 0);
+    $('.bag__note').textContent = recurring
+      ? 'Initial shipping: ' + (sub > FREE_SHIP ? 'free' : '$5.99') + '. Then ' + money(recurring / 100) + '/month + ' + (recurring > 4500 ? 'free US shipping' : '$5.99 US shipping') + '. Renews monthly until canceled. Manage or cancel via the footer link.'
+      : 'US only. Shipping: ' + (sub > FREE_SHIP ? 'free' : '$5.99') + '. Final total shown in Stripe checkout.';
     checkoutBtn.disabled = c === 0;
     if (!cart.length) { bagItems.innerHTML = '<div class="bag__empty"><img src="assets/mark-orange.png" alt=""><h4>Your bag is empty</h4><p>Pick a formula and start doing more.</p><a class="btn btn--solid btn--sm" href="shop.html">Shop the formulas →</a></div>'; return; }
     bagItems.innerHTML = cart.map(function (l, i) { var p = P[l.sku]; return '<div class="line" style="--c:' + p.color + '"><div class="line__img"><img src="' + p.img + '" alt=""></div><div class="line__body"><div class="line__top"><b>' + p.name + '</b><span class="line__price">' + money(linePrice(l) * l.qty) + '</span></div><p class="line__meta">' + (l.mode === 'sub' ? 'Subscribe & save · ' + money(p.sub) + '/mo' : 'One-time · ' + money(p.price)) + '</p><div class="line__ctl"><div class="qty"><button type="button" aria-label="Decrease" data-line-qty="-1" data-i="' + i + '">−</button><span>' + l.qty + '</span><button type="button" aria-label="Increase" data-line-qty="1" data-i="' + i + '">+</button></div><button type="button" class="line__rm" data-rm="' + i + '">Remove</button></div></div></div>'; }).join('');
   }
   function addToCart(sku, mode, qty) {
     if (!COMMERCE_ENABLED) return;
-    if (!P[sku]) return; mode = mode === 'sub' ? 'sub' : 'once'; qty = Math.max(1, qty || 1);
+    if (ORDER.indexOf(sku) < 0) return; mode = mode === 'sub' ? 'sub' : 'once'; qty = Math.min(20, Math.max(1, qty || 1));
     var i = -1; cart.forEach(function (l, k) { if (l.sku === sku && l.mode === mode) i = k; });
-    if (i > -1) cart[i].qty += qty; else cart.push({ sku: sku, mode: mode, qty: qty });
+    if (i > -1) cart[i].qty = Math.min(20, cart[i].qty + qty); else cart.push({ sku: sku, mode: mode, qty: qty });
     save(); renderCart();
     toast('<img src="' + P[sku].img + '" alt=""><div><b>Added to your bag</b><span>' + P[sku].name + (qty > 1 ? ' × ' + qty : '') + (mode === 'sub' ? ' · subscription' : '') + '</span></div><button type="button" data-bag-open>View bag</button>');
     if (headCount) { headCount.classList.remove('pop'); void headCount.offsetWidth; headCount.classList.add('pop'); }
@@ -163,38 +189,65 @@
   renderCart();
 
   /* ---------- checkout (demo) ---------- */
-  var co = $('#checkout'), coForm = $('#coForm'), coDone = $('#coDone'), coBody = $('#coBody');
   function openModal(m) { m.classList.add('open'); m.setAttribute('aria-hidden', 'false'); lock(true); var f = $('input, button', m); if (f) setTimeout(function () { f.focus(); }, 50); }
   function closeModal(m) { if (!m.classList.contains('open')) return; m.classList.remove('open'); m.setAttribute('aria-hidden', 'true'); lock(false); }
   /* Stripe Checkout handoff: POST the cart to the Replit endpoint, redirect to the session URL */
   function stripeCheckout() {
-    var items = cart.map(function (l) { var p = P[l.sku], pr = (CFG.prices || {})[l.sku] || {}; return { sku: l.sku, mode: l.mode, qty: l.qty, price_id: pr[l.mode] || '', name: p.name + (l.mode === 'sub' ? ' (monthly)' : ''), unit_amount: Math.round(linePrice(l) * 100) }; });
-    var abs = function (u) { return /^https?:/.test(u) ? u : location.origin + location.pathname.replace(/[^/]*$/, '') + u; };
+    var items = cart.map(function (l) { return { sku: l.sku, mode: l.mode, qty: l.qty }; });
+    var requestKey = 'doco_checkout_request', body = JSON.stringify(items), pending;
+    try { pending = JSON.parse(sessionStorage.getItem(requestKey) || 'null'); } catch (_) {}
+    if (!pending || pending.body !== body) pending = { body: body, key: crypto.randomUUID() };
+    try { sessionStorage.setItem(requestKey, JSON.stringify(pending)); } catch (_) {}
     checkoutBtn.disabled = true; var orig = checkoutBtn.innerHTML; checkoutBtn.innerHTML = 'Taking you to secure checkout\u2026';
-    return fetch(CFG.checkoutEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ items: items, success_url: abs(CFG.successUrl || 'thanks.html'), cancel_url: abs(CFG.cancelUrl || 'shop.html'), currency: CFG.currency || 'usd' }) })
-      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-      .then(function (d) { if (!d || !d.url) throw new Error('No checkout URL'); location.href = d.url; })
+    return fetch(CFG.checkoutEndpoint, { method: 'POST', signal: AbortSignal.timeout(45000), headers: { 'Content-Type': 'application/json', 'Idempotency-Key': pending.key }, body: JSON.stringify({ items: items }) })
+      .then(async function (r) {
+        var data = await r.json();
+        if (!r.ok) {
+          if (r.status === 409) { try { sessionStorage.removeItem(requestKey); } catch (_) {} }
+          throw new Error(data.error || 'Checkout failed');
+        }
+        return data;
+      })
+      .then(function (d) { if (!d || !/^https:\/\/checkout\.stripe\.com\//.test(d.url)) throw new Error('Invalid checkout URL'); location.href = d.url; })
       .catch(function (err) { checkoutBtn.disabled = false; checkoutBtn.innerHTML = orig; toast('<div><b>Checkout is unavailable right now</b><span>Please try again in a moment. (' + esc(err.message) + ')</span></div>'); });
   }
   checkoutBtn.addEventListener('click', function () {
     if (!COMMERCE_ENABLED || !cart.length) return;
-    if (CFG.checkoutEndpoint) { stripeCheckout(); return; }
-    closeBag();
-    var sub = subtotal(), ship = sub >= FREE_SHIP ? 0 : SHIP_FEE;
-    $('#coItems').innerHTML = cart.map(function (l) { var p = P[l.sku]; return '<div class="co__line"><img src="' + p.img + '" alt=""><div><b>' + p.name + '</b><span>' + (l.mode === 'sub' ? 'Subscription' : 'One-time') + ' × ' + l.qty + '</span></div><em>' + money(linePrice(l) * l.qty) + '</em></div>'; }).join('');
-    $('#coSub').textContent = money(sub); $('#coShip').textContent = ship ? money(ship) : 'Free'; $('#coTotal').textContent = money(sub + ship);
-    coBody.hidden = false; coDone.hidden = true; coForm.classList.remove('was-validated'); openModal(co);
-  });
-  coForm.addEventListener('submit', function (e) {
-    e.preventDefault();
-    if (!COMMERCE_ENABLED) return;
-    if (!coForm.checkValidity()) { coForm.classList.add('was-validated'); coForm.reportValidity(); return; }
-    $('#coNum').textContent = 'DOCO-' + Math.random().toString(36).slice(2, 8).toUpperCase(); $('#coEmail').textContent = $('#coEmailIn').value;
-    coBody.hidden = true; coDone.hidden = false; cart = []; save(); renderCart();
+    stripeCheckout();
   });
 
   /* ---------- order confirmation page (Stripe success_url) ---------- */
-  if ($('.thanks')) { var sid = new URLSearchParams(location.search).get('session_id'); if (sid) { cart = []; save(); renderCart(); var ts = $('#thanksSession'); if (ts && sid.length > 10) ts.textContent = ' \u00b7 ref ' + sid.slice(-8).toUpperCase(); } }
+  if ($('.thanks')) {
+    var confirmationParams = new URLSearchParams(location.search), sid = confirmationParams.get('session_id');
+    var title = $('.thanks h1'), message = $('.thanks__p'), kicker = $('.thanks .eyebrow');
+    if (sid) {
+      try {
+        var response = await fetch('/api/checkout-status?' + confirmationParams.toString(), { signal: AbortSignal.timeout(15000) });
+        var status = await response.json();
+        if (!response.ok) throw new Error('Unable to verify this checkout.');
+        if (status.paid) {
+          cart = []; save(); renderCart();
+          try { sessionStorage.removeItem('doco_checkout_request'); } catch (_) {}
+          kicker.textContent = status.testMode ? 'Test payment confirmed' : 'Payment confirmed';
+          title.textContent = status.testMode ? 'Test complete.' : 'Thank you.';
+          message.textContent = (status.testMode ? 'This was a sandbox payment. No real charge or shipment was made.' : 'Stripe has confirmed your payment. Contact DOCO with any order or shipping questions.') + ' Reference: ' + status.reference.toUpperCase();
+        } else {
+          kicker.textContent = 'Not confirmed'; title.textContent = 'Payment not completed.';
+          message.textContent = 'We have not confirmed payment. Your bag has been kept. You can return to the shop and try checkout again.';
+        }
+      } catch (_) {
+        kicker.textContent = 'Confirmation unavailable'; title.textContent = 'We could not verify payment.';
+        message.textContent = 'Your bag has been kept. If you already paid, do not pay again; contact DOCO or refresh this confirmation link.';
+      }
+    } else {
+      kicker.textContent = 'No checkout found'; title.textContent = 'No payment confirmed.';
+      message.textContent = 'Complete Stripe checkout to receive a verified payment confirmation.';
+    }
+  }
+  if (new URLSearchParams(location.search).get('checkout') === 'canceled') {
+    try { sessionStorage.removeItem('doco_checkout_request'); } catch (_) {}
+    toast('<div><b>Checkout canceled</b><span>No payment was completed here. Your bag has been kept.</span></div>');
+  }
 
   /* ---------- product grid + tabs ---------- */
   function cardHTML(sku) {
@@ -203,7 +256,7 @@
       '<a class="pcard__media" href="product.html?sku=' + sku + '">' + media + '<span class="pcard__tag">' + esc(p.eyebrow) + '</span></a>' +
       '<div class="pcard__body"><div class="pcard__top"><h3><a href="product.html?sku=' + sku + '">' + esc(p.name) + '</a></h3><span class="pcard__price">' + money(p.price) + '</span></div>' +
       '<p class="pcard__tagline">' + esc(p.tag) + '</p>' +
-      '<div class="pcard__foot"><span class="pcard__sub">Launching soon · online orders are not open yet</span><a class="pcard__link" href="product.html?sku=' + sku + '">View &rarr;</a></div></div></article>';
+      '<div class="pcard__foot"><span class="pcard__sub">' + (COMMERCE_ENABLED ? 'One-time or ' + money(p.sub) + '/month' : 'Checkout unavailable') + '</span><a class="pcard__link" href="product.html?sku=' + sku + '">View &rarr;</a></div></div></article>';
   }
   $$('[data-product-grid]').forEach(function (g) {
     var list = ORDER.filter(function (s) { return (!g.dataset.kind || P[s].kind === g.dataset.kind) && s !== g.dataset.exclude; });
@@ -278,7 +331,7 @@
       '<div class="pdp__thumbs"><button type="button" class="is-on is-stage" data-thumb="stage" aria-label="Product"><img src="' + p.pouch + '" alt=""></button>' + p.gallery.map(function (g, i) { return '<button type="button" data-thumb="' + g + '" aria-label="Image ' + (i + 2) + '"><img src="' + g + '" alt=""></button>'; }).join('') + '</div></div>' +
       '<div class="pdp__info"><p class="eyebrow">' + esc(p.eyebrow) + '</p><h1 class="display">' + esc(p.name) + '</h1><p class="serif-accent">' + esc(p.tag) + '</p>' +
       '<ul class="pdp__chips">' + (p.flavor ? '<li>' + esc(p.flavor) + ' flavor</li>' : '') + '<li>' + p.strips + ' strips</li>' + p.pills.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>' +
-      '<p class="pdp__desc"><b>' + money(p.price) + '</b> · planned launch price</p>' +
+      '<p class="pdp__desc"><b>' + money(p.price) + '</b> USD · US shipping only</p>' +
       '<p class="pdp__desc">' + p.desc + '</p>' +
       '<div class="pdp__keys">' + keys.map(function (k) { return '<div class="pdp__key"><b>' + esc(k.a) + '</b><span>' + esc(k.n) + '</span></div>'; }).join('') + '</div>' +
       '<a class="pdp__more" href="#inside">See the full panel ↓</a>' +
@@ -331,11 +384,11 @@
   /* ---------- global clicks ---------- */
   document.addEventListener('click', function (e) {
     var t = e.target.closest('[data-add]');
-    if (t) { e.preventDefault(); var card = t.closest('[data-sku]'); addToCart(t.dataset.add, t.dataset.mode || (card && card.dataset.mode) || 'once', +((card && card.dataset.qty) || 1));
+    if (t) { e.preventDefault(); var card = t.closest('[data-sku]') || (t.closest('.pdp__sticky') && $('#pdp')); addToCart(t.dataset.add, t.dataset.mode || (card && card.dataset.mode) || 'once', +((card && card.dataset.qty) || 1));
       t.classList.add('is-added'); var orig = t.innerHTML; t.innerHTML = 'Added ✓'; setTimeout(function () { t.innerHTML = orig; t.classList.remove('is-added'); }, 1400); return; }
     if (e.target.closest('[data-bag-open]')) { e.preventDefault(); closeDrawer(); openBag(); return; }
     if (e.target.closest('[data-bag-close]')) { e.preventDefault(); closeBag(); return; }
-    var q = e.target.closest('[data-line-qty]'); if (q) { var i = +q.dataset.i; if (!cart[i]) return; cart[i].qty = Math.max(0, cart[i].qty + Number(q.dataset.lineQty)); if (!cart[i].qty) cart.splice(i, 1); save(); renderCart(); return; }
+    var q = e.target.closest('[data-line-qty]'); if (q) { var i = +q.dataset.i; if (!cart[i]) return; cart[i].qty = Math.min(20, Math.max(0, cart[i].qty + Number(q.dataset.lineQty))); if (!cart[i].qty) cart.splice(i, 1); save(); renderCart(); return; }
     var r = e.target.closest('[data-rm]'); if (r) { cart.splice(+r.dataset.rm, 1); save(); renderCart(); return; }
     var mc = e.target.closest('[data-modal-close]'); if (mc) { closeModal(mc.closest('.modal')); var sc = mc.dataset.scroll; if (sc) setTimeout(function () { var el = $(sc); if (el) el.scrollIntoView({ behavior: 'smooth' }); }, 300); return; }
   });
