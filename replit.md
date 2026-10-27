@@ -27,8 +27,10 @@ Styles are in `css/style.css`, behavior and product data in `js/main.js`, and im
 - Development uses the Replit-managed Stripe sandbox. The separate Stripe MCP connection to the live DOCO account does not supply website runtime authentication.
 - Connect the live DOCO account through the Publishing pane's Stripe setup before republishing. Do not mix manually copied API keys with the managed connector.
 - The server uses the connectors SDK for credential-free transport of Stripe SDK requests. No Stripe API key enters the public website.
+- Both environment connections coexist after live activation. The runtime explicitly selects the enabled development or production connection; never require exactly one Stripe connection across all environments.
 - Stripe data is synced with stripe-replit-sync into its managed schema. Products/Prices are not duplicated into application tables.
 - Catalog initialization reuses existing matching products/prices or idempotently creates missing ones in the connected account. All prices are USD: individual formulas $29.99 / $25.49 monthly; duos $44.99 / $38.24 monthly; Variety Pack $79.99 / $71.99 monthly.
+- Merchant-created live subscriptions are separate products. Reuse the “Subscription” records and the “The More Duo” name through catalog matching; do not create duplicate canonical products or put new monthly prices on the one-time products unnecessarily.
 - Shipping is US-only, $5.99, free when the shipment's product subtotal is strictly over $45. Subscription shipping renews monthly; mixed carts use a first-invoice shipping discount if the initial shipment qualifies but subsequent shipments do not.
 - The browser sends SKU, purchase mode and quantity only. The server resolves active Stripe Price IDs and ignores client amounts, redirect URLs and price IDs.
 - Checkout requests are idempotent. The thank-you page requires a server-verified paid Stripe session plus a signed confirmation proof before clearing the bag.
@@ -41,6 +43,7 @@ Styles are in `css/style.css`, behavior and product data in `js/main.js`, and im
 `npm test` covers cart validation, server-authoritative prices, shipping boundaries, all seven SKUs and both purchase modes, recurring shipping and mixed-cart first-shipment discounts.
 `npm run test:checkout` exercises the running sandbox API, including Stripe session totals, idempotency, invalid requests, confirmation proofs and private-file protection. `npm run test:browser` exercises the mobile cart and real Stripe redirect; set PLAYWRIGHT_CHROMIUM_EXECUTABLE to an available Chromium binary. Generated screenshots are excluded from Git and publishing.
 `npm run stripe:check` audits the connected account, all product prices, shipping prices, and subscription management without modifying Stripe. `RUN_SANDBOX_PAYMENTS=yes npm run test:payments` completes representative sandbox payments and tests the hosted subscription cancellation portal, then cleans up test subscriptions.
+`NODE_ENV=production npm run test:live-readiness` checks all approved live prices, shipping, the shipping-only coupon and the production commerce route privately. It refreshes local synced data but creates no live Stripe transaction and does not publish.
 See `docs/stripe-readiness.md` for the product readiness matrix, test results, and live authorization checks still required. A sandbox test result must not be described as proof of live readiness.
 Browser and API checks must use the sandbox only. Never submit a live charge as a test.
 

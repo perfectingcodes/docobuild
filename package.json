@@ -13,6 +13,7 @@
     "test:browser": "node scripts/verify-browser.mjs",
     "test:payments": "node scripts/verify-payments.mjs",
     "stripe:check": "node scripts/check-stripe-catalog.mjs",
+    "test:live-readiness": "node scripts/verify-live-readiness.mjs",
     "seed:stripe": "node scripts/seed-products.mjs"
   },
   "repository": {

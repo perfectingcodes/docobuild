@@ -2,6 +2,7 @@ import Stripe from 'stripe';
 import { ReplitConnectors } from '@replit/connectors-sdk';
 import { StripeSync, runMigrations } from 'stripe-replit-sync';
 import pg from 'pg';
+import { selectStripeConnection } from './stripe-connection.mjs';
 
 const connectors = new ReplitConnectors();
 export const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL, max: 5 });
@@ -11,8 +12,7 @@ let selectedConnection;
 async function connectorFetch(url, options = {}) {
   if (!selectedConnection) {
     const rows = await connectors.listConnections({ connector_names: 'stripe' });
-    if (rows.length !== 1) throw new Error('Exactly one website Stripe connection is required.');
-    selectedConnection = rows[0].id;
+    selectedConnection = selectStripeConnection(rows, process.env.NODE_ENV === 'production');
   }
   const parsed = new URL(url);
   if (parsed.hostname !== 'api.stripe.com') throw new Error('Unexpected Stripe API host');

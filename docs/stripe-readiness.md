@@ -1,20 +1,20 @@
 # DOCO Stripe readiness
 
-Verified October 27, 2026. **Sandbox checkout is verified. Live sales are not yet verified or enabled.**
+Verified October 27, 2026. **Sandbox payments and the live catalog are verified. The production code passes live-account readiness checks before publishing. The public checkout and webhook still require republishing and external verification.**
 
 ## Products
 
-All listed products have active matching USD prices in the website's connected sandbox. Actual Stripe Checkout sessions were tested for every row and both purchase options, including quantity, totals, US-only address collection, and confirmation protection.
+All listed products have active matching USD prices in both sandbox and live Stripe. Actual sandbox Checkout sessions were tested for every row and both purchase options, including quantity, totals, US-only address collection, and confirmation protection. The live product/price mapping was checked without creating live checkout sessions or payments.
 
 | Product | One-time | Monthly | Sandbox checkout | Live catalog |
 | --- | ---: | ---: | --- | --- |
-| Multivitamin DOCO Strips | $29.99 | $25.49 | Both passed | Not verified |
-| Sports Energy DOCO Strips | $29.99 | $25.49 | Both passed | Not verified |
-| Calm + Stress DOCO Strips | $29.99 | $25.49 | Both passed | Not verified |
-| Sleep Strips | $29.99 | $25.49 | Both passed | Not verified |
-| The Do More Duo | $44.99 | $38.24 | Both passed | Not verified |
-| The Relaxation Duo | $44.99 | $38.24 | Both passed | Not verified |
-| The Variety Pack | $79.99 | $71.99 | Both passed | Not verified |
+| Multivitamin DOCO Strips | $29.99 | $25.49 | Both passed | Both verified |
+| Sports Energy DOCO Strips | $29.99 | $25.49 | Both passed | Both verified |
+| Calm + Stress DOCO Strips | $29.99 | $25.49 | Both passed | Both verified |
+| Sleep Strips | $29.99 | $25.49 | Both passed | Both verified |
+| The Do More Duo | $44.99 | $38.24 | Both passed | Both verified |
+| The Relaxation Duo | $44.99 | $38.24 | Both passed | Both verified |
+| The Variety Pack | $79.99 | $71.99 | Both passed | Both verified |
 
 Shipping is $5.99 per shipment, free when that shipment's product subtotal is strictly greater than $45. The $45 boundary, free monthly shipping, and mixed-cart first-shipment shipping waiver were checked.
 
@@ -29,24 +29,31 @@ Shipping is $5.99 per shipment, free when that shipment's product subtotal is st
 - Development checkout now requires sandbox prices for every product and shipping option; production requires matching live prices. A single live price cannot incorrectly enable a partly configured catalog.
 - These were sandbox transactions, not real charges or shipment requests.
 
-## Checks still blocked
+## Live-account checks completed
 
-The website connection currently resolves to **docobuild Sandbox**, not the live DOCO merchant connection. The separate live-account MCP connection is unreachable, so no fresh live-account catalog or payment-capability audit was possible. Sandbox readiness does not prove the live catalog exists.
+- The native website integration has separate development and production connections. Connection selection uses their environment, not the order of returned connections.
+- The production connection resolves to DOCO The Do Company LLC, with charges and payouts enabled and no currently due activation requirements at inspection.
+- The merchant's fourteen existing live products/prices were reused, including separate subscription products and the merchant's “The More Duo” naming. No product or advertised price was replaced or deleted.
+- Matching one-time and monthly shipping prices and the shipping-only first-invoice discount are configured in live Stripe.
+- A live Stripe billing portal is configured for payment-method updates, invoices, and cancellation at the end of the billing period.
+- The production commerce code was run privately against the live account and returned `enabled=true`, `testMode=false`, and the live subscription portal.
+- No live checkout session, customer, subscription, invoice, or charge was created by these checks. Only sandbox payments were submitted.
+
+## Checks still blocked
 
 At the time of this check, the published site was still a static deployment and its `/api/commerce` route returned 404. The checkout backend changes have not been published.
 
-The merchant subsequently confirmed completing live-account authorization in Publishing. A follow-up deployment check still showed the previous static deployment and a 404 checkout API, so applying that authorization to the published backend and verifying live products remains blocked on republishing.
+An attempted backend publish logged Stripe startup failures and did not replace the older working deployment. The same failure was reproduced in the workspace: both environment connections were present, while the old transport required exactly one connection globally. That selection bug is now fixed and covered by tests, including a passing production-code check against the live account.
+
+The merchant confirmed completing live-account authorization in Publishing. The production website connection is now available and its catalog checks pass. Applying the updated backend to the public site remains blocked on the merchant clicking Republish.
 
 Real signed Stripe webhook delivery has not been tested end to end. The private development preview is intentionally not registered as a webhook destination. The public production backend and its managed webhook must be checked after authorization and republishing.
 
 ## Merchant authorization and launch
 
-1. Open Replit **Publishing** and choose **Adjust settings**.
-2. In the Stripe setup, choose **Install Stripe app** and authorize **Replit Integrated Payments** with the intended live DOCO merchant account in Stripe.
-3. Complete any live-account verification Stripe requests, then return to Replit. Do not paste API keys into chat or mix manually copied keys with the managed integration.
-4. Confirm live products/prices and live payment capability through the managed publishing flow before enabling sales. Reuse matching existing records and do not duplicate or delete unrelated products.
-5. Republish the app with its configured backend deployment. Only the merchant should click Publish.
-6. Verify the published `/api/commerce` reports enabled live checkout, all fourteen live product options match the approved prices, the live subscription portal works, and the managed webhook is active and receiving valid signed events. Do not submit a real charge as a test.
+1. Open Replit **Publishing**. Live Stripe authorization and the live catalog checks are already complete.
+2. Republish the app with its configured Autoscale backend deployment. Only the merchant should click Publish.
+3. Verify the published `/api/commerce` reports enabled live checkout, all fourteen live product options match the approved prices, the live subscription portal works, and the managed webhook is active and receiving valid signed events. Do not submit a real charge as a test.
 
 Do not describe live sales as ready until those checks are complete. Automatic sales tax and automated fulfillment remain outside this work.
 
@@ -57,3 +64,4 @@ Do not describe live sales as ready until those checks are complete. Automatic s
 - `npm run test:checkout`: real sandbox session checks for all fourteen product/purchase options and mixed carts.
 - `npm run test:browser`: mobile selection, bag, hosted checkout redirect, and false-confirmation protection.
 - `RUN_SANDBOX_PAYMENTS=yes npm run test:payments`: opt-in completed sandbox payment and subscription portal cancellation tests. Requires an installed Playwright Chromium browser or `PLAYWRIGHT_CHROMIUM_EXECUTABLE`; test subscriptions are cleaned up.
+- `NODE_ENV=production npm run test:live-readiness`: verifies the native live account, all fourteen mapped prices, shipping, the shipping-only coupon, and production commerce readiness privately. Refreshes the local catalog cache but does not create Stripe transactions or publish.

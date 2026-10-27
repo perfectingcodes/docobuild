@@ -15,6 +15,12 @@ The current connectors integration uses authenticated proxy transport rather tha
 
 **How to apply:** Follow the connected integration's own skill for runtime authentication instead of substituting older credential-fetch examples.
 
+After live activation, the native Stripe integration legitimately lists both development and production connections in the same workspace. Select by the connection's environment rather than requiring a single connection globally or choosing the first result.
+
+**Why:** Live authorization added a second healthy connection; a global single-connection assumption stopped the storefront even though both credentials were valid.
+
+**How to apply:** Keep previews on the development connection and production on the production connection. Fail when the requested environment is absent or ambiguous, rather than silently using the other environment.
+
 Stripe API and sync behavior must be verified against installed versions: the installed API rejects the former payment-method-types checkout parameter, and synced JSON null is not necessarily SQL NULL. Incremental product backfill follows creation time and can miss edits to older product metadata.
 
 **Why:** These behaviors caused valid products or checkout requests to be rejected during integration.

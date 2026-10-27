@@ -1,23 +1,30 @@
 import { stripe, initializeStripe, pool, getStripeSync } from '../server/stripe.mjs';
 import { CATALOG } from '../server/catalog.mjs';
 import { pathToFileURL } from 'node:url';
+import { findCatalogProduct } from '../server/catalog-matching.mjs';
 
 export async function ensureCatalog() {
   // One-time setup script only; never creates products during customer requests.
-  const products = await stripe.products.list({ active: true, limit: 100 });
+  const products = await stripe.products.list({ active: true, limit: 100 }).autoPagingToArray({ limit: 10000 });
   for (const [sku, item] of Object.entries(CATALOG)) {
-    let product = products.data.find(p => p.metadata?.doco_sku === sku || p.name === item.name);
-    if (!product) product = await stripe.products.create({
-      name: item.name, shippable: true, metadata: { doco_sku: sku },
-    }, { idempotencyKey: `doco-product-${sku}` });
-    else if (product.metadata?.doco_sku !== sku) await stripe.products.update(product.id, {
-      metadata: { doco_sku: sku }, shippable: true,
-    });
-    // Incremental backfill follows creation time, not metadata updates.
-    await getStripeSync().syncSingleEntity(product.id);
-    const prices = await stripe.prices.list({ product: product.id, active: true, limit: 100 });
     for (const mode of ['once', 'sub']) {
-      const found = prices.data.some(p => p.unit_amount === item[mode] && p.currency === 'usd' &&
+      let product = findCatalogProduct(products, sku, mode);
+      if (!product) {
+        product = await stripe.products.create({
+          name: item.name, shippable: true, metadata: { doco_sku: sku },
+        }, { idempotencyKey: `doco-product-${sku}` });
+        products.push(product);
+      } else if (product.metadata?.doco_sku !== sku || !product.shippable) {
+        product = await stripe.products.update(product.id, {
+          metadata: { doco_sku: sku }, shippable: true,
+        });
+        products[products.findIndex(p => p.id === product.id)] = product;
+      }
+      // Incremental backfill follows creation time, not metadata updates.
+      await getStripeSync().syncSingleEntity(product.id);
+      const prices = await stripe.prices.list({ product: product.id, active: true, limit: 100 })
+        .autoPagingToArray({ limit: 10000 });
+      const found = prices.some(p => p.unit_amount === item[mode] && p.currency === 'usd' &&
         (mode === 'sub' ? p.recurring?.interval === 'month' && p.recurring.interval_count === 1 : !p.recurring));
       if (!found) await stripe.prices.create({
         product: product.id, currency: 'usd', unit_amount: item[mode],
@@ -27,7 +34,7 @@ export async function ensureCatalog() {
     }
     console.log(`Ready: ${item.name}, one-time and monthly`);
   }
-  let shipping = products.data.find(p => p.metadata?.doco_sku === '_shipping');
+  let shipping = products.find(p => p.metadata?.doco_sku === '_shipping');
   if (!shipping) shipping = await stripe.products.create({
     name: 'US shipping', metadata: { doco_sku: '_shipping' },
   }, { idempotencyKey: 'doco-shipping-product' });
