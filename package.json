@@ -11,6 +11,8 @@
     "test": "node --test tests/*.test.mjs",
     "test:checkout": "node scripts/verify-checkout.mjs",
     "test:browser": "node scripts/verify-browser.mjs",
+    "test:payments": "node scripts/verify-payments.mjs",
+    "stripe:check": "node scripts/check-stripe-catalog.mjs",
     "seed:stripe": "node scripts/seed-products.mjs"
   },
   "repository": {

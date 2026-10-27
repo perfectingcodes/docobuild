@@ -26,6 +26,9 @@ export function normalizeCart(items) {
   return [...lines.values()].sort((a, b) =>
     `${a.sku}:${a.mode}`.localeCompare(`${b.sku}:${b.mode}`));
 }
+export function shippingForSubtotal(subtotal) {
+  return subtotal > 4500 ? 0 : 599;
+}
 export function cartTotals(items) {
   let first = 0, monthly = 0;
   for (const item of items) {
@@ -35,7 +38,7 @@ export function cartTotals(items) {
   }
   return {
     first, monthly,
-    firstShipping: first > 4500 ? 0 : 599,
-    monthlyShipping: monthly ? (monthly > 4500 ? 0 : 599) : 0,
+    firstShipping: shippingForSubtotal(first),
+    monthlyShipping: monthly ? shippingForSubtotal(monthly) : 0,
   };
 }

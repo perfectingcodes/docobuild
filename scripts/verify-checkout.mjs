@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import { stripe } from '../server/stripe.mjs';
+import { CATALOG, cartTotals } from '../server/catalog.mjs';
 
 const base = process.env.TEST_BASE_URL || `https://${process.env.REPLIT_DEV_DOMAIN}`;
 const readiness = await (await fetch(`${base}/api/commerce`)).json();
@@ -11,11 +12,14 @@ const post = (body, key = randomUUID(), origin = base) => fetch(`${base}/api/cre
   body: JSON.stringify(body),
 });
 const cases = [
-  ['one-time', [{ sku: 'multi', mode: 'once', qty: 1 }], 3598, 'payment'],
-  ['monthly', [{ sku: 'multi', mode: 'sub', qty: 1 }], 3148, 'subscription'],
+  ...Object.keys(CATALOG).flatMap(sku => ['once', 'sub'].map(mode => {
+    const items = [{ sku, mode, qty: 1 }];
+    const totals = cartTotals(items);
+    return [`${sku}-${mode}`, items, totals.first + totals.firstShipping,
+      mode === 'sub' ? 'subscription' : 'payment'];
+  })),
   ['mixed', [{ sku: 'multi', mode: 'sub', qty: 1 }, { sku: 'sport', mode: 'once', qty: 1 }], 5548, 'subscription'],
-  ['duo', [{ sku: 'duo-domore', mode: 'once', qty: 1 }], 5098, 'payment'],
-  ['variety-free-shipping', [{ sku: 'stack', mode: 'once', qty: 1 }], 7999, 'payment'],
+  ['monthly-free-shipping', [{ sku: 'multi', mode: 'sub', qty: 2 }], 5098, 'subscription'],
 ];
 for (const [name, items, total, mode] of cases) {
   const key = randomUUID();
@@ -28,6 +32,15 @@ for (const [name, items, total, mode] of cases) {
   assert.equal(session.livemode, false);
   assert.equal(session.amount_total, total);
   assert.equal(session.mode, mode);
+  const lines = await stripe.checkout.sessions.listLineItems(id, { limit: 100 });
+  for (const item of items) {
+    const line = lines.data.find(l => l.price?.metadata?.doco_mode === item.mode &&
+      l.price.unit_amount === CATALOG[item.sku][item.mode] &&
+      l.description === CATALOG[item.sku].name);
+    assert.ok(line, `Missing approved Stripe line for ${item.sku}/${item.mode}`);
+    assert.equal(line.quantity, item.qty);
+    assert.equal(line.price.livemode, false);
+  }
   assert.ok(session.success_url.startsWith(`${base}/thanks.html?`));
   assert.deepEqual(session.shipping_address_collection.allowed_countries, ['US']);
   const duplicate = await post({ items }, key);

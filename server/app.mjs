@@ -6,8 +6,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { stripe, pool, account, getStripeSync } from './stripe.mjs';
 import { listCheckoutPrices } from './storage.mjs';
-import { CATALOG, normalizeCart } from './catalog.mjs';
+import { normalizeCart } from './catalog.mjs';
 import { buildCheckout } from './checkout.mjs';
+import { catalogReadiness, portalReady } from './readiness.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'dist');
 export const app = express();
@@ -56,15 +57,13 @@ function proof(requestId) {
 app.get('/api/commerce', async (_req, res, next) => {
   try {
     const prices = await listCheckoutPrices();
-    const complete = Object.keys(CATALOG).every(sku =>
-      ['once', 'sub'].every(mode => prices.some(p =>
-        p.sku === sku && p.mode === mode && p.unit_amount === CATALOG[sku][mode])));
-    const live = prices.some(p => p.livemode);
+    const production = process.env.NODE_ENV === 'production';
+    const complete = catalogReadiness(prices, { production }).ready;
     const portals = await stripe.billingPortal.configurations.list({ active: true, limit: 100 });
     const portal = portals.data.find(p => p.metadata?.doco_portal === 'true');
     res.json({
-      enabled: complete && (process.env.NODE_ENV !== 'production' || (live && account.charges_enabled)),
-      testMode: !live,
+      enabled: complete && portalReady(portal) && (!production || account.charges_enabled),
+      testMode: !production,
       portalUrl: portal?.login_page?.url || null,
     });
   } catch (error) { next(error); }
@@ -78,6 +77,10 @@ app.post('/api/create-checkout-session', async (req, res, next) => {
   const requestId = req.get('Idempotency-Key') || randomUUID();
   if (!/^[a-zA-Z0-9-]{16,80}$/.test(requestId)) return res.status(400).json({ error: 'Invalid checkout request.' });
   try {
+    const prices = await listCheckoutPrices();
+    if (!catalogReadiness(prices, { production: process.env.NODE_ENV === 'production' }).ready) {
+      return res.status(503).json({ error: 'The payment catalog is not ready. Please contact DOCO.' });
+    }
     const cartHash = createHash('sha256').update(JSON.stringify({ origin, cart })).digest('hex');
     await pool.query(
       'INSERT INTO public.checkout_requests(id,cart_hash) VALUES($1,$2) ON CONFLICT(id) DO NOTHING',
@@ -90,7 +93,7 @@ app.post('/api/create-checkout-session', async (req, res, next) => {
       if (old.status === 'open' && old.url) return res.json({ url: old.url });
       return res.status(409).json({ error: 'That checkout has finished or expired. Start a new checkout.' });
     }
-    const params = buildCheckout(cart, await listCheckoutPrices(), {
+    const params = buildCheckout(cart, prices, {
       successUrl: `${origin}/thanks.html?session_id={CHECKOUT_SESSION_ID}&proof=${proof(requestId)}`,
       cancelUrl: `${origin}/shop.html?checkout=canceled`,
       requestId,

@@ -20,3 +20,9 @@ Stripe API and sync behavior must be verified against installed versions: the in
 **Why:** These behaviors caused valid products or checkout requests to be rejected during integration.
 
 **How to apply:** Use current Stripe API capabilities, distinguish price modes using their explicit type, and explicitly resync modified existing entities rather than relying only on incremental backfill.
+
+Stripe's hosted portal can schedule cancellation at the period end by setting `cancel_at` to the subscription items' period end while leaving `cancel_at_period_end` false.
+
+**Why:** A real sandbox portal cancellation succeeded, but an assertion based only on the legacy boolean incorrectly reported failure with the installed API version.
+
+**How to apply:** Verify the scheduled end timestamp and cancellation reason, not just the legacy flag. Do not treat a false legacy flag as proof that the customer is still scheduled to renew.

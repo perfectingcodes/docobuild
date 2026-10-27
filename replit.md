@@ -40,6 +40,8 @@ Styles are in `css/style.css`, behavior and product data in `js/main.js`, and im
 ## Verification
 `npm test` covers cart validation, server-authoritative prices, shipping boundaries, all seven SKUs and both purchase modes, recurring shipping and mixed-cart first-shipment discounts.
 `npm run test:checkout` exercises the running sandbox API, including Stripe session totals, idempotency, invalid requests, confirmation proofs and private-file protection. `npm run test:browser` exercises the mobile cart and real Stripe redirect; set PLAYWRIGHT_CHROMIUM_EXECUTABLE to an available Chromium binary. Generated screenshots are excluded from Git and publishing.
+`npm run stripe:check` audits the connected account, all product prices, shipping prices, and subscription management without modifying Stripe. `RUN_SANDBOX_PAYMENTS=yes npm run test:payments` completes representative sandbox payments and tests the hosted subscription cancellation portal, then cleans up test subscriptions.
+See `docs/stripe-readiness.md` for the product readiness matrix, test results, and live authorization checks still required. A sandbox test result must not be described as proof of live readiness.
 Browser and API checks must use the sandbox only. Never submit a live charge as a test.
 
 Google Fonts requires an internet connection.

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizeCart, cartTotals, CATALOG } from '../server/catalog.mjs';
+import { normalizeCart, cartTotals, shippingForSubtotal, CATALOG } from '../server/catalog.mjs';
 import { buildCheckout } from '../server/checkout.mjs';
 
 const prices = Object.entries(CATALOG).flatMap(([sku, p]) =>
@@ -21,6 +21,9 @@ test('combines duplicate lines and ignores browser pricing', () => {
   ]), [{ sku: 'multi', mode: 'once', qty: 3 }]);
 });
 test('shipping is strictly free only over $45', () => {
+  assert.equal(shippingForSubtotal(4499), 599);
+  assert.equal(shippingForSubtotal(4500), 599);
+  assert.equal(shippingForSubtotal(4501), 0);
   assert.equal(cartTotals([{ sku: 'multi', mode: 'once', qty: 1 }]).firstShipping, 599);
   assert.equal(cartTotals([{ sku: 'duo-domore', mode: 'once', qty: 1 }]).firstShipping, 599);
   assert.equal(cartTotals([{ sku: 'multi', mode: 'once', qty: 2 }]).firstShipping, 0);

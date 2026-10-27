@@ -40,6 +40,11 @@ export async function initializeStripe() {
       (!account.charges_enabled || account.id !== 'acct_1UQY8SG2IwfaSIOP')) {
     throw new Error('Connect the live DOCO Stripe account with payments enabled before publishing.');
   }
+  // Refuse live credentials in preview before any setup script can mutate data.
+  const sample = await stripe.products.list({ limit: 1 });
+  if (process.env.NODE_ENV !== 'production' && sample.data.some(p => p.livemode)) {
+    throw new Error('Development requires the Stripe sandbox, not live credentials.');
+  }
   await runMigrations({ databaseUrl: process.env.DATABASE_URL });
   sync = new StripeSync({
     // Stable, account-scoped non-secret identity for the connector transport.
