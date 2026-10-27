@@ -35,6 +35,8 @@ The website connection currently resolves to **docobuild Sandbox**, not the live
 
 At the time of this check, the published site was still a static deployment and its `/api/commerce` route returned 404. The checkout backend changes have not been published.
 
+The merchant subsequently confirmed completing live-account authorization in Publishing. A follow-up deployment check still showed the previous static deployment and a 404 checkout API, so applying that authorization to the published backend and verifying live products remains blocked on republishing.
+
 Real signed Stripe webhook delivery has not been tested end to end. The private development preview is intentionally not registered as a webhook destination. The public production backend and its managed webhook must be checked after authorization and republishing.
 
 ## Merchant authorization and launch
