@@ -2,9 +2,16 @@ import { stripe, initializeStripe, pool, getStripeSync } from '../server/stripe.
 import { CATALOG } from '../server/catalog.mjs';
 import { pathToFileURL } from 'node:url';
 import { findCatalogProduct } from '../server/catalog-matching.mjs';
+import { synchronizeCheckoutCatalog } from '../server/catalog-resolution.mjs';
 
 export async function ensureCatalog() {
-  // One-time setup script only; never creates products during customer requests.
+  // Never auto-create live replacements on startup or an accidental seed run.
+  if (process.env.NODE_ENV === 'production') {
+    await synchronizeCheckoutCatalog({ stripe, sync: getStripeSync(), production: true });
+    console.log('Verified existing live catalog; no Stripe records were changed.');
+    return;
+  }
+  // Explicit sandbox setup only; server startup never calls this script.
   const products = await stripe.products.list({ active: true, limit: 100 }).autoPagingToArray({ limit: 10000 });
   for (const [sku, item] of Object.entries(CATALOG)) {
     for (const mode of ['once', 'sub']) {

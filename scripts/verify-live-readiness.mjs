@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { once } from 'node:events';
-import { stripe, account, pool, initializeStripe } from '../server/stripe.mjs';
+import { stripe, account, pool, initializeStripe, getStripeSync } from '../server/stripe.mjs';
+import { synchronizeCheckoutCatalog } from '../server/catalog-resolution.mjs';
 import { app } from '../server/app.mjs';
 import { listCheckoutPrices } from '../server/storage.mjs';
 import { CATALOG, cartTotals } from '../server/catalog.mjs';
@@ -15,6 +16,8 @@ try {
   await initializeStripe();
   assert.equal(account.id, 'acct_1UQY8SG2IwfaSIOP');
   assert.equal(account.charges_enabled, true);
+  await synchronizeCheckoutCatalog({ stripe, sync: getStripeSync(), production: true });
+  console.log('PASS production startup catalog synchronization: existing live identities, no Stripe writes');
   const prices = await listCheckoutPrices();
   assert.equal(catalogReadiness(prices, { production: true }).ready, true);
   assert.ok(prices.every(p => p.livemode === true));
@@ -59,6 +62,10 @@ try {
   // or exposing a temporary server publicly.
   server = app.listen(0, '127.0.0.1');
   await once(server, 'listening');
+  const root = await fetch(`http://127.0.0.1:${server.address().port}/`);
+  assert.equal(root.status, 200);
+  assert.ok((await root.text()).includes('DOCO'));
+  console.log('PASS production root startup-check route: HTTP 200');
   const response = await fetch(`http://127.0.0.1:${server.address().port}/api/commerce`);
   assert.equal(response.status, 200);
   const readiness = await response.json();

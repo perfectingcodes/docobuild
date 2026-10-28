@@ -1,7 +1,8 @@
 import { pool, account } from './stripe.mjs';
+import { selectCheckoutPrices } from './catalog-resolution.mjs';
 export async function listCheckoutPrices() {
   const result = await pool.query(`
-    SELECT p.id, p.unit_amount, p.livemode, pr.metadata->>'doco_sku' AS sku,
+    SELECT p.id, p.product AS product_id, p.unit_amount, p.livemode, pr.metadata->>'doco_sku' AS sku,
       CASE WHEN p.type='one_time' THEN 'once' ELSE 'sub' END AS mode
     FROM stripe.prices p JOIN stripe.products pr
       ON pr.id=p.product AND pr._account_id=p._account_id
@@ -10,5 +11,5 @@ export async function listCheckoutPrices() {
       AND (p.type='one_time' OR
         (p.recurring->>'interval'='month' AND (p.recurring->>'interval_count')::int=1))
   `, [account.id, process.env.NODE_ENV === 'production']);
-  return result.rows;
+  return selectCheckoutPrices(result.rows, { production: process.env.NODE_ENV === 'production' });
 }

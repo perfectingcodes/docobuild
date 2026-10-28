@@ -39,15 +39,29 @@ Shipping is $5.99 per shipment, free when that shipment's product subtotal is st
 - The production commerce code was run privately against the live account and returned `enabled=true`, `testMode=false`, and the live subscription portal.
 - No live checkout session, customer, subscription, invoice, or charge was created by these checks. Only sandbox payments were submitted.
 
+## Publishing startup repair — October 28, 2026
+
+The backend was successfully published on October 27; the public commerce route subsequently returned `enabled=true` and `testMode=false`. The earlier static-deployment and connection-selection blockers are no longer the current failure.
+
+The October 28 publish failed during startup with `Multiple Stripe products match multi/once; review before setup.` Live read-only inspection found additional active shared-price products alongside the original one-time and separate monthly products. Both sets have matching names and SKU metadata. The old name/metadata matcher therefore rejected the catalog, exited, and failed the startup health check. The previous successful Autoscale version remains published.
+
+The repair uses explicit previously verified live product/price identities for all fourteen product options and both shipping prices. Startup and checkout use the same resolver; duplicate copies cannot change the selected price by list order. The shipping identity remains the one to which the first-invoice shipping coupon applies. No live records were created, renamed, archived, updated, or deleted.
+
+Routine server startup no longer calls the product-creation script. It reads and validates existing records, then synchronizes selected identities into the local cache. Production seed runs are also verification-only. Truly missing/invalid pinned prices and unresolved unconfigured sandbox duplicates still fail closed.
+
+Verification completed for this repair:
+- 28 automated tests passed, including the observed duplicate shape, reordered Stripe results, renamed subscription products, invalid pinned records, shared/separate sandbox layouts, and read-only catalog startup behavior.
+- The production catalog initialization path ran against live Stripe using GETs only; all fourteen prices, both shipping prices, and the shipping-only coupon passed.
+- The production Express app was served privately for verification: `/` returned HTTP 200 and `/api/commerce` reported enabled live mode and the live billing portal.
+- The actual development workflow restarted cleanly. All fourteen sandbox checkout variants plus mixed-cart and free-monthly-shipping cases passed, along with mobile subscription selection, bag, hosted redirect, cancellation retention, and false-confirmation protection.
+
 ## Checks still blocked
 
-At the time of this check, the published site was still a static deployment and its `/api/commerce` route returned 404. The checkout backend changes have not been published.
+The merchant must republish to apply the startup repair. The full published production entrypoint, including its existing managed-webhook registration, has not been rerun by these private checks. Post-publish root-page and commerce checks must be reported separately from private production-code validation.
 
-An attempted backend publish logged Stripe startup failures and did not replace the older working deployment. The same failure was reproduced in the workspace: both environment connections were present, while the old transport required exactly one connection globally. That selection bug is now fixed and covered by tests, including a passing production-code check against the live account.
+The merchant also reported `Checkout is unavailable right now` when pressing Checkout with a subscription on the published site. Fixing startup does not prove that separate live handoff error is resolved. It still requires investigation/verification after republishing, without real charges or live subscriptions.
 
-The merchant confirmed completing live-account authorization in Publishing. The production website connection is now available and its catalog checks pass. Applying the updated backend to the public site remains blocked on the merchant clicking Republish.
-
-Real signed Stripe webhook delivery has not been tested end to end. The private development preview is intentionally not registered as a webhook destination. The public production backend and its managed webhook must be checked after authorization and republishing.
+Real signed Stripe webhook delivery has not been tested end to end. The private development preview is intentionally not registered as a webhook destination.
 
 ## Merchant authorization and launch
 
