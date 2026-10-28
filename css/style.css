@@ -1612,3 +1612,19 @@ section[id]{scroll-margin-top:calc(var(--ticker-h) + var(--header-h))}
   .btn--text{box-shadow:none!important;padding:8px 2px}
   .showcase__tabs button{white-space:nowrap}
 }
+
+/* ---- live checkout chrome: notice bar, cart icon ---- */
+.launch-notice{font-size:.7rem;letter-spacing:.06em;font-weight:700}
+#cartBtn{display:inline-flex}
+#cartBtn[hidden]{display:none}
+.site-header__actions{gap:10px}
+.iconbtn .iconbtn__count{display:none}
+.iconbtn .iconbtn__count.has{display:inline-flex}
+@media(max-width:700px){
+  .launch-notice{height:30px;font-size:.6rem;letter-spacing:.04em;padding:2px 10px}
+  :root{--ticker-h:30px}
+  .site-header__actions{gap:6px}
+  .site-header__actions .btn--chip{display:none}
+  .iconbtn{padding:8px}
+  .iconbtn__count{top:-2px;right:-2px}
+}

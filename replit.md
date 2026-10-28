@@ -48,3 +48,16 @@ See `docs/stripe-readiness.md` for the product readiness matrix, test results, a
 Browser and API checks must use the sandbox only. Never submit a live charge as a test.
 
 Google Fonts requires an internet connection.
+
+## Admin dashboard (owner only)
+- URL: `/admin.html` on the same site. Not linked publicly; `noindex`.
+- Sign-in password comes from the `ADMIN_PASSWORD` secret. Until it is set the fallback is `domore` — set the secret in Replit Secrets before sharing the URL, then restart/republish.
+- Sessions are signed cookies (`SESSION_SECRET`), 12 hours, HttpOnly, SameSite=Strict, Secure in production. Login is rate limited.
+- Routes live in `server/admin.mjs` and are mounted in `server/app.mjs`; `ensureAdminTables()` creates `public.site_events` and `public.creator_applications` at startup (`server/index.mjs`).
+- Orders and subscriptions are read live from Stripe through the existing connector (`checkout.sessions.list` with `doco_checkout` metadata, paid only, environment-matched; `subscriptions.list`), cached for 60 seconds. CSV export at `/api/admin/orders.csv`.
+- Site analytics are first-party: the browser posts anonymous events (`pageview`, `add_to_cart`, `cart_update`, `checkout_start`, `quiz_complete`, `builder_pick`, `creator_apply`) to `POST /api/track` with a random session id; no names, emails or IPs are stored. "Carts" shows the latest cart snapshot per session over 7 days for sessions that have not started checkout.
+- `tests/admin.test.mjs` covers token signing, password checks, event sanitizing and aggregation; it runs with `npm test`.
+
+## Creators & partners page
+- `/creators.html` with an application form posting to `POST /api/creators` (rate limited, stored in `public.creator_applications`); applications appear under the Admin → Creators tab with a status selector.
+- Program terms shown on the page (20% commission, 15% audience code, free monthly box) are placeholders chosen for launch copy. Change them in `creators.html` (perks + steps copy) and `js/creators.js` (`TERMS` for the earnings illustration).

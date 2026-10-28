@@ -9,6 +9,7 @@ import { listCheckoutPrices } from './storage.mjs';
 import { normalizeCart } from './catalog.mjs';
 import { buildCheckout } from './checkout.mjs';
 import { catalogReadiness, portalReady } from './readiness.mjs';
+import { registerAdmin } from './admin.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'dist');
 export const app = express();
@@ -120,6 +121,7 @@ app.get('/api/checkout-status', async (req, res, next) => {
     res.json({ paid, status: session.status, testMode: !session.livemode, reference: paid ? session.id.slice(-8) : null });
   } catch (error) { next(error); }
 });
+registerAdmin(app, { pool, stripe });
 app.use('/api', (_req, res) => res.status(404).json({ error: 'Not found' }));
 app.use(express.static(root, { dotfiles: 'deny', etag: true, setHeaders(res, file) {
   if (/\.(html|js|css)$/.test(file)) res.set('Cache-Control', 'no-cache');

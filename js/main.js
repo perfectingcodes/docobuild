@@ -27,6 +27,7 @@
     : 'Checkout is currently unavailable. Browse the collection or contact us.';
   if (COMMERCE_ENABLED) {
     var actions = $('.site-header__actions');
+    if ($('#cartBtn')) $('#cartBtn').hidden = false;
     if (actions && !$('#cartBtn')) actions.insertAdjacentHTML('beforeend',
       '<button type="button" class="btn btn--chip btn--sm" id="cartBtn" data-bag-open aria-label="Open your bag">Bag (<span id="cartCount">0</span>)</button>');
     $$('.slide[data-sku]').forEach(function (slide) {
@@ -42,6 +43,20 @@
     }
   }
   var esc = function (s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); };
+
+  /* ---------- first-party analytics: anonymous session id, no personal data ---------- */
+  var SID = ''; try { SID = localStorage.getItem('doco_sid') || ''; if (!/^[a-zA-Z0-9-]{8,64}$/.test(SID)) { SID = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(36).slice(2)); localStorage.setItem('doco_sid', SID); } } catch (_) { SID = 'anon-' + Math.random().toString(36).slice(2, 14); }
+  function track(type, meta) {
+    try {
+      var w = window.innerWidth, device = w < 700 ? 'mobile' : w < 1024 ? 'tablet' : 'desktop', ref = '';
+      try { ref = document.referrer ? new URL(document.referrer).host : ''; } catch (_) {}
+      if (ref === location.host) ref = '';
+      var body = JSON.stringify({ type: type, sid: SID, path: location.pathname + (location.search.indexOf('sku=') > -1 ? location.search : ''), ref: ref, device: device, meta: meta || {} });
+      if (navigator.sendBeacon) navigator.sendBeacon('/api/track', new Blob([body], { type: 'application/json' }));
+      else fetch('/api/track', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body, keepalive: true }).catch(function () {});
+    } catch (_) {}
+  }
+  track('pageview');
 
   /* ---------- type preview switcher: ?font=bricolage|unbounded|syne|space|anton (sticks for the session; ?font=default clears) ---------- */
   (function () {
@@ -155,7 +170,7 @@
     }).slice(0, 20);
   } catch (e) {} }
   var bag = $('#bag'), bagScrim = $('#bagScrim'), bagItems = $('#bagItems'), bagSub = $('#bagSub'), bagCount = $('#bagCount'), headCount = $('#cartCount'), shipBar = $('#shipBar'), shipMsg = $('#shipMsg'), checkoutBtn = $('#checkoutBtn');
-  function save() { try { localStorage.setItem('doco_cart', JSON.stringify(cart)); } catch (e) {} }
+  function save() { try { localStorage.setItem('doco_cart', JSON.stringify(cart)); } catch (e) {} track('cart_update', { items: cart.map(function (l) { return { sku: l.sku, mode: l.mode, qty: l.qty }; }) }); }
   function linePrice(l) { return l.mode === 'sub' ? P[l.sku].sub : P[l.sku].price; }
   function subtotal() { return cart.reduce(function (s, l) { return s + linePrice(l) * l.qty; }, 0); }
   function count() { return cart.reduce(function (s, l) { return s + l.qty; }, 0); }
@@ -179,6 +194,7 @@
     if (ORDER.indexOf(sku) < 0) return; mode = mode === 'sub' ? 'sub' : 'once'; qty = Math.min(20, Math.max(1, qty || 1));
     var i = -1; cart.forEach(function (l, k) { if (l.sku === sku && l.mode === mode) i = k; });
     if (i > -1) cart[i].qty = Math.min(20, cart[i].qty + qty); else cart.push({ sku: sku, mode: mode, qty: qty });
+    track('add_to_cart', { sku: sku, mode: mode, qty: qty });
     save(); renderCart();
     toast('<img src="' + P[sku].img + '" alt=""><div><b>Added to your bag</b><span>' + P[sku].name + (qty > 1 ? ' × ' + qty : '') + (mode === 'sub' ? ' · subscription' : '') + '</span></div><button type="button" data-bag-open>View bag</button>');
     if (headCount) { headCount.classList.remove('pop'); void headCount.offsetWidth; headCount.classList.add('pop'); }
@@ -193,6 +209,7 @@
   function closeModal(m) { if (!m.classList.contains('open')) return; m.classList.remove('open'); m.setAttribute('aria-hidden', 'true'); lock(false); }
   /* Stripe Checkout handoff: POST the cart to the Replit endpoint, redirect to the session URL */
   function stripeCheckout() {
+    track('checkout_start', { items: cart.map(function (l) { return { sku: l.sku, mode: l.mode, qty: l.qty }; }) });
     var items = cart.map(function (l) { return { sku: l.sku, mode: l.mode, qty: l.qty }; });
     var requestKey = 'doco_checkout_request', body = JSON.stringify(items), pending;
     try { pending = JSON.parse(sessionStorage.getItem(requestKey) || 'null'); } catch (_) {}
@@ -430,6 +447,7 @@
     var lead = P[top], line = picks.length === 1 ? lead.tag : picks.slice(0, 3).map(function (k, i) { return (i ? P[k].name : P[k].name) + ' for ' + ROLE[k]; }).join(', ') + '.';
     qBar.style.width = '100%'; qCount.textContent = 'Your match'; qBack.hidden = false; qNext.hidden = true;
     var ctaSku = sku || top, tweak = 'index.html?stack=' + picks.join(',') + '#stack';
+    track('quiz_complete', { sku: ctaSku, picks: picks });
     qStep.innerHTML = '<div class="q q--in result" style="--c:' + lead.color + '" data-sku="' + ctaSku + '" data-mode="once">' +
       '<div class="result__head"><p class="q__kicker">' + (picks.length > 1 ? 'Your stack' : 'Your match') + '</p><h3 class="result__name">' + name + '</h3><p class="result__tag">' + line + '</p></div>' +
       '<ul class="rstack">' + picks.map(function (k, i) { var f = P[k]; return '<li style="--c:' + f.color + '"><img src="' + f.pouch + '" alt=""><div><b>' + f.name + '</b><small>' + QWHEN[k] + '</small></div><span class="rstack__badge">' + (i ? 'Support' : 'Lead') + '</span></li>'; }).join('') + '</ul>' +
@@ -538,6 +556,7 @@
       el.save.hidden = !(price < full); el.save.textContent = 'Save ' + money(full - price);
       el.note.textContent = n === 0 ? 'tap a formula above' : sku === 'stack' ? 'the best value in the lineup' : bundle ? 'duo price unlocked' : n === 1 ? 'pair it to unlock a duo price' : n === 3 ? 'add the fourth for the Variety Pack price' : 'pair Multivitamin + Sports Energy or Calm + Sleep for a duo price';
       el.cta.href = sku ? 'product.html?sku=' + sku : 'shop.html';
+      if (calc.ran) track('builder_pick', { picks: on, sku: sku }); calc.ran = true;
       el.cta.innerHTML = (sku ? 'View ' + esc(P[sku].name) : n ? 'Shop these formulas' : 'Browse all formulas') + ' <span class="arr">&rarr;</span>';
     }
     var pre = new URLSearchParams(location.search).get('stack');

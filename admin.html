@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0b0b0b">
+<title>DOCO Admin</title>
+<link rel="icon" href="assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/admin.css?v=51">
+</head>
+<body class="adm">
+<header class="adm__top">
+  <a class="adm__brand" href="index.html"><img src="assets/mark-orange.png" alt=""><span>DOCO <b>Admin</b></span></a>
+  <div class="adm__topright"><span class="adm__env" id="admEnv" hidden>Test mode</span><button type="button" class="adm__logout" id="admLogout" hidden>Sign out</button></div>
+</header>
+
+<main id="admLogin" class="adm__login" hidden>
+  <form class="adm__card adm__loginbox" id="loginForm" autocomplete="off">
+    <img class="adm__loginlogo" src="assets/logo-stacked-black.png" alt="DOCO">
+    <h1>Company dashboard</h1>
+    <p>Orders, subscriptions, live carts and site analytics.</p>
+    <label for="admPw">Password</label>
+    <input id="admPw" type="password" autocomplete="current-password" required placeholder="••••••••">
+    <button type="submit" class="adm__btn adm__btn--solid">Sign in</button>
+    <p class="adm__err" id="loginErr" hidden></p>
+  </form>
+</main>
+
+<main id="admApp" class="adm__app" hidden>
+  <div class="adm__bar">
+    <nav class="adm__tabs" id="admTabs">
+      <button type="button" class="is-on" data-tab="overview">Overview</button>
+      <button type="button" data-tab="orders">Orders</button>
+      <button type="button" data-tab="subs">Subscriptions</button>
+      <button type="button" data-tab="carts">Carts</button>
+      <button type="button" data-tab="analytics">Analytics</button>
+      <button type="button" data-tab="creators">Creators</button>
+    </nav>
+    <div class="adm__range"><label for="admDays">Range</label><select id="admDays"><option value="7">7 days</option><option value="30" selected>30 days</option><option value="90">90 days</option><option value="365">1 year</option></select><button type="button" class="adm__refresh" id="admRefresh" aria-label="Refresh">↻</button></div>
+  </div>
+
+  <section class="adm__panel" data-panel="overview">
+    <div class="adm__kpis" id="kpis"></div>
+    <div class="adm__card"><div class="adm__cardhead"><h2>Revenue &amp; visitors</h2><span id="chartNote"></span></div><div class="adm__chart" id="chart"></div></div>
+    <div class="adm__grid2">
+      <div class="adm__card"><div class="adm__cardhead"><h2>Funnel</h2></div><ul class="adm__funnel" id="funnel"></ul></div>
+      <div class="adm__card"><div class="adm__cardhead"><h2>Latest orders</h2><button type="button" class="adm__link" data-go="orders">All orders →</button></div><div id="latestOrders"></div></div>
+    </div>
+  </section>
+
+  <section class="adm__panel" data-panel="orders" hidden>
+    <div class="adm__card"><div class="adm__cardhead"><h2>Orders</h2><div class="adm__actions"><input type="search" id="orderSearch" placeholder="Search name, email, ref"><a class="adm__btn" id="csvLink" href="/api/admin/orders.csv?days=30">Export CSV</a></div></div><div id="ordersList"></div></div>
+  </section>
+
+  <section class="adm__panel" data-panel="subs" hidden>
+    <div class="adm__card"><div class="adm__cardhead"><h2>Subscriptions</h2><span id="subsNote"></span></div><div id="subsList"></div></div>
+  </section>
+
+  <section class="adm__panel" data-panel="carts" hidden>
+    <div class="adm__kpis" id="cartKpis"></div>
+    <div class="adm__card"><div class="adm__cardhead"><h2>What&rsquo;s sitting in carts</h2><span>Last 7 days, sessions that have not started checkout</span></div><div id="cartsList"></div></div>
+  </section>
+
+  <section class="adm__panel" data-panel="analytics" hidden>
+    <div class="adm__grid2">
+      <div class="adm__card"><div class="adm__cardhead"><h2>Top pages</h2></div><div id="pagesList"></div></div>
+      <div class="adm__card"><div class="adm__cardhead"><h2>Where visitors come from</h2></div><div id="refsList"></div></div>
+      <div class="adm__card"><div class="adm__cardhead"><h2>Devices</h2></div><div id="devicesList"></div></div>
+      <div class="adm__card"><div class="adm__cardhead"><h2>Quiz results</h2></div><div id="quizList"></div></div>
+      <div class="adm__card"><div class="adm__cardhead"><h2>Add-to-bag by product</h2></div><div id="atcList"></div></div>
+    </div>
+  </section>
+
+  <section class="adm__panel" data-panel="creators" hidden>
+    <div class="adm__card"><div class="adm__cardhead"><h2>Creator applications</h2><span id="creatorsNote"></span></div><div id="creatorsList"></div></div>
+  </section>
+  <p class="adm__foot">Orders and subscriptions come straight from Stripe. Visits, carts and quiz data are first-party and anonymous. Fulfil and refund in the Stripe dashboard.</p>
+</main>
+<script src="js/admin.js?v=51"></script>
+</body>
+</html>
