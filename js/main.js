@@ -273,7 +273,7 @@
       '<a class="pcard__media" href="product.html?sku=' + sku + '">' + media + '<span class="pcard__tag">' + esc(p.eyebrow) + '</span></a>' +
       '<div class="pcard__body"><div class="pcard__top"><h3><a href="product.html?sku=' + sku + '">' + esc(p.name) + '</a></h3><span class="pcard__price">' + money(p.price) + '</span></div>' +
       '<p class="pcard__tagline">' + esc(p.tag) + '</p>' +
-      '<div class="pcard__foot"><span class="pcard__sub">' + (COMMERCE_ENABLED ? 'One-time or ' + money(p.sub) + '/month' : 'Checkout unavailable') + '</span><a class="pcard__link" href="product.html?sku=' + sku + '">View &rarr;</a></div></div></article>';
+      '<div class="pcard__foot"><span class="pcard__sub">' + (COMMERCE_ENABLED ? 'One-time or ' + money(p.sub) + '/month' : 'Checkout unavailable') + '</span><span class="pcard__acts">' + (COMMERCE_ENABLED ? '<button type="button" class="pcard__add" data-add="' + sku + '" data-mode="once">Add to bag</button>' : '') + '<a class="pcard__link" href="product.html?sku=' + sku + '">View &rarr;</a></span></div></div></article>';
   }
   $$('[data-product-grid]').forEach(function (g) {
     var list = ORDER.filter(function (s) { return (!g.dataset.kind || P[s].kind === g.dataset.kind) && s !== g.dataset.exclude; });
@@ -359,7 +359,7 @@
     /* inside your strip */
     if (!isB) {
       html += '<section class="psec psec--tint" id="inside"><div class="container"><div class="psec__head"><div><p class="eyebrow">Inside your strip</p><h2 class="display">What’s in ' + esc(p.name) + '</h2></div><p>' + esc(p.inside) + '</p></div>' +
-        '<div class="spots' + (p.ingredients.length > 6 ? ' spots--many' : '') + '"><div class="spot spot--strip"><div class="dissolve"><img src="' + p.strip + '" alt=""><i></i></div><span class="spot__name">One strip, one labeled dose</span><span class="spot__note">Rests on the tongue and dissolves in about 15 seconds. Nothing to swallow.</span><span class="dissolve__t">~15s</span></div>' + p.ingredients.map(function (r, i) { return '<div class="spot"><span class="spot__idx">' + (i + 1 < 10 ? '0' : '') + (i + 1) + '</span><span class="spot__amt">' + r[1] + '</span><span class="spot__name">' + r[0] + '</span><span class="spot__note">' + r[2] + '</span></div>'; }).join('') + '</div>' +
+        '<div class="spots' + (p.ingredients.length > 6 ? ' spots--many' : '') + '">' + p.ingredients.map(function (r, i) { return '<div class="spot"><span class="spot__idx">' + (i + 1 < 10 ? '0' : '') + (i + 1) + '</span><span class="spot__amt">' + r[1] + '</span><span class="spot__name">' + r[0] + '</span><span class="spot__note">' + r[2] + '</span></div>'; }).join('') + '</div>' +
         (p.note ? '<p class="ingr__note" style="margin-top:18px">✓ ' + p.note + '</p>' : '') + '</div></section>';
       html += '<section class="psec"><div class="container facts-wrap">' + factsHTML(p) +
         '<div class="facts-note"><h3>Read the label with us</h3><p>Every amount above is printed on the box. We list actives in plain numbers so you know exactly what you are choosing — nothing hidden in a blend.</p><ul>' + p.benefits.map(function (b) { return '<li>' + b + '</li>'; }).join('') + '</ul></div></div></section>';
@@ -564,6 +564,38 @@
     if (pre) { var want = pre.split(','); picks.forEach(function (p) { var on = want.indexOf(p.dataset.pick) > -1; p.classList.toggle('is-on', on); p.setAttribute('aria-pressed', on); }); }
     picks.forEach(function (p) { p.addEventListener('click', function () { p.classList.toggle('is-on'); p.setAttribute('aria-pressed', p.classList.contains('is-on')); calc(); }); });
     calc();
+  })();
+
+  /* ---------- FAQ: show four, expand the rest ---------- */
+  $$('[data-faq-more]').forEach(function (b) { b.addEventListener('click', function () { var wrap = b.closest('.faq__list'); wrap.classList.add('is-open'); b.remove(); }); });
+
+  /* ---------- welcome offer popup: first visit to the home page ---------- */
+  (function () {
+    if (!$('.hero') || !$('.faq')) return;
+    var seen = ''; try { seen = localStorage.getItem('doco_popup') || ''; } catch (_) {}
+    if (seen) return;
+    var pop = document.createElement('div'); pop.className = 'pop'; pop.id = 'pop'; pop.hidden = true; pop.setAttribute('role', 'dialog'); pop.setAttribute('aria-label', 'Welcome offer');
+    pop.innerHTML = '<div class="pop__scrim" data-pop-close></div><div class="pop__card"><button type="button" class="pop__close" data-pop-close aria-label="Close">&times;</button><div class="pop__pattern" aria-hidden="true"></div><img class="pop__bolt" src="assets/step-go.webp" alt="" width="885" height="900">' +
+      '<div class="pop__body"><p class="eyebrow eyebrow--light">Your first order</p><h3 class="pop__title">Let’s go.<br><span>10% off.</span></h3><p class="pop__sub">Drop your email and we’ll send a code for 10% off your first box.</p>' +
+      '<form class="pop__form" novalidate><input type="email" name="email" required placeholder="you@example.com" autocomplete="email" inputmode="email" aria-label="Email"><button type="submit" class="btn btn--solid">Get my 10% <span class="arr">→</span></button></form><p class="pop__err" hidden></p><p class="pop__fine">One welcome email. No spam, unsubscribe anytime.</p></div>' +
+      '<div class="pop__done" hidden><p class="eyebrow eyebrow--light">Your code</p><b class="pop__code">LETSGO10</b><p class="pop__sub">Enter it at checkout on your first order.</p><a class="btn btn--solid" href="shop.html">Shop the formulas <span class="arr">→</span></a></div></div>';
+    document.body.appendChild(pop);
+    var shown = false;
+    function show() { if (shown) return; shown = true; pop.hidden = false; requestAnimationFrame(function () { pop.classList.add('is-on'); }); track('popup_view'); }
+    function close(mark) { pop.classList.remove('is-on'); setTimeout(function () { pop.hidden = true; }, 350); try { localStorage.setItem('doco_popup', mark || '1'); } catch (_) {} }
+    setTimeout(show, 6000);
+    window.addEventListener('scroll', function onS() { if (window.scrollY > window.innerHeight * 0.35) { window.removeEventListener('scroll', onS); setTimeout(show, 600); } }, { passive: true });
+    pop.addEventListener('click', function (e) { if (e.target.closest('[data-pop-close]')) close('1'); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !pop.hidden) close('1'); });
+    $('.pop__form', pop).addEventListener('submit', function (e) {
+      e.preventDefault(); var input = $('input', pop), err = $('.pop__err', pop), btn = $('button[type=submit]', pop), email = input.value.trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { err.textContent = 'Please enter a valid email.'; err.hidden = false; input.focus(); return; }
+      err.hidden = true; btn.disabled = true; btn.textContent = 'Sending…';
+      fetch('/api/subscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: email, source: 'popup' }) })
+        .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.error || 'Could not sign you up'); return d; }); })
+        .then(function (d) { if (d.code) $('.pop__code', pop).textContent = d.code; $('.pop__body', pop).hidden = true; $('.pop__done', pop).hidden = false; try { localStorage.setItem('doco_popup', 'done'); } catch (_) {} track('email_signup', { source: 'popup' }); })
+        .catch(function (ex) { btn.disabled = false; btn.innerHTML = 'Get my 10% <span class="arr">→</span>'; err.textContent = ex.message; err.hidden = false; });
+    });
   })();
 
   /* ---------- home: sticky conversion bar on phones ---------- */

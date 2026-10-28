@@ -38,13 +38,14 @@
     api('carts').then(renderCarts).catch(note('#cartsList'));
     api('analytics?days=' + d).then(renderAnalytics).catch(note('#pagesList'));
     api('creators').then(renderCreators).catch(note('#creatorsList'));
+    api('emails').then(renderEmails).catch(note('#emailsList'));
   }
   function note(sel) { return function (ex) { if (ex.message !== 'Signed out') $(sel).innerHTML = '<p class="adm__empty">' + esc(ex.message) + '</p>'; }; }
   function kpi(label, value, sub, color) { return '<div class="adm__kpi" style="--c:' + (color || 'var(--accent)') + '"><span>' + label + '</span><b>' + value + '</b>' + (sub ? '<small>' + sub + '</small>' : '') + '</div>'; }
 
   function renderOverview(o) {
     $('#kpis').innerHTML = kpi('Revenue', money(o.revenue), o.days + ' days' + (o.testMode ? ' · test mode' : ''), '#f7941d') + kpi('Orders', o.orders, 'AOV ' + money(o.aov), '#d63a30') +
-      kpi('Visitors', o.visitors.toLocaleString(), o.pageviews.toLocaleString() + ' pageviews', '#2592c9') + kpi('Conversion', o.conversion + '%', o.subscriptionsActive + ' active subscriptions', '#6a4fc9');
+      kpi('Visitors', o.visitors.toLocaleString(), o.pageviews.toLocaleString() + ' pageviews', '#2592c9') + kpi('Conversion', o.conversion + '%', o.subscriptionsActive + ' active subscriptions · ' + (o.emailSignups || 0) + ' emails', '#6a4fc9');
     $('#chartNote').textContent = 'Last ' + o.series.length + ' days';
     renderChart(o.series);
     var steps = [['Visitors', o.visitors], ['Added to bag', o.addToCart], ['Started checkout', o.checkoutStarts], ['Paid orders', o.orders]], max = Math.max(1, o.visitors);
@@ -93,5 +94,9 @@
   }
   $('#creatorsList').addEventListener('change', function (e) { var s = e.target.closest('[data-status]'); if (!s) return; var id = s.closest('[data-id]').dataset.id; api('creators/' + id, { method: 'POST', body: JSON.stringify({ status: s.value }) }).catch(function (ex) { alert(ex.message); }); });
 
+  function renderEmails(r) {
+    var l = r.emails || []; $('#emailsNote').textContent = l.length + ' signups · code ' + (r.code || '');
+    $('#emailsList').innerHTML = l.length ? '<table class="adm__table"><thead><tr><th>Email</th><th>When</th><th>Source</th><th>Code</th></tr></thead><tbody>' + l.map(function (x) { return '<tr><td>' + esc(x.email) + '</td><td>' + whenIso(x.ts) + '</td><td><span class="adm__tag">' + esc(x.source || 'popup') + '</span></td><td class="num">' + esc(x.code || '') + '</td></tr>'; }).join('') + '</tbody></table>' : '<p class="adm__empty">No signups yet. The welcome popup collects them on the home page.</p>';
+  }
   api('session').then(function (s) { showApp(s.testMode); }).catch(showLogin);
 })();

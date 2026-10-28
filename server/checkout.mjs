@@ -29,7 +29,11 @@ export function buildCheckout(items, prices, { successUrl, cancelUrl, requestId 
     } : { customer_creation: 'always' }),
     ...(totals.monthlyShipping && !totals.firstShipping ? {
       discounts: [{ coupon: 'doco-first-shipping-free' }],
-    } : {}),
+    } : {
+      // Lets customers enter the welcome code (e.g. LETSGO10) in Stripe Checkout.
+      // Stripe does not allow this together with a preset discount.
+      allow_promotion_codes: true,
+    }),
     // No unapproved tax assumptions or tax-rate changes. Stripe totals are final.
     custom_text: {
       submit: { message: totals.monthly

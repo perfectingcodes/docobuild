@@ -61,3 +61,8 @@ Google Fonts requires an internet connection.
 ## Creators & partners page
 - `/creators.html` with an application form posting to `POST /api/creators` (rate limited, stored in `public.creator_applications`); applications appear under the Admin → Creators tab with a status selector.
 - Program terms shown on the page (20% commission, 15% audience code, free monthly box) are placeholders chosen for launch copy. Change them in `creators.html` (perks + steps copy) and `js/creators.js` (`TERMS` for the earnings illustration).
+
+## Welcome offer popup
+- First visit to the home page shows a 10%-off email popup (`js/main.js`, after 6 s or 35% scroll; remembered in localStorage). Emails post to `POST /api/subscribe` and are stored in `public.email_signups` (unique by email); they appear under Admin → Emails with CSV export.
+- The code shown is `WELCOME_CODE` (default `LETSGO10`). **Create a matching promotion code in the Stripe dashboard** (10% off, limit to first-time customers, optionally one use per customer). Checkout sessions now set `allow_promotion_codes: true` except for mixed carts that already carry the first-shipment coupon (Stripe does not allow both).
+- No automated welcome email is sent yet; the popup shows the code on screen. Wire an email provider later if you want the code delivered by email.

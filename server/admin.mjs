@@ -14,7 +14,10 @@ export async function ensureAdminTables(pool) {
   await pool.query(`CREATE TABLE IF NOT EXISTS public.creator_applications (
     id uuid PRIMARY KEY, ts timestamptz NOT NULL DEFAULT now(), name text NOT NULL, email text NOT NULL,
     handle text, platform text, audience text, website text, message text, status text NOT NULL DEFAULT 'new')`);
+  await pool.query(`CREATE TABLE IF NOT EXISTS public.email_signups (
+    id uuid PRIMARY KEY, ts timestamptz NOT NULL DEFAULT now(), email text NOT NULL UNIQUE, source text, code text)`);
 }
+export const WELCOME_CODE = process.env.WELCOME_CODE || 'LETSGO10';
 
 function production() { return process.env.NODE_ENV === 'production'; }
 function isAdmin(req) { return verifyToken(parseCookies(req.headers.cookie)[ADMIN_COOKIE]); }
@@ -57,6 +60,16 @@ export function registerAdmin(app, { pool, stripe }) {
     } catch (error) { next(error); }
   });
 
+  /* ---- public: email signups (welcome offer) ---- */
+  app.post('/api/subscribe', rateLimit({ windowMs: 3600000, limit: 12, standardHeaders: 'draft-8', legacyHeaders: false }), async (req, res, next) => {
+    const email = String(req.body?.email || '').trim().toLowerCase().slice(0, 120), source = String(req.body?.source || 'popup').slice(0, 40);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return res.status(400).json({ error: 'Please enter a valid email.' });
+    try {
+      await pool.query('INSERT INTO public.email_signups(id,email,source,code) VALUES($1,$2,$3,$4) ON CONFLICT(email) DO NOTHING', [randomUUID(), email, source, WELCOME_CODE]);
+      res.json({ ok: true, code: WELCOME_CODE });
+    } catch (error) { next(error); }
+  });
+
   /* ---- admin auth ---- */
   app.post('/api/admin/login', rateLimit({ windowMs: 15 * 60000, limit: 10, standardHeaders: 'draft-8', legacyHeaders: false }), (req, res) => {
     if (!passwordMatches(req.body?.password)) return res.status(401).json({ error: 'Wrong password.' });
@@ -80,11 +93,12 @@ export function registerAdmin(app, { pool, stripe }) {
       ]);
       const by = Object.fromEntries(counts.rows.map(r => [r.type, { n: Number(r.n), sessions: Number(r.sessions) }]));
       const visitorsTotal = (await pool.query('SELECT COUNT(DISTINCT sid) AS n FROM public.site_events WHERE ts >= $1', [since])).rows[0].n;
+      const emailSignups = Number((await pool.query('SELECT COUNT(*) AS n FROM public.email_signups WHERE ts >= $1', [since])).rows[0].n);
       const sum = summarizeOrders(orders);
       res.json({
         days: d, testMode: !production(), ...sum, subscriptionsActive: subs,
         visitors: Number(visitorsTotal), pageviews: by.pageview?.n || 0,
-        addToCart: by.add_to_cart?.sessions || 0, checkoutStarts: by.checkout_start?.sessions || 0, quizzes: by.quiz_complete?.n || 0,
+        emailSignups, addToCart: by.add_to_cart?.sessions || 0, checkoutStarts: by.checkout_start?.sessions || 0, quizzes: by.quiz_complete?.n || 0,
         conversion: Number(visitorsTotal) ? +(100 * orders.length / Number(visitorsTotal)).toFixed(2) : 0,
         series: buildSeries(Math.min(d, 90), orders, visitors.rows),
       });
@@ -124,6 +138,16 @@ export function registerAdmin(app, { pool, stripe }) {
         q(`SELECT meta->>'sku' AS sku, COUNT(*) AS n FROM public.site_events WHERE ts>=$1 AND type='add_to_cart' GROUP BY 1 ORDER BY n DESC`),
       ]);
       res.json({ pages, referrers: refs, devices, quiz, addToCartBySku: products, catalog: Object.fromEntries(Object.entries(CATALOG).map(([k, v]) => [k, v.name])) });
+    } catch (error) { next(error); }
+  });
+  app.get('/api/admin/emails', requireAdmin, async (_req, res, next) => {
+    try { res.json({ code: WELCOME_CODE, emails: (await pool.query('SELECT id, ts, email, source, code FROM public.email_signups ORDER BY ts DESC LIMIT 2000')).rows }); } catch (error) { next(error); }
+  });
+  app.get('/api/admin/emails.csv', requireAdmin, async (_req, res, next) => {
+    try {
+      const rows = (await pool.query('SELECT ts, email, source, code FROM public.email_signups ORDER BY ts DESC')).rows;
+      res.set('Content-Type', 'text/csv'); res.set('Content-Disposition', 'attachment; filename="doco-emails.csv"');
+      res.send(['date,email,source,code', ...rows.map(r => [new Date(r.ts).toISOString(), r.email, r.source, r.code].map(v => '"' + String(v ?? '').replace(/"/g, '""') + '"').join(','))].join('\n'));
     } catch (error) { next(error); }
   });
   app.get('/api/admin/creators', requireAdmin, async (_req, res, next) => {

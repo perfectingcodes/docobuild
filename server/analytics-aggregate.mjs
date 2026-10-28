@@ -1,5 +1,5 @@
 // Pure helpers for the admin dashboard; no I/O so they are unit-testable.
-export const EVENT_TYPES = new Set(['pageview', 'add_to_cart', 'cart_update', 'checkout_start', 'quiz_complete', 'builder_pick', 'creator_apply']);
+export const EVENT_TYPES = new Set(['pageview', 'add_to_cart', 'cart_update', 'checkout_start', 'quiz_complete', 'builder_pick', 'creator_apply', 'email_signup']);
 export const DEVICES = new Set(['mobile', 'tablet', 'desktop']);
 export function cleanEvent(body) {
   if (!body || typeof body !== 'object') return null;
