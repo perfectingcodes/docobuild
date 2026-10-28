@@ -140,7 +140,7 @@
   var burger = $('#burger'), drawer = $('#drawer'), scrim = $('#scrim');
   function openDrawer() { drawer.classList.add('open'); drawer.setAttribute('aria-hidden', 'false'); scrim.hidden = false; requestAnimationFrame(function () { scrim.classList.add('show'); }); burger.setAttribute('aria-expanded', 'true'); lock(true); }
   function closeDrawer() { if (!drawer || !drawer.classList.contains('open')) return; drawer.classList.remove('open'); drawer.setAttribute('aria-hidden', 'true'); scrim.classList.remove('show'); burger.setAttribute('aria-expanded', 'false'); lock(false); setTimeout(function () { if (!scrim.classList.contains('show')) scrim.hidden = true; }, 400); }
-  if (burger) { burger.addEventListener('click', function () { drawer.classList.contains('open') ? closeDrawer() : openDrawer(); }); scrim.addEventListener('click', closeDrawer); $$('a', drawer).forEach(function (a) { a.addEventListener('click', closeDrawer); }); }
+  if (burger) { burger.addEventListener('click', function () { drawer.classList.contains('open') ? closeDrawer() : openDrawer(); }); scrim.addEventListener('click', closeDrawer); $$('[data-drawer-close]', drawer).forEach(function (b) { b.addEventListener('click', closeDrawer); }); $$('a', drawer).forEach(function (a) { a.addEventListener('click', closeDrawer); }); }
 
   /* ---------- purchase-mode toggles ---------- */
   function initModes(root) {
@@ -492,6 +492,7 @@
       dots.forEach(function (d, k) { d.classList.toggle('is-on', k === i); });
       if (wipe && prev > -1) { wipe.style.background = slides[i].dataset.color; wipe.classList.remove('is-run'); void wipe.offsetWidth; wipe.classList.add('is-run'); }
       stage.style.setProperty('--stage', slides[i].dataset.color); if (cur) cur.textContent = (i + 1 < 10 ? '0' : '') + (i + 1);
+      var mn = $('.showcase__mini-name', sc); if (mn) { mn.textContent = $('.slide__name', slides[i]).textContent; $$('.showcase__mini-bars i', sc).forEach(function (b, k) { b.classList.toggle('is-on', k <= i); }); }
     }
     function update() {
       ticking = false;
