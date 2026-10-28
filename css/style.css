@@ -1784,3 +1784,17 @@ section[id]{scroll-margin-top:calc(var(--ticker-h) + var(--header-h))}
 @media(max-width:700px){.pop__card{padding-top:56px}}
 .pcard__add{white-space:nowrap}
 @media(max-width:700px){.pcard__add{padding:7px 9px;font-size:.56rem;letter-spacing:.04em}}
+/* ---- product card quick add: quiet round "+" ---- */
+.pcard__acts{gap:12px}
+.pcard__add{width:34px;height:34px;padding:0;border-radius:50%;border:1.5px solid var(--ink);background:#fff;color:var(--ink);box-shadow:none;font-size:0;line-height:0;display:inline-flex;align-items:center;justify-content:center;position:relative;transition:background .2s,color .2s,transform .2s var(--ease)}
+.pcard__add::before{content:"+";font-size:1.2rem;font-weight:600;line-height:1}
+.pcard__add:hover{background:var(--accent);border-color:var(--ink);transform:scale(1.06)}
+.pcard__add.is-added{background:var(--green);border-color:var(--green);color:#fff}
+.pcard__add.is-added::before{content:"\2713";font-size:.95rem}
+.pcard__add.is-added::after{content:"Added";position:absolute;right:42px;top:50%;transform:translateY(-50%);font-size:.66rem;font-weight:800;color:var(--green);white-space:nowrap}
+@media(max-width:700px){
+  .pcard__add{width:32px;height:32px;padding:0;font-size:0;letter-spacing:0}
+  .pcard__add::before{font-size:1.1rem}
+  .pcard__acts{gap:10px}
+  .pcard__foot{padding-top:8px}
+}
