@@ -7,83 +7,122 @@
 <meta name="theme-color" content="#0b0b0b">
 <title>DOCO Admin</title>
 <link rel="icon" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/mark-orange.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/admin.css?v=58">
+<link rel="stylesheet" href="css/admin.css?v=60">
 </head>
 <body class="adm">
-<header class="adm__top">
-  <a class="adm__brand" href="index.html"><img src="assets/mark-orange.png" alt=""><span>DOCO <b>Admin</b></span></a>
-  <div class="adm__topright"><span class="adm__env" id="admEnv" hidden>Test mode</span><button type="button" class="adm__logout" id="admLogout" hidden>Sign out</button></div>
-</header>
 
 <main id="admLogin" class="adm__login" hidden>
-  <form class="adm__card adm__loginbox" id="loginForm" autocomplete="off">
+  <form class="adm__loginbox" id="loginForm" autocomplete="off">
     <img class="adm__loginlogo" src="assets/logo-stacked-black.png" alt="DOCO">
-    <h1>Company dashboard</h1>
-    <p>Orders, subscriptions, live carts and site analytics.</p>
+    <h1>Admin</h1>
+    <p>Orders, subscriptions, carts, analytics, creators and emails.</p>
     <label for="admPw">Password</label>
     <input id="admPw" type="password" autocomplete="current-password" required placeholder="••••••••">
     <button type="submit" class="adm__btn adm__btn--solid">Sign in</button>
     <p class="adm__err" id="loginErr" hidden></p>
+    <a class="adm__back" href="/">← Back to the site</a>
   </form>
 </main>
 
-<main id="admApp" class="adm__app" hidden>
-  <div class="adm__bar">
-    <nav class="adm__tabs" id="admTabs">
-      <button type="button" class="is-on" data-tab="overview">Overview</button>
-      <button type="button" data-tab="orders">Orders</button>
-      <button type="button" data-tab="subs">Subscriptions</button>
-      <button type="button" data-tab="carts">Carts</button>
-      <button type="button" data-tab="analytics">Analytics</button>
-      <button type="button" data-tab="creators">Creators</button>
-      <button type="button" data-tab="emails">Emails</button>
+<div id="admApp" class="adm__shell" hidden>
+  <aside class="adm__side">
+    <a class="adm__brand" href="/"><img src="assets/mark-orange.png" alt=""><span>DOCO <b>Admin</b></span></a>
+    <nav class="adm__nav" id="admNav" aria-label="Sections">
+      <button type="button" class="is-on" data-tab="overview"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v10h14V10"/></svg><span>Overview</span></button>
+      <button type="button" data-tab="orders"><svg viewBox="0 0 24 24"><path d="M4 7h16l-1.2 11.2a2 2 0 0 1-2 1.8H7.2a2 2 0 0 1-2-1.8L4 7Z"/><path d="M8.5 7V5.8a3.5 3.5 0 0 1 7 0V7"/></svg><span>Orders</span><i class="adm__badge" data-badge="orders" hidden></i></button>
+      <button type="button" data-tab="carts"><svg viewBox="0 0 24 24"><path d="M3 4h2l2.4 12h11.2L21 8H6.5"/><circle cx="9" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/></svg><span>Carts</span></button>
+      <button type="button" data-tab="analytics"><svg viewBox="0 0 24 24"><path d="M4 19V11"/><path d="M10 19V5"/><path d="M16 19v-8"/><path d="M22 19H2"/></svg><span>Insights</span></button>
+      <button type="button" data-tab="people"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7"/><path d="M17.5 13.5a6 6 0 0 1 4 6.5"/></svg><span>People</span><i class="adm__badge" data-badge="people" hidden></i></button>
     </nav>
-    <div class="adm__range"><label for="admDays">Range</label><select id="admDays"><option value="7">7 days</option><option value="30" selected>30 days</option><option value="90">90 days</option><option value="365">1 year</option></select><button type="button" class="adm__refresh" id="admRefresh" aria-label="Refresh">↻</button></div>
-  </div>
-
-  <section class="adm__panel" data-panel="overview">
-    <div class="adm__kpis" id="kpis"></div>
-    <div class="adm__card"><div class="adm__cardhead"><h2>Revenue &amp; visitors</h2><span id="chartNote"></span></div><div class="adm__chart" id="chart"></div></div>
-    <div class="adm__grid2">
-      <div class="adm__card"><div class="adm__cardhead"><h2>Funnel</h2></div><ul class="adm__funnel" id="funnel"></ul></div>
-      <div class="adm__card"><div class="adm__cardhead"><h2>Latest orders</h2><button type="button" class="adm__link" data-go="orders">All orders →</button></div><div id="latestOrders"></div></div>
+    <div class="adm__sidefoot">
+      <span class="adm__env" id="admEnv" hidden>Test mode</span>
+      <span class="adm__updated" id="admUpdated"></span>
+      <button type="button" class="adm__signout" id="admLogout">Sign out</button>
     </div>
-  </section>
+  </aside>
 
-  <section class="adm__panel" data-panel="orders" hidden>
-    <div class="adm__card"><div class="adm__cardhead"><h2>Orders</h2><div class="adm__actions"><input type="search" id="orderSearch" placeholder="Search name, email, ref"><a class="adm__btn" id="csvLink" href="/api/admin/orders.csv?days=30">Export CSV</a></div></div><div id="ordersList"></div></div>
-  </section>
-
-  <section class="adm__panel" data-panel="subs" hidden>
-    <div class="adm__card"><div class="adm__cardhead"><h2>Subscriptions</h2><span id="subsNote"></span></div><div id="subsList"></div></div>
-  </section>
-
-  <section class="adm__panel" data-panel="carts" hidden>
-    <div class="adm__kpis" id="cartKpis"></div>
-    <div class="adm__card"><div class="adm__cardhead"><h2>What&rsquo;s sitting in carts</h2><span>Last 7 days, sessions that have not started checkout</span></div><div id="cartsList"></div></div>
-  </section>
-
-  <section class="adm__panel" data-panel="analytics" hidden>
-    <div class="adm__grid2">
-      <div class="adm__card"><div class="adm__cardhead"><h2>Top pages</h2></div><div id="pagesList"></div></div>
-      <div class="adm__card"><div class="adm__cardhead"><h2>Where visitors come from</h2></div><div id="refsList"></div></div>
-      <div class="adm__card"><div class="adm__cardhead"><h2>Devices</h2></div><div id="devicesList"></div></div>
-      <div class="adm__card"><div class="adm__cardhead"><h2>Quiz results</h2></div><div id="quizList"></div></div>
-      <div class="adm__card"><div class="adm__cardhead"><h2>Add-to-bag by product</h2></div><div id="atcList"></div></div>
+  <header class="adm__topbar">
+    <a class="adm__brand" href="/"><img src="assets/mark-orange.png" alt=""><span>DOCO <b>Admin</b></span></a>
+    <div class="adm__topright">
+      <span class="adm__env adm__env--sm" id="admEnvSm" hidden>Test</span>
+      <button type="button" class="adm__iconbtn" id="admRefreshSm" aria-label="Refresh"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v5h-5"/></svg></button>
+      <button type="button" class="adm__iconbtn" id="admLogoutSm" aria-label="Sign out"><svg viewBox="0 0 24 24"><path d="M10 4H5v16h5"/><path d="M14 8l4 4-4 4"/><path d="M18 12H9"/></svg></button>
     </div>
-  </section>
+  </header>
 
-  <section class="adm__panel" data-panel="creators" hidden>
-    <div class="adm__card"><div class="adm__cardhead"><h2>Creator applications</h2><span id="creatorsNote"></span></div><div id="creatorsList"></div></div>
-  </section>
-  <section class="adm__panel" data-panel="emails" hidden>
-    <div class="adm__card"><div class="adm__cardhead"><h2>Email signups</h2><div class="adm__actions"><span id="emailsNote"></span><a class="adm__btn" href="/api/admin/emails.csv">Export CSV</a></div></div><div id="emailsList"></div></div>
-  </section>
-  <p class="adm__foot">Orders and subscriptions come straight from Stripe. Visits, carts and quiz data are first-party and anonymous. Fulfil and refund in the Stripe dashboard.</p>
-</main>
-<script src="js/admin.js?v=58"></script>
+  <main class="adm__main">
+    <div class="adm__phead">
+      <h1 id="pTitle">Overview</h1>
+      <div class="adm__tools">
+        <select id="admDays" aria-label="Date range"><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option><option value="365">Last year</option></select>
+        <button type="button" class="adm__iconbtn adm__iconbtn--line" id="admRefresh" aria-label="Refresh"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v5h-5"/></svg></button>
+      </div>
+    </div>
+
+    <section class="adm__panel" data-panel="overview">
+      <div class="adm__today" id="today"></div>
+      <div class="adm__kpis" id="kpis"></div>
+      <div class="adm__card"><div class="adm__cardhead"><h2>Revenue &amp; visitors</h2><span id="chartNote"></span></div><div class="adm__chart" id="chart"></div></div>
+      <div class="adm__grid2">
+        <div class="adm__card"><div class="adm__cardhead"><h2>Needs a look</h2></div><div id="attention"></div></div>
+        <div class="adm__card"><div class="adm__cardhead"><h2>Latest orders</h2><button type="button" class="adm__link" data-go="orders">All orders →</button></div><div id="latestOrders"></div></div>
+      </div>
+      <div class="adm__card"><div class="adm__cardhead"><h2>Funnel</h2><span>Visitors to paid orders</span></div><ul class="adm__funnel" id="funnel"></ul></div>
+    </section>
+
+    <section class="adm__panel" data-panel="orders" hidden>
+      <div class="adm__seg" role="tablist"><button type="button" class="is-on" data-sub="orders">Orders</button><button type="button" data-sub="subs">Subscriptions</button></div>
+      <div data-subpanel="orders">
+        <div class="adm__filters"><input type="search" id="orderSearch" placeholder="Search name, email or ref" aria-label="Search orders"><div class="adm__chips" id="orderChips"><button type="button" class="is-on" data-filter="all">All</button><button type="button" data-filter="today">Today</button><button type="button" data-filter="one-time">One-time</button><button type="button" data-filter="subscription">Subscription</button></div><a class="adm__btn" id="csvLink" href="/api/admin/orders.csv?days=30">CSV</a></div>
+        <div id="ordersList" class="adm__list"></div>
+      </div>
+      <div data-subpanel="subs" hidden>
+        <p class="adm__note" id="subsNote"></p>
+        <div id="subsList" class="adm__list"></div>
+      </div>
+    </section>
+
+    <section class="adm__panel" data-panel="carts" hidden>
+      <div class="adm__kpis" id="cartKpis"></div>
+      <div class="adm__card"><div class="adm__cardhead"><h2>What&rsquo;s sitting in carts</h2><span>Last 7 days, sessions that have not started checkout</span></div><div id="cartsList"></div></div>
+    </section>
+
+    <section class="adm__panel" data-panel="analytics" hidden>
+      <div class="adm__grid2">
+        <div class="adm__card"><div class="adm__cardhead"><h2>Top pages</h2></div><div id="pagesList"></div></div>
+        <div class="adm__card"><div class="adm__cardhead"><h2>Where visitors come from</h2></div><div id="refsList"></div></div>
+        <div class="adm__card"><div class="adm__cardhead"><h2>Devices</h2></div><div id="devicesList"></div></div>
+        <div class="adm__card"><div class="adm__cardhead"><h2>Quiz results</h2></div><div id="quizList"></div></div>
+        <div class="adm__card"><div class="adm__cardhead"><h2>Add-to-bag by product</h2></div><div id="atcList"></div></div>
+      </div>
+    </section>
+
+    <section class="adm__panel" data-panel="people" hidden>
+      <div class="adm__seg" role="tablist"><button type="button" class="is-on" data-sub="creators">Creators</button><button type="button" data-sub="emails">Emails</button></div>
+      <div data-subpanel="creators">
+        <p class="adm__note" id="creatorsNote"></p>
+        <div id="creatorsList" class="adm__list"></div>
+      </div>
+      <div data-subpanel="emails" hidden>
+        <div class="adm__filters"><p class="adm__note" id="emailsNote"></p><a class="adm__btn" href="/api/admin/emails.csv">CSV</a></div>
+        <div id="emailsList" class="adm__list"></div>
+      </div>
+    </section>
+    <p class="adm__foot">Orders and subscriptions come straight from Stripe. Visits, carts and quiz data are first-party and anonymous. Fulfil and refund in the Stripe dashboard.</p>
+  </main>
+
+  <nav class="adm__tabbar" id="admTabbar" aria-label="Sections">
+    <button type="button" class="is-on" data-tab="overview"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v10h14V10"/></svg><span>Home</span></button>
+    <button type="button" data-tab="orders"><svg viewBox="0 0 24 24"><path d="M4 7h16l-1.2 11.2a2 2 0 0 1-2 1.8H7.2a2 2 0 0 1-2-1.8L4 7Z"/><path d="M8.5 7V5.8a3.5 3.5 0 0 1 7 0V7"/></svg><span>Orders</span><i class="adm__badge" data-badge="orders" hidden></i></button>
+    <button type="button" data-tab="carts"><svg viewBox="0 0 24 24"><path d="M3 4h2l2.4 12h11.2L21 8H6.5"/><circle cx="9" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/></svg><span>Carts</span></button>
+    <button type="button" data-tab="analytics"><svg viewBox="0 0 24 24"><path d="M4 19V11"/><path d="M10 19V5"/><path d="M16 19v-8"/><path d="M22 19H2"/></svg><span>Insights</span></button>
+    <button type="button" data-tab="people"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7"/><path d="M17.5 13.5a6 6 0 0 1 4 6.5"/></svg><span>People</span><i class="adm__badge" data-badge="people" hidden></i></button>
+  </nav>
+</div>
+<script src="js/admin.js?v=60"></script>
 </body>
 </html>

@@ -18,8 +18,8 @@
 window.DOCO_COMMERCE = {
   enabled: true,
   checkoutEndpoint: '/api/create-checkout-session',
-  successUrl: 'thanks.html?session_id={CHECKOUT_SESSION_ID}',
-  cancelUrl: 'shop.html?checkout=canceled',
+  successUrl: '/thanks?session_id={CHECKOUT_SESSION_ID}',
+  cancelUrl: '/shop?checkout=canceled',
   currency: 'usd',
   freeShippingOver: 45,
   shippingFee: 5.99,

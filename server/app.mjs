@@ -11,6 +11,7 @@ import { buildCheckout } from './checkout.mjs';
 import { catalogReadiness, portalReady } from './readiness.mjs';
 import { registerAdmin } from './admin.mjs';
 import { checkoutOrigin } from './checkout-origin.mjs';
+import { cleanUrls } from './clean-urls.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'dist');
 export const app = express();
@@ -121,7 +122,8 @@ app.get('/api/checkout-status', async (req, res, next) => {
 });
 registerAdmin(app, { pool, stripe });
 app.use('/api', (_req, res) => res.status(404).json({ error: 'Not found' }));
-app.use(express.static(root, { dotfiles: 'deny', etag: true, setHeaders(res, file) {
+app.use(cleanUrls);
+app.use(express.static(root, { dotfiles: 'deny', etag: true, extensions: ['html'], setHeaders(res, file) {
   if (/\.(html|js|css)$/.test(file)) res.set('Cache-Control', 'no-cache');
 } }));
 app.use((error, _req, res, _next) => {

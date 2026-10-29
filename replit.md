@@ -16,9 +16,10 @@ Publishing is configured as **Autoscale** because checkout needs a backend. Buil
 Use Replit's Publish action to put the site live. Changes to the source require republishing to update the live site.
 
 ## Pages
-- `/` or `/index.html`: home page
-- `/shop.html`: shop
-- `/product.html?sku=multi`: example product
+- Checkout origins allowed by `server/checkout-origin.mjs`: `https://docobuild.replit.app`, `https://docostrips.com`, `https://www.docostrips.com`. Add any new custom domain there or checkout returns 403.
+- `/`: home page (clean URLs: `/shop`, `/product?sku=multi`, `/creators`, `/thanks`, `/admin`; any `*.html` address 301-redirects to its clean form)
+- `/shop`: shop
+- `/product?sku=multi`: example product
 
 Styles are in `css/style.css`, behavior and product data in `js/main.js`, and images in `assets/`.
 
@@ -51,7 +52,7 @@ Browser and API checks must use the sandbox only. Never submit a live charge as 
 Google Fonts requires an internet connection.
 
 ## Admin dashboard (owner only)
-- URL: `/admin.html` on the same site. Not linked publicly; `noindex`.
+- URL: `/admin` on the same site. Not linked publicly; `noindex`.
 - Sign-in password comes from the `ADMIN_PASSWORD` secret. Until it is set the fallback is `domore` — set the secret in Replit Secrets before sharing the URL, then restart/republish.
 - Sessions are signed cookies (`SESSION_SECRET`), 12 hours, HttpOnly, SameSite=Strict, Secure in production. Login is rate limited.
 - Routes live in `server/admin.mjs` and are mounted in `server/app.mjs`; `ensureAdminTables()` creates `public.site_events` and `public.creator_applications` at startup (`server/index.mjs`).
@@ -60,7 +61,7 @@ Google Fonts requires an internet connection.
 - `tests/admin.test.mjs` covers token signing, password checks, event sanitizing and aggregation; it runs with `npm test`.
 
 ## Creators & partners page
-- `/creators.html` with an application form posting to `POST /api/creators` (rate limited, stored in `public.creator_applications`); applications appear under the Admin → Creators tab with a status selector.
+- `/creators` with an application form posting to `POST /api/creators` (rate limited, stored in `public.creator_applications`); applications appear under the Admin → Creators tab with a status selector.
 - Program terms shown on the page (20% commission, 15% audience code, free monthly box) are placeholders chosen for launch copy. Change them in `creators.html` (perks + steps copy) and `js/creators.js` (`TERMS` for the earnings illustration).
 
 ## Welcome offer popup

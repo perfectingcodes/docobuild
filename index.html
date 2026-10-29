@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="assets/favicon.png">
-<link rel="stylesheet" href="css/style.css?v=59">
+<link rel="stylesheet" href="css/style.css?v=60">
 </head>
 <body>
 
@@ -28,18 +28,18 @@
 <!-- ===== HEADER ===== -->
 <header class="site-header" id="siteHeader">
   <div class="container site-header__inner">
-    <a href="index.html" class="brand" aria-label="DOCO home"><img src="assets/logo-orange.png" alt="DOCO — The Do Company"></a>
+    <a href="/" class="brand" aria-label="DOCO home"><img src="assets/logo-orange.png" alt="DOCO — The Do Company"></a>
     <nav class="mainnav" id="mainnav" aria-label="Primary">
-      <a href="shop.html">Shop</a>
-      <a href="index.html#science">Science</a>
-      <a href="index.html#reviews">Reviews</a>
+      <a href="/shop">Shop</a>
+      <a href="/#science">Science</a>
+      <a href="/#reviews">Reviews</a>
       <a href="#quiz" data-quiz-open>Quiz</a>
-      <a href="index.html#faq">FAQ</a>
-      <a href="creators.html">Creators</a>
+      <a href="/#faq">FAQ</a>
+      <a href="/creators">Creators</a>
     </nav>
     <div class="site-header__actions">
-      <a href="product.html?sku=stack" class="btn btn--solid btn--sm">Explore the stack <span class="arr">→</span></a>
-      <button type="button" class="iconbtn" id="cartBtn" data-bag-open aria-label="Open your bag" hidden><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 7h16l-1.2 11.2a2 2 0 0 1-2 1.8H7.2a2 2 0 0 1-2-1.8L4 7Z"/><path d="M8.5 7V5.8a3.5 3.5 0 0 1 7 0V7"/></svg><span class="iconbtn__count" id="cartCount">0</span></button>
+      <a href="/product?sku=stack" class="btn btn--solid btn--sm">Explore the stack <span class="arr">→</span></a>
+      <button type="button" class="iconbtn" id="cartBtn" data-bag-open aria-label="Open your bag" hidden><span class="iconbtn__in"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 7h16l-1.2 11.2a2 2 0 0 1-2 1.8H7.2a2 2 0 0 1-2-1.8L4 7Z"/><path d="M8.5 7V5.8a3.5 3.5 0 0 1 7 0V7"/></svg><span class="iconbtn__count" id="cartCount">0</span></span></button>
       <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span></button>
     </div>
   </div>
@@ -47,19 +47,20 @@
 
 <!-- ===== MOBILE DRAWER ===== -->
 <div class="drawer" id="drawer" aria-hidden="true">
-  <div class="drawer__head"><a href="index.html" aria-label="DOCO home"><img src="assets/logo-orange.png" alt="DOCO"></a><button type="button" class="drawer__close" data-drawer-close aria-label="Close menu">&times;</button></div>
+  <div class="drawer__head"><a href="/" aria-label="DOCO home"><img src="assets/logo-orange.png" alt="DOCO"></a><button type="button" class="drawer__close" data-drawer-close aria-label="Close menu">&times;</button></div>
   <nav class="drawer__nav" aria-label="Mobile">
-    <a href="shop.html">Shop</a>
-    <a href="index.html#science">Science</a>
-    <a href="index.html#reviews">Reviews</a>
+    <a href="/shop">Shop</a>
+    <a href="/#science">Science</a>
+    <a href="/#reviews">Reviews</a>
     <a href="#quiz" data-quiz-open>Quiz</a>
-    <a href="index.html#faq">FAQ</a>
-    <a href="creators.html">Creators</a>
-    <a href="product.html?sku=stack" class="btn btn--solid btn--block">Explore the stack →</a>
+    <a href="/#faq">FAQ</a>
+    <a href="/creators">Creators</a>
+    <a href="/product?sku=stack" class="btn btn--solid btn--block">Explore the stack →</a>
   </nav>
   <div class="drawer__meta">
-    <a href="tel:4012179740">401-217-9740</a>
-    <a href="mailto:joyce@docostrips.com">joyce@docostrips.com</a>
+    <p class="drawer__meta-k">Questions? Real people answer.</p>
+    <a class="drawer__contact" href="tel:4012179740"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.8 2z"/></svg><span>Call or text</span><b>401-217-9740</b></a>
+    <a class="drawer__contact" href="mailto:joyce@docostrips.com"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><span>Email</span><b>joyce@docostrips.com</b></a>
   </div>
 </div>
 <div class="scrim" id="scrim" hidden></div>
@@ -139,8 +140,8 @@
             <h3 class="slide__name">Multivitamin</h3>
             <p class="serif-accent slide__tag">From someday to every day.</p>
             <p class="slide__desc">Ten nutrients that support everyday body functions in one portable strip. The vitamin habit you can actually keep.</p>
-            <div class="slide__inside"><span class="slide__inside-k">Inside your strip</span><ul><li><b>Vitamin A</b><i>900 mcg</i></li><li><b>Vitamin D3</b><i>800 IU</i></li><li><b>Vitamin K2</b><i>120 mcg</i></li><li><b>Vitamin B5</b><i>5 mg</i></li><li><b>Vitamin B6</b><i>2 mg</i></li></ul><a class="slide__more" href="product.html?sku=multi">Full panel &rarr;</a></div>
-            <div class="slide__foot"><span class="slide__price" data-price>$29.99</span><button type="button" class="btn btn--light" disabled>Launching soon</button><a class="slide__more" href="product.html?sku=multi">Details →</a></div>
+            <div class="slide__inside"><span class="slide__inside-k">Inside your strip</span><ul><li><b>Vitamin A</b><i>900 mcg</i></li><li><b>Vitamin D3</b><i>800 IU</i></li><li><b>Vitamin K2</b><i>120 mcg</i></li><li><b>Vitamin B5</b><i>5 mg</i></li><li><b>Vitamin B6</b><i>2 mg</i></li></ul><a class="slide__more" href="/product?sku=multi">Full panel &rarr;</a></div>
+            <div class="slide__foot"><span class="slide__price" data-price>$29.99</span><button type="button" class="btn btn--light" disabled>Launching soon</button><a class="slide__more" href="/product?sku=multi">Details →</a></div>
           </div>
           <div class="slide__stage">
             <span class="slide__idx" aria-hidden="true">01</span>
@@ -161,8 +162,8 @@
             <h3 class="slide__name">Sports Energy</h3>
             <p class="serif-accent slide__tag">Energy now. No crash later.</p>
             <p class="slide__desc">A labeled 80 mg of natural caffeine with L-theanine and B12 &mdash; a measured option for the gym, the office, the next move. No drink to carry.</p>
-            <div class="slide__inside"><span class="slide__inside-k">Inside your strip</span><ul><li><b>Natural caffeine</b><i>80 mg</i></li><li><b>L-theanine</b><i>30 mg</i></li><li><b>Vitamin B12</b><i>1,500 mcg</i></li></ul><a class="slide__more" href="product.html?sku=sport">Full panel &rarr;</a></div>
-            <div class="slide__foot"><span class="slide__price" data-price>$29.99</span><button type="button" class="btn btn--light" disabled>Launching soon</button><a class="slide__more" href="product.html?sku=sport">Details →</a></div>
+            <div class="slide__inside"><span class="slide__inside-k">Inside your strip</span><ul><li><b>Natural caffeine</b><i>80 mg</i></li><li><b>L-theanine</b><i>30 mg</i></li><li><b>Vitamin B12</b><i>1,500 mcg</i></li></ul><a class="slide__more" href="/product?sku=sport">Full panel &rarr;</a></div>
+            <div class="slide__foot"><span class="slide__price" data-price>$29.99</span><button type="button" class="btn btn--light" disabled>Launching soon</button><a class="slide__more" href="/product?sku=sport">Details →</a></div>
           </div>
           <div class="slide__stage">
             <span class="slide__idx" aria-hidden="true">02</span>
@@ -183,8 +184,8 @@
             <h3 class="slide__name">Calm + Stress</h3>
             <p class="serif-accent slide__tag">From chaos to calm.</p>
             <p class="slide__desc">SunTheanine&reg; L-theanine with holy basil, passionflower and lemon balm in a lemon strip &mdash; your cue to step away, breathe, and reset.</p>
-            <div class="slide__inside"><span class="slide__inside-k">Inside your strip</span><ul><li><b>SunTheanine&reg; L-theanine</b><i>50 mg</i></li><li><b>Holy basil</b><i>30 mg</i></li><li><b>Passionflower</b><i>20 mg</i></li><li><b>Lemon balm</b><i>10 mg</i></li><li><b>Ashwagandha</b><i>5 mg</i></li></ul><a class="slide__more" href="product.html?sku=calm">Full panel &rarr;</a></div>
-            <div class="slide__foot"><span class="slide__price" data-price>$29.99</span><button type="button" class="btn btn--light" disabled>Launching soon</button><a class="slide__more" href="product.html?sku=calm">Details →</a></div>
+            <div class="slide__inside"><span class="slide__inside-k">Inside your strip</span><ul><li><b>SunTheanine&reg; L-theanine</b><i>50 mg</i></li><li><b>Holy basil</b><i>30 mg</i></li><li><b>Passionflower</b><i>20 mg</i></li><li><b>Lemon balm</b><i>10 mg</i></li><li><b>Ashwagandha</b><i>5 mg</i></li></ul><a class="slide__more" href="/product?sku=calm">Full panel &rarr;</a></div>
+            <div class="slide__foot"><span class="slide__price" data-price>$29.99</span><button type="button" class="btn btn--light" disabled>Launching soon</button><a class="slide__more" href="/product?sku=calm">Details →</a></div>
           </div>
           <div class="slide__stage">
             <span class="slide__idx" aria-hidden="true">03</span>
@@ -205,8 +206,8 @@
             <h3 class="slide__name">Sleep</h3>
             <p class="serif-accent slide__tag">From restless to rested.</p>
             <p class="slide__desc">Tart cherry, saffron and B6 in a cranberry strip &mdash; your cue to set the phone aside, lower the lights and begin the wind-down. No added melatonin.</p>
-            <div class="slide__inside"><span class="slide__inside-k">Inside your strip</span><ul><li><b>Tart cherry</b><i>50 mg</i></li><li><b>Saffron</b><i>14 mg</i></li><li><b>Vitamin B6</b><i>1.4 mg</i></li></ul><a class="slide__more" href="product.html?sku=sleep">Full panel &rarr;</a></div>
-            <div class="slide__foot"><span class="slide__price" data-price>$29.99</span><button type="button" class="btn btn--light" disabled>Launching soon</button><a class="slide__more" href="product.html?sku=sleep">Details →</a></div>
+            <div class="slide__inside"><span class="slide__inside-k">Inside your strip</span><ul><li><b>Tart cherry</b><i>50 mg</i></li><li><b>Saffron</b><i>14 mg</i></li><li><b>Vitamin B6</b><i>1.4 mg</i></li></ul><a class="slide__more" href="/product?sku=sleep">Full panel &rarr;</a></div>
+            <div class="slide__foot"><span class="slide__price" data-price>$29.99</span><button type="button" class="btn btn--light" disabled>Launching soon</button><a class="slide__more" href="/product?sku=sleep">Details →</a></div>
           </div>
           <div class="slide__stage">
             <span class="slide__idx" aria-hidden="true">04</span>
@@ -243,7 +244,7 @@
       <div class="tabs" role="tablist" data-target="#lineupGrid"><button type="button" class="tab is-on" data-filter="all">All</button><button type="button" class="tab" data-filter="formula">Formulas</button><button type="button" class="tab" data-filter="bundle">Bundles</button></div>
     </div>
     <div class="pgrid" id="lineupGrid" data-product-grid></div>
-    <div class="lineup__more reveal"><a class="btn btn--ink" href="shop.html">See the full shop <span class="arr">&rarr;</span></a></div>
+    <div class="lineup__more reveal"><a class="btn btn--ink" href="/shop">See the full shop <span class="arr">&rarr;</span></a></div>
   </div>
 </section>
 
@@ -320,7 +321,7 @@
       <article class="love__card reveal" data-delay="1" style="--c:#ef8120"><img src="assets/step-place.webp" alt="" loading="lazy"><h3>The taste</h3><p>Cranberry, strawberry-mint and lemon &mdash; flavors you look forward to, not something to get over with.</p></article>
       <article class="love__card reveal" data-delay="2" style="--c:#2592c9"><img src="assets/step-peel.webp" alt="" loading="lazy"><h3>The ritual</h3><p>Peel, place, go. A habit small enough to keep on your busiest days &mdash; in a pocket, a bag, a glovebox.</p></article>
     </div>
-    <div class="love__strip reveal" data-delay="2"><span class="rating__stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span><p>Reviews open with the first orders. Try a box for a week and tell us what you think &mdash; we read every one.</p><a class="btn btn--chip" href="shop.html">Shop the formulas &rarr;</a></div>
+    <div class="love__strip reveal" data-delay="2"><span class="rating__stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span><p>Reviews open with the first orders. Try a box for a week and tell us what you think &mdash; we read every one.</p><a class="btn btn--chip" href="/shop">Shop the formulas &rarr;</a></div>
   </div>
 </section>
 
@@ -348,7 +349,7 @@
           <p class="builder__meta"><b data-b-count>4</b> formulas &middot; <b data-b-strips>120</b> strips &middot; <span data-b-note>the best value in the lineup</span></p>
         </div>
         <div class="builder__price"><span class="builder__now" data-b-price>$79.99</span><span class="builder__was" data-b-was>$119.96</span><span class="builder__save" data-b-save>Save $39.97</span></div>
-        <div class="builder__act"><a class="btn btn--solid" data-b-cta href="product.html?sku=stack">View the Variety Pack <span class="arr">&rarr;</span></a><span class="builder__launch">US shipping only</span></div>
+        <div class="builder__act"><a class="btn btn--solid" data-b-cta href="/product?sku=stack">View the Variety Pack <span class="arr">&rarr;</span></a><span class="builder__launch">US shipping only</span></div>
       </div>
     </div>
   </div>
@@ -449,8 +450,8 @@
         <p>Fast-dissolving wellness strips for people with big plans. Four formulas, one simple ritual.</p>
         <span class="footer__brandline"><img src="assets/mark-white.png" alt="" style="filter:invert(1)">Do more. Be more.</span>
       </div>
-      <div class="footer__col"><h5>Shop</h5><a href="product.html?sku=multi">Multivitamin</a><a href="product.html?sku=sport">Sports Energy</a><a href="product.html?sku=calm">Calm + Stress</a><a href="product.html?sku=sleep">Sleep</a><a href="product.html?sku=stack">The Variety Pack</a><a href="shop.html">All products</a></div>
-      <div class="footer__col"><h5>Learn</h5><a href="index.html#science">Science</a><a href="index.html#ritual">How it works</a><a href="index.html#story">Our story</a><a href="index.html#faq">FAQ</a><a href="creators.html">Creators &amp; partners</a></div>
+      <div class="footer__col"><h5>Shop</h5><a href="/product?sku=multi">Multivitamin</a><a href="/product?sku=sport">Sports Energy</a><a href="/product?sku=calm">Calm + Stress</a><a href="/product?sku=sleep">Sleep</a><a href="/product?sku=stack">The Variety Pack</a><a href="/shop">All products</a></div>
+      <div class="footer__col"><h5>Learn</h5><a href="/#science">Science</a><a href="/#ritual">How it works</a><a href="/#story">Our story</a><a href="/#faq">FAQ</a><a href="/creators">Creators &amp; partners</a></div>
       <div class="footer__col"><h5>Support</h5><a href="mailto:joyce@docostrips.com">Contact</a><a href="mailto:joyce@docostrips.com?subject=Returns%20question">Returns questions</a><a href="mailto:joyce@docostrips.com?subject=Shipping%20question">Shipping questions</a><a href="tel:4012179740">401-217-9740</a></div>
       <div class="footer__col"><h5>Follow</h5><span>Social links coming soon</span></div>
     </div>
@@ -463,7 +464,7 @@
 </footer>
 
 
-<script src="js/commerce-config.js?v=59"></script>
-<script src="js/main.js?v=59"></script>
+<script src="js/commerce-config.js?v=60"></script>
+<script src="js/main.js?v=60"></script>
 </body>
 </html>
