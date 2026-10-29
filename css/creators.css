@@ -12,7 +12,7 @@
 .cr-hero__stickers li.is-yellow{background:var(--yellow)}
 .cr-hero__stickers li.is-ink{background:var(--accent)}
 .cr-hero__art{position:relative;max-width:420px;justify-self:center;width:100%}
-.cr-hero__photo{width:100%;aspect-ratio:4/5;object-fit:cover;object-position:50% 40%;border-radius:24px;border:2px solid #fff;box-shadow:10px 10px 0 var(--accent);transform:rotate(-2deg)}
+.cr-hero__photo{width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;object-position:50% 40%;border-radius:24px;border:2px solid #fff;box-shadow:10px 10px 0 var(--accent);transform:rotate(-2deg)}
 .cr-hero__tongue{position:absolute;right:-24px;bottom:-14px;width:150px;height:auto;transform:rotate(8deg);filter:drop-shadow(0 16px 20px rgba(0,0,0,.5));animation:tongue 5s ease-in-out infinite}
 .cr-hero__tag{position:absolute;left:-14px;top:20px;background:var(--yellow);color:var(--ink);border:2px solid var(--ink);border-radius:999px;padding:8px 14px;font-weight:800;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;box-shadow:3px 3px 0 var(--ink);transform:rotate(-4deg)}
 .cr-hero__tag b{color:var(--ink)}
@@ -135,3 +135,9 @@
 }
 .cr-apply .accent{color:#fff}
 .cr-hero__photo{object-position:50% 62%}
+
+/* ---- hero sizing guard + polish ---- */
+.cr-hero__photo{height:auto!important}
+.cr-perks__grid img,.cr-step__art img,.cr-form__bolt{height:auto}
+.cr-hero__art{max-width:400px}
+@media(max-width:700px){.cr-hero__art{width:min(100%,300px);margin:0 auto}.cr-hero__photo{aspect-ratio:4/5}}
