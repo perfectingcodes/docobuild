@@ -1939,3 +1939,9 @@ section[id]{scroll-margin-top:calc(var(--ticker-h) + var(--header-h))}
   .valuestrip .vitem strong{font-size:.86rem}
   .valuestrip .vitem span{font-size:.68rem;margin-top:1px}
 }
+/* ---- value strip icons v2: plain Lucide line icons, no bubble ---- */
+.vitem__ic{width:auto;height:auto;border:none;background:transparent;border-radius:0;color:var(--accent)}
+.vitem__ic svg{width:26px;height:26px;stroke-width:1.6}
+.valuestrip .vitem:hover .vitem__ic{background:transparent;color:var(--ink);transform:none}
+.valuestrip .vitem{gap:14px}
+@media(max-width:700px){.vitem__ic svg{width:22px;height:22px}.valuestrip .vitem{gap:10px}}
