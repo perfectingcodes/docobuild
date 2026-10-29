@@ -1950,3 +1950,10 @@ section[id]{scroll-margin-top:calc(var(--ticker-h) + var(--header-h))}
 .valuestrip .vitem .vitem__ic{color:var(--accent);margin:0;font-size:0;line-height:0;display:flex;align-items:center}
 .valuestrip .vitem:hover .vitem__ic{color:var(--ink)}
 .valuestrip .vitem>div{min-width:0}
+/* ---- overlay safety: hidden means hidden, and closed overlays never catch taps ---- */
+[hidden]{display:none!important}
+.lb{pointer-events:none}
+.lb.is-on{pointer-events:auto}
+.pop{pointer-events:none}
+.pop.is-on{pointer-events:auto}
+.scrim:not(.show){pointer-events:none}
