@@ -1945,3 +1945,8 @@ section[id]{scroll-margin-top:calc(var(--ticker-h) + var(--header-h))}
 .valuestrip .vitem:hover .vitem__ic{background:transparent;color:var(--ink);transform:none}
 .valuestrip .vitem{gap:14px}
 @media(max-width:700px){.vitem__ic svg{width:22px;height:22px}.valuestrip .vitem{gap:10px}}
+/* ---- value strip fixes: keep container side padding, icon colour beats the span rule ---- */
+.valuestrip__grid{padding-left:clamp(20px,5vw,56px);padding-right:clamp(20px,5vw,56px)}
+.valuestrip .vitem .vitem__ic{color:var(--accent);margin:0;font-size:0;line-height:0;display:flex;align-items:center}
+.valuestrip .vitem:hover .vitem__ic{color:var(--ink)}
+.valuestrip .vitem>div{min-width:0}
