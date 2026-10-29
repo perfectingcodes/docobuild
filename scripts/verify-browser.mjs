@@ -10,7 +10,7 @@ const browser = await chromium.launch({
 });
 await mkdir('generated-artifacts', { recursive: true });
 try {
-  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
   const page = await context.newPage();
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
@@ -51,6 +51,24 @@ try {
   await page.reload();
   await expect(page.locator('#cartBtn')).toContainText('0', { timeout: 20000 });
   await expect(page.locator('a[href^="https://billing.stripe.com/"]')).toHaveText('Manage subscriptions');
+  await page.goto(`${base}/shop.html`);
+  const card = page.locator('.pcard').first();
+  const pouch = card.locator('.pcard__pouch');
+  await expect(pouch).toBeVisible();
+  await expect(pouch).toHaveJSProperty('complete', true);
+  await card.locator('[data-add]').tap();
+  await expect(page.locator('#cartCount')).toHaveText('1');
+  await expect(pouch).toHaveCSS('opacity', '1');
+  await expect(pouch).toBeVisible();
+  await page.screenshot({ path: 'generated-artifacts/mobile-card-after-add.png' });
+  // Exercise the sticky-hover state explicitly: touch browsers may retain :hover after tapping.
+  await card.hover();
+  await expect(pouch).toHaveCSS('opacity', '1');
+  await page.locator('#cartBtn').tap();
+  await expect(page.locator('.line')).toHaveCount(1);
+  await page.locator('#checkoutBtn').tap();
+  await page.waitForURL(/^https:\/\/checkout\.stripe\.com\//, { timeout: 45000 });
+  console.log('PASS touch mobile card image remains visible after add/sticky hover → one-time sandbox checkout');
   if (errors.length) throw new Error(`Browser errors: ${errors.join('; ')}`);
   console.log('PASS canceled checkout preserves bag, quantity/remove, false confirmation protection, invalid SKU/cart resilience and management link');
 } finally {

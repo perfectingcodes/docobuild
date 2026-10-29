@@ -10,6 +10,7 @@ import { normalizeCart } from './catalog.mjs';
 import { buildCheckout } from './checkout.mjs';
 import { catalogReadiness, portalReady } from './readiness.mjs';
 import { registerAdmin } from './admin.mjs';
+import { checkoutOrigin } from './checkout-origin.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'dist');
 export const app = express();
@@ -43,13 +44,10 @@ app.use('/api', rateLimit({ windowMs: 60000, limit: 100, standardHeaders: 'draft
 app.use(express.json({ limit: '16kb' }));
 app.use('/api', (_req, res, next) => { res.set('Cache-Control', 'no-store'); next(); });
 function approvedOrigin(req) {
-  const allowed = new Set(['https://docobuild.replit.app']);
-  if (process.env.NODE_ENV !== 'production') {
-    if (process.env.REPLIT_DEV_DOMAIN) allowed.add(`https://${process.env.REPLIT_DEV_DOMAIN}`);
-    allowed.add('http://127.0.0.1:5000');
-  }
-  const origin = req.get('origin');
-  return allowed.has(origin) ? origin : null;
+  return checkoutOrigin(req.get('origin'), {
+    production: process.env.NODE_ENV === 'production',
+    devDomain: process.env.REPLIT_DEV_DOMAIN,
+  });
 }
 function proof(requestId) {
   if (!process.env.SESSION_SECRET) throw new Error('SESSION_SECRET is required');

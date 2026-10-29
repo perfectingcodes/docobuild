@@ -11,7 +11,7 @@ Command: `bash build.sh && node server/index.mjs`
 Requires Node 22, `npm ci`, Replit PostgreSQL, the connected Stripe integration, and SESSION_SECRET. Run rebuilds the public website into `dist/` and serves only that directory plus `/api`. Restart after source changes.
 
 ## Publish
-Publishing is configured as **Autoscale** because checkout needs a backend. Build: `npm ci && bash build.sh`. Run: `node server/index.mjs`. Production uses NODE_ENV=production and refuses to start with the wrong Stripe account or payments disabled. The known public URL is https://docobuild.replit.app; if the domain changes, update the server's allowed checkout origin and managed webhook URL after checking publishing information.
+Publishing is configured as **Autoscale** because checkout needs a backend. Build: `npm ci && bash build.sh`. Run: `node server/index.mjs`. Production uses NODE_ENV=production and refuses to start with the wrong Stripe account or payments disabled. The verified public domains are https://docostrips.com (primary) and https://docobuild.replit.app. If domains change, verify publishing information and update the explicit checkout-origin allowlist and managed webhook URL. Never derive approved redirect origins from untrusted request headers.
 
 Use Replit's Publish action to put the site live. Changes to the source require republishing to update the live site.
 

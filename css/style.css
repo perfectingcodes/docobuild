@@ -1345,8 +1345,10 @@ section[id]{scroll-margin-top:calc(var(--ticker-h) + var(--header-h))}
 /* ---- more real photos: card hover swap, review photo headers ---- */
 .pcard__media{overflow:hidden}
 .pcard__photo{position:absolute;inset:0;width:100%!important;height:100%!important;object-fit:cover;object-position:50% 58%;border-radius:0!important;opacity:0;transition:opacity .4s var(--ease),transform .6s var(--ease)!important;transform:scale(1.04)}
-.pcard:hover .pcard__photo{opacity:1;transform:scale(1)}
-.pcard:hover .pcard__media .pcard__pouch{transform:scale(.9) rotate(-2deg);opacity:0}
+@media(hover:hover) and (pointer:fine){
+  .pcard:hover .pcard__photo{opacity:1;transform:scale(1)}
+  .pcard:hover .pcard__media .pcard__pouch{transform:scale(.9) rotate(-2deg);opacity:0}
+}
 .rcard{padding-top:0;overflow:hidden}
 .rcard__photo{margin:0 -26px 10px;height:170px;overflow:hidden;border-bottom:1.5px solid var(--line)}
 .rcard__photo img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s var(--ease)}
