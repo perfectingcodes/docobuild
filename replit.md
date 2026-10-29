@@ -68,3 +68,9 @@ Google Fonts requires an internet connection.
 - First visit to the home page shows a 10%-off email popup (`js/main.js`, after 6 s or 35% scroll; remembered in localStorage). Emails post to `POST /api/subscribe` and are stored in `public.email_signups` (unique by email); they appear under Admin → Emails with CSV export.
 - The code shown is `WELCOME_CODE` (default `LETSGO10`). **Create a matching promotion code in the Stripe dashboard** (10% off, limit to first-time customers, optionally one use per customer). Checkout sessions now set `allow_promotion_codes: true` except for mixed carts that already carry the first-shipment coupon (Stripe does not allow both).
 - No automated welcome email is sent yet; the popup shows the code on screen. Wire an email provider later if you want the code delivered by email.
+
+## SEO / GEO (Oct 28, 2026)
+- Every page has a canonical link, Open Graph + Twitter meta (`assets/og.jpg`, 1200x630) and JSON-LD: Organization + WebSite + FAQPage + product ItemList on the home page, CollectionPage + ItemList on `/shop`, WebPage on `/creators`. Product pages fill `#pdpLd` (Product + Offer + BreadcrumbList), the title, description, canonical and OG tags from the catalog in `js/main.js` (`seoProduct`).
+- `robots.txt` (disallows /admin, /api/, /thanks), `sitemap.xml` and `llms.txt` (plain-language brand + product facts for AI answer engines) live in the repo root and are copied by `build.sh`. `/thanks` is `noindex`.
+- Unknown paths get the branded `404.html` (served by the handler after `express.static` in `server/app.mjs`).
+- The site's public domain is https://docostrips.com; keep canonical/sitemap URLs on that host.

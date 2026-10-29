@@ -189,14 +189,14 @@
     if (!cart.length) { bagItems.innerHTML = '<div class="bag__empty"><img src="assets/mark-orange.png" alt=""><h4>Your bag is empty</h4><p>Pick a formula and start doing more.</p><a class="btn btn--solid btn--sm" href="/shop">Shop the formulas →</a></div>'; return; }
     bagItems.innerHTML = cart.map(function (l, i) { var p = P[l.sku]; return '<div class="line" style="--c:' + p.color + '"><div class="line__img"><img src="' + p.img + '" alt=""></div><div class="line__body"><div class="line__top"><b>' + p.name + '</b><span class="line__price">' + money(linePrice(l) * l.qty) + '</span></div><p class="line__meta">' + (l.mode === 'sub' ? 'Subscribe & save · ' + money(p.sub) + '/mo' : 'One-time · ' + money(p.price)) + '</p><div class="line__ctl"><div class="qty"><button type="button" aria-label="Decrease" data-line-qty="-1" data-i="' + i + '">−</button><span>' + l.qty + '</span><button type="button" aria-label="Increase" data-line-qty="1" data-i="' + i + '">+</button></div><button type="button" class="line__rm" data-rm="' + i + '">Remove</button></div></div></div>'; }).join('');
   }
-  function addToCart(sku, mode, qty) {
+  function addToCart(sku, mode, qty, quiet) {
     if (!COMMERCE_ENABLED) return;
     if (ORDER.indexOf(sku) < 0) return; mode = mode === 'sub' ? 'sub' : 'once'; qty = Math.min(20, Math.max(1, qty || 1));
     var i = -1; cart.forEach(function (l, k) { if (l.sku === sku && l.mode === mode) i = k; });
     if (i > -1) cart[i].qty = Math.min(20, cart[i].qty + qty); else cart.push({ sku: sku, mode: mode, qty: qty });
     track('add_to_cart', { sku: sku, mode: mode, qty: qty });
     save(); renderCart();
-    toast('<img src="' + P[sku].img + '" alt=""><div><b>Added to your bag</b><span>' + P[sku].name + (qty > 1 ? ' × ' + qty : '') + (mode === 'sub' ? ' · subscription' : '') + '</span></div><button type="button" data-bag-open>View bag</button>');
+    if (!quiet) toast('<img src="' + P[sku].img + '" alt=""><div><b>Added to your bag</b><span>' + P[sku].name + (qty > 1 ? ' × ' + qty : '') + (mode === 'sub' ? ' · subscription' : '') + '</span></div><button type="button" data-bag-open>View bag</button>');
     if (headCount) { headCount.classList.remove('pop'); void headCount.offsetWidth; headCount.classList.add('pop'); }
   }
   function openBag() { if (!COMMERCE_ENABLED) return; bag.classList.add('open'); bag.setAttribute('aria-hidden', 'false'); bagScrim.hidden = false; requestAnimationFrame(function () { bagScrim.classList.add('show'); }); lock(true); $('.bag__close', bag).focus(); }
@@ -331,13 +331,26 @@
     OTHER.forEach(function (o) { if (parts.indexOf(o[0]) > -1 && !seen[o[1]]) { seen[o[1]] = 1; items.push('<li><b>' + o[1] + '</b><span>' + o[2] + '</span></li>'); } });
     return items.join('');
   }
+  function seoProduct(sku, p) {
+    var SITE = 'https://docostrips.com', url = SITE + '/product?sku=' + sku, desc = (p.desc || p.inside || p.tag || '').replace(/\s+/g, ' ').trim();
+    function meta(sel, v) { var el = $(sel); if (el) el.setAttribute('content', v); }
+    meta('meta[name="description"]', desc); meta('#ogTitle', document.title); meta('#ogDesc', desc); meta('#ogUrl', url); meta('#ogImg', SITE + '/' + p.pouch); meta('meta[name="twitter:title"]', document.title); meta('meta[name="twitter:description"]', desc); meta('meta[name="twitter:image"]', SITE + '/' + p.pouch);
+    var canon = $('#canon'); if (canon) canon.href = url;
+    var ld = $('#pdpLd'); if (!ld) return;
+    var imgs = [SITE + '/' + p.pouch].concat((p.gallery || []).map(function (g) { return SITE + '/' + g; }));
+    ld.textContent = JSON.stringify({ '@context': 'https://schema.org', '@graph': [
+      { '@type': 'Product', name: 'DOCO ' + p.name + ' Strips', sku: sku, url: url, image: imgs, description: desc, brand: { '@type': 'Brand', name: 'DOCO' },
+        offers: [{ '@type': 'Offer', url: url, priceCurrency: 'USD', price: p.price.toFixed(2), availability: COMMERCE_ENABLED ? 'https://schema.org/InStock' : 'https://schema.org/PreOrder', itemCondition: 'https://schema.org/NewCondition', shippingDetails: { '@type': 'OfferShippingDetails', shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'US' } } }] },
+      { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: SITE + '/' }, { '@type': 'ListItem', position: 2, name: 'Shop', item: SITE + '/shop' }, { '@type': 'ListItem', position: 3, name: p.name, item: url }] }
+    ] });
+  }
   function howHTML() {
     return '<ol class="hsteps"><li class="hstep"><img src="assets/step-peel.webp" alt="" loading="lazy"><b>Peel</b><span>Open one strip when you’re ready.</span></li><li class="hstep"><img src="assets/step-place.webp" alt="" loading="lazy"><b>Place</b><span>Rest it on your tongue. No water.</span></li><li class="hstep"><img src="assets/step-go.webp" alt="" loading="lazy"><b>Go</b><span>It dissolves in about 15 seconds.</span></li></ol>';
   }
   var pdp = $('#pdp');
   if (pdp) {
     var sku = (new URLSearchParams(location.search).get('sku') || 'multi'); if (ORDER.indexOf(sku) < 0) sku = 'multi';
-    var p = P[sku], isB = p.kind === 'bundle'; document.title = p.name + ' — DOCO';
+    var p = P[sku], isB = p.kind === 'bundle'; document.title = 'DOCO ' + p.name + ' Strips — ' + money(p.price) + ' · ' + p.strips + ' strips'; seoProduct(sku, p);
     pdp.style.setProperty('--c', p.color); pdp.dataset.sku = sku;
     var keys = isB ? [{ a: p.includes.length, n: 'formulas' }, { a: p.strips, n: 'strips' }, { a: 'Save ' + money(p.includes.length * P.multi.price - p.price), n: 'vs. singles' }] : p.ingredients.slice(0, 3).map(function (r) { return { a: r[1], n: r[0] }; });
     var first = isB ? P[p.includes[0]] : p, timing = TIMING[isB ? p.includes[0] : sku];
@@ -455,11 +468,13 @@
       '<div class="result__price"><div class="result__pricebox"><span class="result__k">' + (bundle ? P[sku].strips + ' strips · bundle price' : picks.length * 30 + ' strips') + '</span><b>' + money(price) + '</b>' + (price < full ? '<s>' + money(full) + '</s><i>Save ' + money(full - price) + '</i>' : '') + '</div>' +
       '<div class="mode mode--light" role="radiogroup" aria-label="Purchase option"><button type="button" class="mode__opt is-on" data-mode="once" role="radio">One-time</button><button type="button" class="mode__opt" data-mode="sub" role="radio">Subscribe <b>' + money(P[ctaSku].sub) + '/mo</b></button></div></div>' +
       '<ul class="result__why">' + lead.benefits.slice(0, 3).map(function (w) { return '<li>' + w + '</li>'; }).join('') + '</ul>' +
-      '<div class="result__cta"><a class="btn btn--solid btn--lg" href="/product?sku=' + ctaSku + '">View ' + (bundle ? P[sku].name : lead.name) + ' →</a>' + (picks.length > 1 ? '<a class="btn btn--chip" href="' + tweak + '">Tweak this stack</a>' : '<a class="btn btn--chip" href="/shop">See all formulas</a>') + '<button type="button" class="btn btn--text" data-add="' + ctaSku + '">Add to bag</button></div>' +
+      '<div class="result__cta">' + (COMMERCE_ENABLED ? '<button type="button" class="btn btn--solid btn--lg" data-quiz-checkout>Checkout with ' + (picks.length > 1 ? 'this stack' : 'it') + ' <span class="arr">→</span></button><button type="button" class="btn btn--chip" data-quiz-add>Add to bag</button>' : '<a class="btn btn--solid btn--lg" href="/product?sku=' + ctaSku + '">View ' + (bundle ? P[sku].name : lead.name) + ' →</a>') + '<a class="btn btn--chip" href="/product?sku=' + ctaSku + '">Details</a>' + (picks.length > 1 ? '<a class="btn btn--chip" href="' + tweak + '">Tweak</a>' : '') + '</div>' +
       '<button type="button" class="result__retake" data-retake>Retake the quiz</button></div>';
+    quizSkus = sku ? [sku] : picks.slice();
     initModes(qStep);
     applyCatalogMode(qStep);
   }
+  var quizSkus = [];
   function advance() { if (qi < QUESTIONS.length - 1) { qi++; renderQ('in'); } else renderResult(); }
   $$('[data-quiz-open]').forEach(function (b) { b.addEventListener('click', function (e) { e.preventDefault(); closeDrawer(); qi = 0; answers = []; renderQ(); openModal(quiz); }); });
   qStep.addEventListener('click', function (e) {
@@ -470,6 +485,8 @@
       answers[qi] = k; $$('[data-opt]', qStep).forEach(function (x) { x.classList.toggle('is-on', x === o); }); setTimeout(advance, 240); return;
     }
     if (e.target.closest('[data-retake]')) { qi = 0; answers = []; renderQ('in'); }
+    var qc = e.target.closest('[data-quiz-checkout],[data-quiz-add]');
+    if (qc) { var res = $('.result', qStep), mode = (res && res.dataset.mode) || 'once'; quizSkus.forEach(function (k) { addToCart(k, mode, 1, true); }); closeModal(quiz); openBag(); if (qc.hasAttribute('data-quiz-checkout')) setTimeout(function () { checkoutBtn.click(); }, 400); else toast('<div><b>Added to your bag</b><span>' + quizSkus.map(function (k) { return P[k].name; }).join(' + ') + '</span></div>'); }
   });
   qNext.addEventListener('click', advance);
   qBack.addEventListener('click', function () { if (qCount.textContent === 'Your match') qi = QUESTIONS.length - 1; else if (qi > 0) qi--; renderQ('back'); });
@@ -616,6 +633,33 @@
   })();
 
   /* ---------- scroll reveal ---------- */
+
+  /* ---------- "In the wild": draggable, always-moving photo rail + lightbox ---------- */
+  (function () {
+    var sc = $('.wild__scroller'), track = sc && $('.wild__track', sc); if (!track) return;
+    var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    track.style.animation = 'none'; $$('img', track).forEach(function (i) { i.draggable = false; });
+    var x = 0, vel = 0, auto = reduce ? 0 : (innerWidth < 700 ? 0.55 : 0.75), dragging = false, moved = 0, lastX = 0, lastT = 0, hover = false, half = 0, raf = 0;
+    function measure() { half = track.scrollWidth / 2; }
+    measure(); window.addEventListener('resize', measure);
+    function tick() {
+      if (!dragging) { if (Math.abs(vel) > 0.08) { x -= vel; vel *= 0.94; } else if (!hover) x -= auto; }
+      if (half) { if (x <= -half) x += half; if (x > 0) x -= half; }
+      track.style.transform = 'translate3d(' + x.toFixed(1) + 'px,0,0)'; raf = requestAnimationFrame(tick);
+    }
+    new IntersectionObserver(function (en) { en.forEach(function (e) { if (e.isIntersecting) { measure(); if (!raf) raf = requestAnimationFrame(tick); } else { cancelAnimationFrame(raf); raf = 0; } }); }).observe(sc);
+    sc.addEventListener('pointerdown', function (e) { if (e.pointerType === 'mouse' && e.button) return; dragging = true; moved = 0; lastX = e.clientX; lastT = performance.now(); vel = 0; sc.classList.add('is-drag'); try { sc.setPointerCapture(e.pointerId); } catch (_) {} });
+    sc.addEventListener('pointermove', function (e) { if (!dragging) return; var dx = e.clientX - lastX, now = performance.now(); x += dx; moved += Math.abs(dx); vel = -dx / Math.max(1, now - lastT) * 16; lastX = e.clientX; lastT = now; });
+    function up() { if (!dragging) return; dragging = false; sc.classList.remove('is-drag'); }
+    sc.addEventListener('pointerup', up); sc.addEventListener('pointercancel', up); sc.addEventListener('lostpointercapture', up);
+    sc.addEventListener('mouseenter', function () { hover = true; }); sc.addEventListener('mouseleave', function () { hover = false; });
+    var lb = document.createElement('div'); lb.className = 'lb'; lb.id = 'lb'; lb.hidden = true; lb.setAttribute('role', 'dialog'); lb.setAttribute('aria-label', 'Photo');
+    lb.innerHTML = '<button type="button" class="lb__close" aria-label="Close">&times;</button><figure class="lb__fig"><img alt=""><figcaption></figcaption></figure>'; document.body.appendChild(lb);
+    function closeLb() { if (lb.hidden) return; lb.classList.remove('is-on'); lock(false); setTimeout(function () { lb.hidden = true; }, 250); }
+    sc.addEventListener('click', function (e) { var img = e.target.closest('img'); if (!img || moved > 8) return; $('img', lb).src = img.currentSrc || img.src; $('figcaption', lb).textContent = img.alt; lb.hidden = false; lock(true); requestAnimationFrame(function () { lb.classList.add('is-on'); }); });
+    lb.addEventListener('click', closeLb); document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeLb(); });
+  })();
+
   var reveals = $$('.reveal');
   if ('IntersectionObserver' in window && reveals.length && !reduced) { var io = new IntersectionObserver(function (es) { es.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } }); }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' }); reveals.forEach(function (el) { io.observe(el); }); }
   else reveals.forEach(function (el) { el.classList.add('in'); });

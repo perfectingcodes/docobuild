@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /thanks
+
+Sitemap: https://docostrips.com/sitemap.xml

@@ -126,6 +126,10 @@ app.use(cleanUrls);
 app.use(express.static(root, { dotfiles: 'deny', etag: true, extensions: ['html'], setHeaders(res, file) {
   if (/\.(html|js|css)$/.test(file)) res.set('Cache-Control', 'no-cache');
 } }));
+app.use((req, res, next) => {
+  if (req.method !== 'GET' || req.path.startsWith('/api/')) return next();
+  res.status(404).sendFile(path.join(root, '404.html'));
+});
 app.use((error, _req, res, _next) => {
   // Do not log Stripe request bodies, customer details, or credential responses.
   console.error('Request failed:', error.type || error.code || error.name);

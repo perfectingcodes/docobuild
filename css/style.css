@@ -1861,3 +1861,33 @@ section[id]{scroll-margin-top:calc(var(--ticker-h) + var(--header-h))}
   .slide__tag{margin:2px 0 8px}
 }
 @media(min-width:701px){.pdp__main{max-height:calc(100vh - 250px);min-height:420px}}
+
+/* ---- in the wild: JS-driven rail on every screen, lightbox ---- */
+.wild__scroller{cursor:grab;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.wild__scroller.is-drag{cursor:grabbing}
+.wild__scroller.is-drag .wild__track li{transition:none}
+.wild__track{animation:none;will-change:transform}
+.wild__track img{-webkit-user-drag:none;pointer-events:auto}
+.lb{position:fixed;inset:0;z-index:340;background:rgba(11,11,11,.93);display:flex;align-items:center;justify-content:center;padding:18px;opacity:0;transition:opacity .25s}
+.lb.is-on{opacity:1}
+.lb__fig{margin:0;max-width:min(92vw,900px);max-height:88vh;display:flex;flex-direction:column;align-items:center;gap:12px;transform:scale(.96);transition:transform .3s var(--ease)}
+.lb.is-on .lb__fig{transform:none}
+.lb__fig img{max-width:100%;max-height:78vh;border-radius:18px;border:2px solid #fff;box-shadow:0 30px 80px rgba(0,0,0,.6);display:block}
+.lb__fig figcaption{color:#fff;font-size:.86rem;font-weight:600;opacity:.85;text-align:center}
+.lb__close{position:absolute;top:calc(14px + env(safe-area-inset-top));right:16px;width:42px;height:42px;border-radius:50%;border:2px solid #fff;background:transparent;color:#fff;font-size:1.5rem;line-height:1;display:flex;align-items:center;justify-content:center}
+@media(max-width:700px){
+  .wild__scroller{overflow:hidden;scroll-snap-type:none;padding:6px 0 22px}
+  .wild__track{padding:0 16px}
+  .wild__track li{height:min(64vw,360px);scroll-snap-align:none}
+  .wild__track li:nth-child(n+9){display:block}
+  .wild__track li:nth-child(even){transform:translateY(14px)!important}
+}
+/* ---- 404 ---- */
+.nf{min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 20px;background:var(--black);color:#fff;position:relative;overflow:hidden}
+.nf__pattern{position:absolute;inset:0;background:url('../assets/tile-black.png') center/560px repeat;opacity:.5}
+.nf>*{position:relative}
+.nf img{height:48px;margin-bottom:28px}
+.nf h1{font-family:var(--anton);font-weight:var(--dw);font-size:clamp(3rem,12vw,7rem);line-height:.9;letter-spacing:var(--dls);text-transform:uppercase}
+.nf h1 span{color:var(--accent)}
+.nf p{margin:18px 0 26px;max-width:36ch;opacity:.85}
+.nf__acts{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}

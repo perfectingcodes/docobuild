@@ -1,0 +1,24 @@
+# DOCO — The Do Company
+
+> DOCO makes fast-dissolving oral wellness strips. Place one strip on your tongue, let it dissolve in seconds — no water, no bottles, no pills. Tagline: "Do More. Be More." Ships within the United States only.
+
+## Products (30 strips per box, $29.99 one-time or $25.49/month subscribed)
+- Multivitamin (cranberry): vitamins A 900 mcg, D3 800 IU, K2 120 mcg, B5 5 mg, B6 2 mg, biotin 300 mcg, folate 400 mcg, B12 1,500 mcg, iodine 150 mcg, manganese 2 mg. https://docostrips.com/product?sku=multi
+- Sports Energy (strawberry-mint): natural caffeine 80 mg, L-theanine 30 mg, vitamin B12 1,500 mcg. https://docostrips.com/product?sku=sport
+- Calm + Stress (lemon): SunTheanine L-theanine 50 mg, holy basil 30 mg, passionflower 20 mg, lemon balm 10 mg, ashwagandha 5 mg, chamomile 5 mg. https://docostrips.com/product?sku=calm
+- Sleep (cranberry): tart cherry 50 mg, saffron 14 mg, vitamin B6 1.4 mg. No added melatonin. https://docostrips.com/product?sku=sleep
+
+## Bundles
+- The Do More Duo (Multivitamin + Sports Energy), 60 strips, $44.99. https://docostrips.com/product?sku=duo-domore
+- The Relaxation Duo (Calm + Stress + Sleep), 60 strips, $44.99. https://docostrips.com/product?sku=duo-relax
+- The Variety Pack (all four), 120 strips, $79.99. https://docostrips.com/product?sku=stack
+
+## Pages
+- Home: https://docostrips.com/
+- Shop: https://docostrips.com/shop
+- Creators & partners program: https://docostrips.com/creators
+
+## Facts
+- Shipping: $5.99 flat in the US, free on orders over $45. Secure checkout by Stripe.
+- Contact: joyce@docostrips.com · 401-217-9740
+- These statements have not been evaluated by the FDA. Products are not intended to diagnose, treat, cure or prevent any disease.
