@@ -313,3 +313,23 @@ svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke
 .adm__steps li{display:block;position:relative;padding-left:34px;grid-template-columns:none}
 .adm__steps li::before{position:absolute;left:0;top:1px}
 .adm__connect .adm__btn{white-space:nowrap}
+
+/* influencer deals */
+.adm__inf{grid-template-columns:1fr auto}
+.adm__inf .who{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:baseline}
+.adm__inf .who small{color:var(--soft)}
+.adm__inf .deal{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.adm__inf .deal span{font-size:.7rem;font-weight:700;background:var(--paper);border-radius:999px;padding:3px 9px;color:var(--ink2)}
+.adm__inf .next{grid-column:1/-1;margin-top:6px;font-size:.78rem;color:var(--ink2);display:flex;gap:6px;align-items:center}
+.adm__inf .next i{width:8px;height:8px;border-radius:50%;background:var(--accent);flex:none}
+.adm__inf .next.is-due{color:var(--red);font-weight:700}
+.adm__inf .next.is-due i{background:var(--red)}
+.adm__inf .acts{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.adm__inf .acts button{font-size:.7rem;font-weight:800;color:var(--accent)}
+.adm__inf .acts .adm__status{padding:6px 26px 6px 10px;font-size:.68rem}
+.adm__inf a{color:var(--blue);font-weight:700}
+.adm__tag--prospect{background:var(--paper);color:var(--ink2)}
+.adm__tag--negotiating{background:#fff1e0;color:#c46a00}
+.adm__tag--paused{background:#ece7fb;color:var(--purple)}
+.adm__creator .todeal{grid-column:1/-1;justify-self:start;font-size:.7rem;font-weight:800;color:var(--accent);margin-top:4px}
+@media(max-width:760px){.adm__inf .acts{grid-column:1/-1;flex-direction:row;align-items:center;margin-top:8px;gap:10px}}

@@ -33,3 +33,16 @@ test('template, post and settings validation reject junk and clamp values', () =
   assert.equal(s.driveUrl, 'https://drive.google.com/x'); assert.equal(s.reminders.renewalDays, 14); assert.equal(s.reminders.reorderDays, 7);
   assert.equal(s.email.replyTo, 'joyce@docostrips.com');
 });
+import { validateInfluencer } from '../server/studio-lib.mjs';
+test('influencer records validate and normalise', () => {
+  assert.throws(() => validateInfluencer({ name: 'A' }), /name/);
+  assert.throws(() => validateInfluencer({ name: 'Ava Lin', email: 'nope' }), /Email/);
+  const v = validateInfluencer({ name: 'Ava Lin', handle: '@avalin', platform: 'TikTok', followers: '42000', rate: '150', commissionPct: '20', code: 'ava15', status: 'negotiating', nextActionAt: '2026-11-10T10:00:00Z', link: 'https://tiktok.com/@avalin' });
+  assert.equal(v.rateCents, 15000); assert.equal(v.code, 'AVA15'); assert.equal(v.followers, 42000); assert.equal(v.nextActionAt, '2026-11-10'); assert.equal(v.status, 'negotiating');
+  assert.equal(validateInfluencer({ name: 'Bo', status: 'bogus' }).status, 'prospect');
+});
+import { summarizeOrders } from '../server/analytics-aggregate.mjs';
+test('revenue sums mapped order totals', () => {
+  const s = summarizeOrders([{ total: 5998 }, { total: 2999 }]);
+  assert.equal(s.revenue, 8997); assert.equal(s.orders, 2); assert.equal(s.aov, 4499);
+});

@@ -4,7 +4,7 @@ import { randomUUID } from 'node:crypto';
 import { ADMIN_COOKIE, verifyToken, parseCookies } from './admin-auth.mjs';
 import { sessionToOrder } from './analytics-aggregate.mjs';
 import { resendConnected, resendSend } from './mailer.mjs';
-import { EMAIL_KINDS, DEFAULT_TEMPLATES, DEFAULT_SETTINGS, SAMPLE_VARS, PLATFORMS, POST_STATUSES, renderEmail, orderVars, money, validateTemplate, validateSocialPost, validateSettings, validEmail } from './studio-lib.mjs';
+import { EMAIL_KINDS, DEFAULT_TEMPLATES, DEFAULT_SETTINGS, SAMPLE_VARS, PLATFORMS, POST_STATUSES, renderEmail, orderVars, money, validateTemplate, validateSocialPost, validateSettings, validEmail, INF_STATUSES, validateInfluencer } from './studio-lib.mjs';
 
 export async function ensureStudioTables(pool) {
   await pool.query(`CREATE TABLE IF NOT EXISTS public.admin_settings (key text PRIMARY KEY, value jsonb NOT NULL, updated_at timestamptz NOT NULL DEFAULT now())`);
@@ -17,6 +17,11 @@ export async function ensureStudioTables(pool) {
     id uuid PRIMARY KEY, ts timestamptz NOT NULL DEFAULT now(), kind text NOT NULL, to_email text NOT NULL, subject text, status text NOT NULL, ref text, provider_id text, error text)`);
   await pool.query('CREATE UNIQUE INDEX IF NOT EXISTS email_log_kind_ref_idx ON public.email_log (kind, ref) WHERE ref IS NOT NULL AND status IN (\'sent\')');
   await pool.query('CREATE INDEX IF NOT EXISTS email_log_ts_idx ON public.email_log (ts)');
+  await pool.query(`CREATE TABLE IF NOT EXISTS public.influencers (
+    id uuid PRIMARY KEY, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now(),
+    name text NOT NULL, handle text, platform text NOT NULL, followers integer, niche text, email text, phone text, link text, location text,
+    status text NOT NULL DEFAULT 'prospect', rate_cents integer, commission_pct integer, code text, free_product text, deal_notes text, notes text,
+    next_action text, next_action_at date, last_contact_at date, source text NOT NULL DEFAULT 'manual', application_id uuid)`);
 }
 
 function production() { return process.env.NODE_ENV === 'production'; }
@@ -187,6 +192,37 @@ export function createStudio({ pool, stripe }) {
         await log({ kind, to, subject: '[Test] ' + mail.subject, status: 'test', providerId });
         res.json({ ok: true });
       } catch (error) { await log({ kind, to, status: 'failed', error: error.message }); res.status(502).json({ error: error.message }); }
+    });
+    /* ---- influencer deals ---- */
+    const INF_COLS = 'id, created_at, updated_at, name, handle, platform, followers, niche, email, phone, link, location, status, rate_cents, commission_pct, code, free_product, deal_notes, notes, next_action, next_action_at, last_contact_at, source, application_id';
+    const infRow = r => ({ id: r.id, createdAt: r.created_at, updatedAt: r.updated_at, name: r.name, handle: r.handle, platform: r.platform, followers: r.followers, niche: r.niche, email: r.email, phone: r.phone, link: r.link, location: r.location, status: r.status,
+      rate: r.rate_cents == null ? '' : (r.rate_cents / 100).toFixed(2), commissionPct: r.commission_pct, code: r.code, freeProduct: r.free_product, dealNotes: r.deal_notes, notes: r.notes, nextAction: r.next_action, nextActionAt: r.next_action_at, lastContactAt: r.last_contact_at, source: r.source, applicationId: r.application_id });
+    const infVals = v => [v.name, v.handle, v.platform, v.followers, v.niche, v.email, v.phone, v.link, v.location, v.status, v.rateCents, v.commissionPct, v.code, v.freeProduct, v.dealNotes, v.notes, v.nextAction, v.nextActionAt, v.lastContactAt, v.source, v.applicationId];
+    app.get('/api/admin/influencers', requireAdmin, async (_req, res, next) => {
+      try { res.json({ influencers: (await pool.query(`SELECT ${INF_COLS} FROM public.influencers ORDER BY updated_at DESC LIMIT 2000`)).rows.map(infRow), statuses: INF_STATUSES, platforms: PLATFORMS }); } catch (error) { next(error); }
+    });
+    app.post('/api/admin/influencers', requireAdmin, json, async (req, res, next) => {
+      try {
+        const v = validateInfluencer(req.body || {}); const id = randomUUID();
+        await pool.query('INSERT INTO public.influencers(id,name,handle,platform,followers,niche,email,phone,link,location,status,rate_cents,commission_pct,code,free_product,deal_notes,notes,next_action,next_action_at,last_contact_at,source,application_id) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22)', [id, ...infVals(v)]);
+        res.json({ ok: true, id });
+      } catch (error) { if (/name|valid|must/i.test(error.message)) return res.status(400).json({ error: error.message }); next(error); }
+    });
+    app.post('/api/admin/influencers/:id', requireAdmin, json, async (req, res, next) => {
+      if (!/^[0-9a-f-]{36}$/.test(req.params.id)) return res.status(400).json({ error: 'Invalid record.' });
+      try {
+        if (req.body && Object.keys(req.body).length === 1 && req.body.status) {
+          const status = INF_STATUSES.includes(req.body.status) ? req.body.status : 'prospect';
+          await pool.query('UPDATE public.influencers SET status=$1, updated_at=now() WHERE id=$2', [status, req.params.id]); return res.json({ ok: true });
+        }
+        const v = validateInfluencer(req.body || {});
+        await pool.query('UPDATE public.influencers SET name=$2,handle=$3,platform=$4,followers=$5,niche=$6,email=$7,phone=$8,link=$9,location=$10,status=$11,rate_cents=$12,commission_pct=$13,code=$14,free_product=$15,deal_notes=$16,notes=$17,next_action=$18,next_action_at=$19,last_contact_at=$20,source=$21,application_id=$22,updated_at=now() WHERE id=$1', [req.params.id, ...infVals(v)]);
+        res.json({ ok: true });
+      } catch (error) { if (/name|valid|must/i.test(error.message)) return res.status(400).json({ error: error.message }); next(error); }
+    });
+    app.delete('/api/admin/influencers/:id', requireAdmin, async (req, res, next) => {
+      if (!/^[0-9a-f-]{36}$/.test(req.params.id)) return res.status(400).json({ error: 'Invalid record.' });
+      try { await pool.query('DELETE FROM public.influencers WHERE id=$1', [req.params.id]); res.json({ ok: true }); } catch (error) { next(error); }
     });
     app.post('/api/admin/email/run-reminders', requireAdmin, async (_req, res) => { res.json(await runReminders()); });
   }
