@@ -23,7 +23,8 @@ function production() { return process.env.NODE_ENV === 'production'; }
 function isAdmin(req) { return verifyToken(parseCookies(req.headers.cookie)[ADMIN_COOKIE]); }
 function requireAdmin(req, res, next) { if (isAdmin(req)) return next(); res.status(401).json({ error: 'Sign in required.' }); }
 
-export function registerAdmin(app, { pool, stripe }) {
+export function registerAdmin(app, { pool, stripe, notify }) {
+  const send = (kind, vars, opts) => { if (typeof notify === 'function') notify(kind, vars, opts).catch(() => {}); };
   const cache = new Map();
   async function cached(key, ttlMs, fn) {
     const hit = cache.get(key);
@@ -57,6 +58,7 @@ export function registerAdmin(app, { pool, stripe }) {
       const id = randomUUID();
       await pool.query('INSERT INTO public.creator_applications(id,name,email,handle,platform,audience,website,message) VALUES($1,$2,$3,$4,$5,$6,$7,$8)', [id, name, email, handle, platform, audience, website, message]);
       res.json({ ok: true, id });
+      send('creator_received', { name: name.split(' ')[0] }, { to: email, ref: id });
     } catch (error) { next(error); }
   });
 
@@ -65,8 +67,9 @@ export function registerAdmin(app, { pool, stripe }) {
     const email = String(req.body?.email || '').trim().toLowerCase().slice(0, 120), source = String(req.body?.source || 'popup').slice(0, 40);
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return res.status(400).json({ error: 'Please enter a valid email.' });
     try {
-      await pool.query('INSERT INTO public.email_signups(id,email,source,code) VALUES($1,$2,$3,$4) ON CONFLICT(email) DO NOTHING', [randomUUID(), email, source, WELCOME_CODE]);
+      const inserted = await pool.query('INSERT INTO public.email_signups(id,email,source,code) VALUES($1,$2,$3,$4) ON CONFLICT(email) DO NOTHING', [randomUUID(), email, source, WELCOME_CODE]);
       res.json({ ok: true, code: WELCOME_CODE });
+      if (inserted.rowCount) send('welcome', { code: WELCOME_CODE }, { to: email, ref: email });
     } catch (error) { next(error); }
   });
 
@@ -156,6 +159,10 @@ export function registerAdmin(app, { pool, stripe }) {
   app.post('/api/admin/creators/:id', requireAdmin, express.json(), async (req, res, next) => {
     const status = ['new', 'contacted', 'approved', 'declined'].includes(req.body?.status) ? req.body.status : null;
     if (!status || !/^[0-9a-f-]{36}$/.test(req.params.id)) return res.status(400).json({ error: 'Invalid update.' });
-    try { await pool.query('UPDATE public.creator_applications SET status=$1 WHERE id=$2', [status, req.params.id]); res.json({ ok: true }); } catch (error) { next(error); }
+    try {
+      const row = (await pool.query('UPDATE public.creator_applications SET status=$1 WHERE id=$2 RETURNING name, email, handle', [status, req.params.id])).rows[0];
+      res.json({ ok: true });
+      if (row && status === 'approved') send('creator_approved', { name: String(row.name || '').split(' ')[0], handle: row.handle || '' }, { to: row.email, ref: req.params.id + ':approved' });
+    } catch (error) { next(error); }
   });
 }

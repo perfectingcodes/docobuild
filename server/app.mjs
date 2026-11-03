@@ -12,6 +12,9 @@ import { catalogReadiness, portalReady } from './readiness.mjs';
 import { registerAdmin } from './admin.mjs';
 import { checkoutOrigin } from './checkout-origin.mjs';
 import { cleanUrls } from './clean-urls.mjs';
+import { createStudio } from './studio.mjs';
+
+export const studio = createStudio({ pool, stripe });
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'dist');
 export const app = express();
@@ -37,6 +40,8 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json', limit: '
   try {
     await getStripeSync().processWebhook(req.body, req.headers['stripe-signature']);
     res.json({ received: true });
+    // Signature already verified above; the email hook never affects the webhook response.
+    try { const event = JSON.parse(req.body.toString('utf8')); studio.onStripeEvent(event).catch(() => {}); } catch { /* ignore */ }
   } catch {
     res.status(400).json({ error: 'Webhook signature or processing failed' });
   }
@@ -120,7 +125,8 @@ app.get('/api/checkout-status', async (req, res, next) => {
     res.json({ paid, status: session.status, testMode: !session.livemode, reference: paid ? session.id.slice(-8) : null });
   } catch (error) { next(error); }
 });
-registerAdmin(app, { pool, stripe });
+registerAdmin(app, { pool, stripe, notify: studio.notify });
+studio.register(app);
 app.use('/api', (_req, res) => res.status(404).json({ error: 'Not found' }));
 app.use(cleanUrls);
 app.use(express.static(root, { dotfiles: 'deny', etag: true, extensions: ['html'], setHeaders(res, file) {
