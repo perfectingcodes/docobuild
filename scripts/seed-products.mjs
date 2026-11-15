@@ -1,5 +1,5 @@
 import { stripe, initializeStripe, pool, getStripeSync } from '../server/stripe.mjs';
-import { CATALOG } from '../server/catalog.mjs';
+import { CATALOG, purchaseModes } from '../server/catalog.mjs';
 import { pathToFileURL } from 'node:url';
 import { findCatalogProduct } from '../server/catalog-matching.mjs';
 import { synchronizeCheckoutCatalog } from '../server/catalog-resolution.mjs';
@@ -14,7 +14,7 @@ export async function ensureCatalog() {
   // Explicit sandbox setup only; server startup never calls this script.
   const products = await stripe.products.list({ active: true, limit: 100 }).autoPagingToArray({ limit: 10000 });
   for (const [sku, item] of Object.entries(CATALOG)) {
-    for (const mode of ['once', 'sub']) {
+    for (const mode of purchaseModes(item)) {
       let product = findCatalogProduct(products, sku, mode);
       if (!product) {
         product = await stripe.products.create({

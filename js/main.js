@@ -109,9 +109,13 @@
     stack: { kind: 'bundle', includes: ['multi', 'sport', 'calm', 'sleep'], name: 'The Variety Pack', eyebrow: 'Best value', tag: 'All four formulas. Every part of your day.', strips: 120, price: 79.99, sub: 71.99, color: '#17130d', img: 'assets/crew-mockup.jpg', pouch: 'assets/pouch-stack.webp',
       desc: 'The fastest way to find your favorites and cover every part of your day — energy, focus, calm and sleep.',
       pills: ['4 formulas', 'Save 33%', '120 strips'], benefits: ['All four formulas in one box', 'Save 33% vs. buying separately', 'One box of each formula'],
-      inside: 'One box each of Multivitamin, Sports Energy, Calm + Stress and Sleep.', gallery: ['assets/box-grass-four.jpg', 'assets/box-calm-sleep-sky.jpg', 'assets/box-sport-berries.jpg'] }
+      inside: 'One box each of Multivitamin, Sports Energy, Calm + Stress and Sleep.', gallery: ['assets/box-grass-four.jpg', 'assets/box-calm-sleep-sky.jpg', 'assets/box-sport-berries.jpg'] },
+    sample: { kind: 'bundle', includes: ['multi', 'sport', 'calm', 'sleep'], name: 'Sample Pack', eyebrow: 'Try DOCO', tag: 'Start small. Find your favorites.', strips: 4, price: 9.99, color: '#ef8120', img: 'assets/pouch-stack.webp', pouch: 'assets/pouch-stack.webp',
+      desc: 'Try DOCO with a 4-strip Sample Pack for $9.99. A simple way to explore the collection before choosing a full-size pack.',
+      pills: ['4 strips', 'Sample size', 'One-time purchase'], benefits: ['Try DOCO before choosing a full-size pack', '4 strips per pack', 'One-time purchase — no subscription'],
+      inside: '4 sample strips. This is a sample-size pack, not four full-size boxes.', gallery: ['assets/pouch-stack.webp'] }
   };
-  var ORDER = ['multi', 'sport', 'calm', 'sleep', 'duo-domore', 'duo-relax', 'stack'];
+  var ORDER = ['multi', 'sport', 'calm', 'sleep', 'duo-domore', 'duo-relax', 'stack', 'sample'];
   var FREE_SHIP = (CFG.freeShippingOver || 45), SHIP_FEE = (CFG.shippingFee || 5.99);
 
   /* ---------- overlays (injected so every page has them) ---------- */
@@ -166,7 +170,7 @@
   var cart = []; if (COMMERCE_ENABLED) { try {
     var stored = JSON.parse(localStorage.getItem('doco_cart') || '[]');
     if (Array.isArray(stored)) cart = stored.filter(function (l) {
-      return l && ORDER.indexOf(l.sku) >= 0 && ['once', 'sub'].indexOf(l.mode) >= 0 && Number.isInteger(l.qty) && l.qty > 0 && l.qty <= 20;
+      return l && ORDER.indexOf(l.sku) >= 0 && ['once', 'sub'].indexOf(l.mode) >= 0 && (l.mode !== 'sub' || P[l.sku].sub != null) && Number.isInteger(l.qty) && l.qty > 0 && l.qty <= 20;
     }).slice(0, 20);
   } catch (e) {} }
   var bag = $('#bag'), bagScrim = $('#bagScrim'), bagItems = $('#bagItems'), bagSub = $('#bagSub'), bagCount = $('#bagCount'), headCount = $('#cartCount'), shipBar = $('#shipBar'), shipMsg = $('#shipMsg'), checkoutBtn = $('#checkoutBtn');
@@ -191,7 +195,7 @@
   }
   function addToCart(sku, mode, qty, quiet) {
     if (!COMMERCE_ENABLED) return;
-    if (ORDER.indexOf(sku) < 0) return; mode = mode === 'sub' ? 'sub' : 'once'; qty = Math.min(20, Math.max(1, qty || 1));
+    if (ORDER.indexOf(sku) < 0 || (mode === 'sub' && P[sku].sub == null)) return; mode = mode === 'sub' ? 'sub' : 'once'; qty = Math.min(20, Math.max(1, qty || 1));
     var i = -1; cart.forEach(function (l, k) { if (l.sku === sku && l.mode === mode) i = k; });
     if (i > -1) cart[i].qty = Math.min(20, cart[i].qty + qty); else cart.push({ sku: sku, mode: mode, qty: qty });
     track('add_to_cart', { sku: sku, mode: mode, qty: qty });
@@ -273,7 +277,7 @@
       '<a class="pcard__media" href="/product?sku=' + sku + '">' + media + '<span class="pcard__tag">' + esc(p.eyebrow) + '</span></a>' +
       '<div class="pcard__body"><div class="pcard__top"><h3><a href="/product?sku=' + sku + '">' + esc(p.name) + '</a></h3><span class="pcard__price">' + money(p.price) + '</span></div>' +
       '<p class="pcard__tagline">' + esc(p.tag) + '</p>' +
-      '<div class="pcard__foot"><span class="pcard__sub">' + (COMMERCE_ENABLED ? 'One-time or ' + money(p.sub) + '/month' : 'Checkout unavailable') + '</span><span class="pcard__acts">' + (COMMERCE_ENABLED ? '<button type="button" class="pcard__add" data-add="' + sku + '" data-mode="once">Add to bag</button>' : '') + '<a class="pcard__link" href="/product?sku=' + sku + '">View &rarr;</a></span></div></div></article>';
+      '<div class="pcard__foot"><span class="pcard__sub">' + (COMMERCE_ENABLED ? (p.sub == null ? 'One-time purchase' : 'One-time or ' + money(p.sub) + '/month') : 'Checkout unavailable') + '</span><span class="pcard__acts">' + (COMMERCE_ENABLED ? '<button type="button" class="pcard__add" data-add="' + sku + '" data-mode="once">Add to bag</button>' : '') + '<a class="pcard__link" href="/product?sku=' + sku + '">View &rarr;</a></span></div></div></article>';
   }
   $$('[data-product-grid]').forEach(function (g) {
     var list = ORDER.filter(function (s) { return (!g.dataset.kind || P[s].kind === g.dataset.kind) && s !== g.dataset.exclude; });
@@ -352,7 +356,7 @@
     var sku = (new URLSearchParams(location.search).get('sku') || 'multi'); if (ORDER.indexOf(sku) < 0) sku = 'multi';
     var p = P[sku], isB = p.kind === 'bundle'; document.title = 'DOCO ' + p.name + ' Strips — ' + money(p.price) + ' · ' + p.strips + ' strips'; seoProduct(sku, p);
     pdp.style.setProperty('--c', p.color); pdp.dataset.sku = sku;
-    var keys = isB ? [{ a: p.includes.length, n: 'formulas' }, { a: p.strips, n: 'strips' }, { a: 'Save ' + money(p.includes.length * P.multi.price - p.price), n: 'vs. singles' }] : p.ingredients.slice(0, 3).map(function (r) { return { a: r[1], n: r[0] }; });
+    var keys = sku === 'sample' ? [{ a: 4, n: 'strips' }, { a: '$9.99', n: 'per pack' }, { a: 'One-time', n: 'purchase' }] : isB ? [{ a: p.includes.length, n: 'formulas' }, { a: p.strips, n: 'strips' }, { a: 'Save ' + money(p.includes.length * P.multi.price - p.price), n: 'vs. singles' }] : p.ingredients.slice(0, 3).map(function (r) { return { a: r[1], n: r[0] }; });
     var first = isB ? P[p.includes[0]] : p, timing = TIMING[isB ? p.includes[0] : sku];
     var html =
       '<div class="pdp__hero"><div class="container pdp__crumbs"><a href="/">Home</a> / <a href="/shop">Shop</a> / <span>' + esc(p.name) + '</span></div>' +
@@ -365,7 +369,7 @@
       '<p class="pdp__desc">' + p.desc + '</p>' +
       '<div class="pdp__keys">' + keys.map(function (k) { return '<div class="pdp__key"><b>' + esc(k.a) + '</b><span>' + esc(k.n) + '</span></div>'; }).join('') + '</div>' +
       '<a class="pdp__more" href="#inside">See the full panel ↓</a>' +
-      '<div class="mode mode--light" role="radiogroup" aria-label="Purchase option" style="margin-top:18px"><button type="button" class="mode__opt is-on" data-mode="once" role="radio">One-time <b>' + money(p.price) + '</b></button><button type="button" class="mode__opt" data-mode="sub" role="radio">Subscribe &amp; save <b>' + money(p.sub) + '/mo</b></button></div>' +
+      '<div class="mode mode--light" role="radiogroup" aria-label="Purchase option" style="margin-top:18px"><button type="button" class="mode__opt is-on" data-mode="once" role="radio">One-time <b>' + money(p.price) + '</b></button>' + (p.sub == null ? '' : '<button type="button" class="mode__opt" data-mode="sub" role="radio">Subscribe &amp; save <b>' + money(p.sub) + '/mo</b></button>') + '</div>' +
       '<div class="pdp__buy"><div class="qty qty--lg"><button type="button" data-qty-step="-1" aria-label="Decrease">−</button><span data-qty-val>1</span><button type="button" data-qty-step="1" aria-label="Increase">+</button></div>' +
       '<button type="button" class="btn btn--solid btn--lg" data-add="' + sku + '">Add to bag — <span data-price></span></button></div>' +
       '<ul class="pdp__perks"><li>Dissolves in ~15 seconds</li><li>No water needed</li><li>' + p.strips + ' strips per box</li></ul></div></div></div>';
@@ -378,7 +382,7 @@
         '<div class="facts-note"><h3>Read the label with us</h3><p>Every amount above is printed on the box. We list actives in plain numbers so you know exactly what you are choosing — nothing hidden in a blend.</p><ul>' + p.benefits.map(function (b) { return '<li>' + b + '</li>'; }).join('') + '</ul></div></div></section>';
       html += '<section class="psec psec--tint"><div class="container"><div class="psec__head"><div><p class="eyebrow">The rest of the strip</p><h2 class="display">Other ingredients, explained</h2></div><p>The supporting ingredients that form, sweeten, flavor and stabilize a strip — and why each one is there.</p></div><ul class="oth">' + otherHTML(p) + '</ul></div></section>';
     } else {
-      html += '<section class="psec psec--tint" id="inside"><div class="container"><div class="psec__head"><div><p class="eyebrow">What’s in the box</p><h2 class="display">' + p.includes.length + ' formulas, one box</h2></div><p>' + esc(p.inside) + ' Bundles are shopping options, not directions to use products together.</p></div>' +
+      html += '<section class="psec psec--tint" id="inside"><div class="container"><div class="psec__head"><div><p class="eyebrow">' + (sku === 'sample' ? 'Sample size' : 'What’s in the box') + '</p><h2 class="display">' + (sku === 'sample' ? '4 strips to try DOCO' : p.includes.length + ' formulas, one box') + '</h2></div><p>' + esc(p.inside) + ' Bundles are shopping options, not directions to use products together.</p></div>' +
         '<div class="bundle-inc">' + p.includes.map(function (s) { var q = P[s]; return '<div class="inc" style="--c:' + q.color + '"><img src="' + q.pouch + '" alt="" loading="lazy"><div><b>' + esc(q.name) + '</b><span>' + q.ingredients.slice(0, 3).map(function (r) { return r[0] + ' ' + r[1]; }).join(' · ') + '</span><a href="/product?sku=' + s + '">Full panel →</a></div></div>'; }).join('') + '</div></div></section>';
       html += '<section class="psec"><div class="container"><div class="psec__head"><div><p class="eyebrow">Supplement facts</p><h2 class="display">Every panel, side by side</h2></div><p>Each formula’s full label, exactly as printed on its box.</p></div><div class="facts-grid">' + p.includes.map(function (s) { return '<div style="--c:' + P[s].color + '"><p class="eyebrow" style="margin-bottom:8px">' + esc(P[s].name) + '</p>' + factsHTML(P[s]) + '</div>'; }).join('') + '</div></div></section>';
     }

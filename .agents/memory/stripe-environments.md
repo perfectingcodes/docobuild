@@ -32,3 +32,9 @@ Stripe's hosted portal can schedule cancellation at the period end by setting `c
 **Why:** A real sandbox portal cancellation succeeded, but an assertion based only on the legacy boolean incorrectly reported failure with the installed API version.
 
 **How to apply:** Verify the scheduled end timestamp and cancellation reason, not just the legacy flag. Do not treat a false legacy flag as proof that the customer is still scheduled to renew.
+
+Production-readiness audits run in the workspace can disturb the local sandbox catalog cache even though live Stripe is only read.
+
+**Why:** A live-account audit succeeded, but the running preview subsequently lost its sandbox catalog matches until the complete sandbox catalog was synchronized again. Incremental backfill alone did not restore them.
+
+**How to apply:** Treat the development database as shared mutable state during live audits. Restore the complete sandbox catalog afterward and confirm preview commerce readiness before finishing; a passing live audit alone is not sufficient.

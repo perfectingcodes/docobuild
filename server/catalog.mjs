@@ -8,7 +8,11 @@ export const CATALOG = {
   'duo-domore': { name: 'The Do More Duo', once: 4499, sub: 3824 },
   'duo-relax': { name: 'The Relaxation Duo', once: 4499, sub: 3824 },
   stack: { name: 'The Variety Pack', once: 7999, sub: 7199 },
+  sample: { name: 'Sample Pack', once: 999 },
 };
+export function purchaseModes(item) {
+  return ['once', 'sub'].filter(mode => Number.isInteger(item[mode]));
+}
 export function normalizeCart(items) {
   if (!Array.isArray(items) || !items.length || items.length > 20) {
     throw new Error('Your bag must contain between 1 and 20 items.');
@@ -16,7 +20,7 @@ export function normalizeCart(items) {
   const lines = new Map();
   for (const item of items) {
     if (!item || !Object.hasOwn(CATALOG, item.sku) ||
-        !['once', 'sub'].includes(item.mode) || !Number.isInteger(item.qty) ||
+        !purchaseModes(CATALOG[item.sku]).includes(item.mode) || !Number.isInteger(item.qty) ||
         item.qty < 1 || item.qty > 20) throw new Error('Invalid item or quantity in your bag.');
     const key = `${item.sku}:${item.mode}`;
     const next = (lines.get(key)?.qty || 0) + item.qty;

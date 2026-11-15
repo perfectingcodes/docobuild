@@ -4,7 +4,7 @@ import { stripe, account, pool, initializeStripe, getStripeSync } from '../serve
 import { synchronizeCheckoutCatalog } from '../server/catalog-resolution.mjs';
 import { app } from '../server/app.mjs';
 import { listCheckoutPrices } from '../server/storage.mjs';
-import { CATALOG, cartTotals } from '../server/catalog.mjs';
+import { CATALOG, cartTotals, purchaseModes } from '../server/catalog.mjs';
 import { buildCheckout } from '../server/checkout.mjs';
 import { catalogReadiness } from '../server/readiness.mjs';
 
@@ -22,7 +22,7 @@ try {
   assert.equal(catalogReadiness(prices, { production: true }).ready, true);
   assert.ok(prices.every(p => p.livemode === true));
   for (const [sku, item] of Object.entries(CATALOG)) {
-    for (const mode of ['once', 'sub']) {
+    for (const mode of purchaseModes(item)) {
       const cart = [{ sku, mode, qty: 1 }];
       const params = buildCheckout(cart, prices, {
         successUrl: 'https://docobuild.replit.app/thanks.html',
@@ -40,7 +40,7 @@ try {
         sum + prices.find(p => p.id === l.price).unit_amount * l.quantity, 0);
       assert.equal(sum, totals.first + totals.firstShipping);
     }
-    console.log(`PASS live mapping: ${item.name}, one-time and monthly`);
+    console.log(`PASS live mapping: ${item.name}, ${purchaseModes(item).join(', ')}`);
   }
   const shipping = prices.find(p => p.sku === '_shipping' && p.mode === 'sub');
   const shippingPrice = await stripe.prices.retrieve(shipping.id);

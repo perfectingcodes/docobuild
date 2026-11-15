@@ -1,13 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { CATALOG } from '../server/catalog.mjs';
+import { CATALOG, purchaseModes } from '../server/catalog.mjs';
 import { catalogReadiness, portalReady } from '../server/readiness.mjs';
 
 const prices = Object.entries(CATALOG).flatMap(([sku, p]) =>
-  ['once', 'sub'].map(mode => ({ sku, mode, unit_amount: p[mode], livemode: false })))
+  purchaseModes(p).map(mode => ({ sku, mode, unit_amount: p[mode], livemode: false })))
   .concat(['once', 'sub'].map(mode =>
     ({ sku: '_shipping', mode, unit_amount: 599, livemode: false })));
-test('all fourteen product options and both shipping prices must match the environment', () => {
+test('all approved product options and both shipping prices must match the environment', () => {
   assert.equal(catalogReadiness(prices).ready, true);
   assert.equal(catalogReadiness(prices, { production: true }).ready, false);
   assert.equal(catalogReadiness(prices.map(p => ({ ...p, livemode: true })), { production: true }).ready, true);

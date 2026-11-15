@@ -53,7 +53,7 @@ test('live imported duplicates reproduce the old startup error but verified iden
 test('live identity survives renamed subscription products without guessing from suffixes', () => {
   const data = fixture();
   data.products.forEach(p => { p.name = 'Merchant renamed this product'; });
-  assert.equal(select(data).length, 16);
+  assert.equal(select(data).length, 17);
 });
 
 test('missing or changed pinned records cannot silently fall back to a same-price copy', () => {
@@ -88,7 +88,7 @@ test('sandbox supports both shared products and separate renamed subscription pr
   for (const shared of [true, false]) {
     const data = fixture(false, shared);
     data.products.forEach(p => { p.name = 'Renamed in sandbox'; });
-    assert.equal(select(data, false).length, 16);
+    assert.equal(select(data, false).length, 17);
   }
 });
 
@@ -115,7 +115,7 @@ test('startup catalog refresh only reads Stripe and syncs selected existing iden
     stripe: api, sync: { syncSingleEntity: async id => synced.push(id) }, production: true,
   });
   assert.deepEqual(calls.sort(), ['GET prices', 'GET products']);
-  assert.equal(selected.length, 16);
+  assert.equal(selected.length, 17);
   assert.deepEqual(new Set(synced), new Set(selected.flatMap(p => [p.product_id, p.id])));
   assert.equal(synced.length, new Set(synced).size);
   data.prices.shift();

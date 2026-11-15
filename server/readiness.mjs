@@ -1,4 +1,4 @@
-import { CATALOG } from './catalog.mjs';
+import { CATALOG, purchaseModes } from './catalog.mjs';
 
 // Test and live prices can share an account ID. Never decide readiness from
 // just one live price or from account.charges_enabled alone.
@@ -6,7 +6,7 @@ export function catalogReadiness(prices, { production = false } = {}) {
   const expectedLive = production;
   const products = Object.entries(CATALOG).map(([sku, item]) => ({
     sku, name: item.name,
-    ...Object.fromEntries(['once', 'sub'].map(mode => [mode,
+    ...Object.fromEntries(purchaseModes(item).map(mode => [mode,
       prices.some(p => p.sku === sku && p.mode === mode &&
         p.unit_amount === item[mode] && p.livemode === expectedLive)])),
   }));
@@ -14,7 +14,7 @@ export function catalogReadiness(prices, { production = false } = {}) {
     prices.some(p => p.sku === '_shipping' && p.mode === mode &&
       p.unit_amount === 599 && p.livemode === expectedLive)]));
   return {
-    ready: products.every(p => p.once && p.sub) && shipping.once && shipping.sub,
+    ready: products.every(p => purchaseModes(CATALOG[p.sku]).every(mode => p[mode])) && shipping.once && shipping.sub,
     products, shipping,
   };
 }

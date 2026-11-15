@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizeCart, cartTotals, shippingForSubtotal, CATALOG } from '../server/catalog.mjs';
+import { normalizeCart, cartTotals, shippingForSubtotal, CATALOG, purchaseModes } from '../server/catalog.mjs';
 import { buildCheckout } from '../server/checkout.mjs';
 
 const prices = Object.entries(CATALOG).flatMap(([sku, p]) =>
-  ['once', 'sub'].map(mode => ({ sku, mode, id: `${sku}-${mode}`, unit_amount: p[mode] })))
+  purchaseModes(p).map(mode => ({ sku, mode, id: `${sku}-${mode}`, unit_amount: p[mode] })))
   .concat(['once', 'sub'].map(mode => ({ sku: '_shipping', mode, id: `shipping-${mode}`, unit_amount: 599 })));
 const urls = { successUrl: 'https://example.com/thanks', cancelUrl: 'https://example.com/shop', requestId: 'test' };
 test('rejects empty, malformed, inherited SKU, invalid modes, fractional and oversized quantities', () => {
@@ -35,12 +35,22 @@ test('one-time checkout collects US address and uses approved Stripe Price IDs',
   assert.deepEqual(p.shipping_address_collection.allowed_countries, ['US']);
   assert.equal(p.discounts, undefined);
 });
-test('every formula and bundle has both price modes', () => {
-  for (const sku of Object.keys(CATALOG)) for (const mode of ['once', 'sub']) {
+test('every product supports its approved purchase modes', () => {
+  for (const sku of Object.keys(CATALOG)) for (const mode of purchaseModes(CATALOG[sku])) {
     const p = buildCheckout([{ sku, mode, qty: 1 }], prices, urls);
     assert.equal(p.line_items[0].price, `${sku}-${mode}`);
     assert.equal(p.mode, mode === 'sub' ? 'subscription' : 'payment');
   }
+});
+test('Sample Pack is four strips for $9.99, one-time only, with normal shipping', () => {
+  const cart = [{ sku: 'sample', mode: 'once', qty: 1 }];
+  assert.deepEqual(purchaseModes(CATALOG.sample), ['once']);
+  assert.equal(CATALOG.sample.once, 999);
+  assert.deepEqual(cartTotals(cart), { first: 999, monthly: 0, firstShipping: 599, monthlyShipping: 0 });
+  assert.throws(() => normalizeCart([{ sku: 'sample', mode: 'sub', qty: 1 }]), /Invalid item/);
+  const checkout = buildCheckout(cart, prices, urls);
+  assert.equal(checkout.mode, 'payment');
+  assert.deepEqual(checkout.line_items, [{ price: 'sample-once', quantity: 1 }, { price: 'shipping-once', quantity: 1 }]);
 });
 test('subscriptions include recurring shipping below threshold', () => {
   const p = buildCheckout([{ sku: 'multi', mode: 'sub', qty: 1 }], prices, urls);

@@ -9,5 +9,6 @@
   <url><loc>https://docostrips.com/product?sku=duo-domore</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://docostrips.com/product?sku=duo-relax</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://docostrips.com/product?sku=stack</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://docostrips.com/product?sku=sample</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://docostrips.com/creators</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
 </urlset>

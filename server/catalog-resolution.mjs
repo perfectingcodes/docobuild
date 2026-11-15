@@ -1,11 +1,11 @@
-import { CATALOG } from './catalog.mjs';
+import { CATALOG, purchaseModes } from './catalog.mjs';
 import { LIVE_CATALOG } from './live-catalog.mjs';
 
 // Both the synchronized DB query and startup's read-only Stripe audit use this
 // selector. The checkout path cannot pick a different duplicate than startup.
 export function selectCheckoutPrices(rows, { production = false } = {}) {
   return Object.entries({ ...CATALOG, _shipping: { once: 599, sub: 599 } })
-    .flatMap(([sku, item]) => ['once', 'sub'].map(mode => {
+    .flatMap(([sku, item]) => purchaseModes(item).map(mode => {
       const identity = production ? LIVE_CATALOG[sku][mode] : null;
       const candidates = rows.filter(row =>
         row.sku === sku && row.mode === mode && row.unit_amount === item[mode] &&

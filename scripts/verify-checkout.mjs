@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import { stripe } from '../server/stripe.mjs';
-import { CATALOG, cartTotals } from '../server/catalog.mjs';
+import { CATALOG, cartTotals, purchaseModes } from '../server/catalog.mjs';
 
 const base = process.env.TEST_BASE_URL || `https://${process.env.REPLIT_DEV_DOMAIN}`;
 const readiness = await (await fetch(`${base}/api/commerce`)).json();
@@ -12,7 +12,7 @@ const post = (body, key = randomUUID(), origin = base) => fetch(`${base}/api/cre
   body: JSON.stringify(body),
 });
 const cases = [
-  ...Object.keys(CATALOG).flatMap(sku => ['once', 'sub'].map(mode => {
+  ...Object.keys(CATALOG).flatMap(sku => purchaseModes(CATALOG[sku]).map(mode => {
     const items = [{ sku, mode, qty: 1 }];
     const totals = cartTotals(items);
     return [`${sku}-${mode}`, items, totals.first + totals.firstShipping,
