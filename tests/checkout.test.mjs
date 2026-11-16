@@ -42,15 +42,31 @@ test('every product supports its approved purchase modes', () => {
     assert.equal(p.mode, mode === 'sub' ? 'subscription' : 'payment');
   }
 });
-test('Sample Pack is four strips for $9.99, one-time only, with normal shipping', () => {
+test('Sample Pack is $11.99, one-time only, with free shipping', () => {
   const cart = [{ sku: 'sample', mode: 'once', qty: 1 }];
   assert.deepEqual(purchaseModes(CATALOG.sample), ['once']);
-  assert.equal(CATALOG.sample.once, 999);
-  assert.deepEqual(cartTotals(cart), { first: 999, monthly: 0, firstShipping: 599, monthlyShipping: 0 });
+  assert.equal(CATALOG.sample.once, 1199);
+  assert.deepEqual(cartTotals(cart), { first: 1199, monthly: 0, firstShipping: 0, monthlyShipping: 0 });
   assert.throws(() => normalizeCart([{ sku: 'sample', mode: 'sub', qty: 1 }]), /Invalid item/);
   const checkout = buildCheckout(cart, prices, urls);
   assert.equal(checkout.mode, 'payment');
-  assert.deepEqual(checkout.line_items, [{ price: 'sample-once', quantity: 1 }, { price: 'shipping-once', quantity: 1 }]);
+  assert.deepEqual(checkout.line_items, [{ price: 'sample-once', quantity: 1 }]);
+});
+test('Sample Packs never affect other products shipping thresholds or recurring shipping', () => {
+  const sample = { sku: 'sample', mode: 'once', qty: 4 };
+  assert.equal(cartTotals([sample]).firstShipping, 0);
+  for (const [sku, mode, qty, shipping] of [
+    ['multi', 'once', 1, 599], ['duo-domore', 'once', 1, 599],
+    ['multi', 'once', 2, 0], ['multi', 'sub', 1, 599], ['multi', 'sub', 2, 0],
+  ]) {
+    const other = { sku, mode, qty };
+    const before = cartTotals([other]), after = cartTotals([sample, other]);
+    assert.equal(after.firstShipping, shipping);
+    assert.equal(after.monthlyShipping, before.monthlyShipping);
+    assert.equal(after.first, before.first + 4796);
+    const checkout = buildCheckout([sample, other], prices, urls);
+    assert.equal(checkout.discounts, undefined);
+  }
 });
 test('subscriptions include recurring shipping below threshold', () => {
   const p = buildCheckout([{ sku: 'multi', mode: 'sub', qty: 1 }], prices, urls);

@@ -38,3 +38,9 @@ Production-readiness audits run in the workspace can disturb the local sandbox c
 **Why:** A live-account audit succeeded, but the running preview subsequently lost its sandbox catalog matches until the complete sandbox catalog was synchronized again. Incremental backfill alone did not restore them.
 
 **How to apply:** Treat the development database as shared mutable state during live audits. Restore the complete sandbox catalog afterward and confirm preview commerce readiness before finishing; a passing live audit alone is not sufficient.
+
+Hosted Stripe Checkout can change its form structure independently of this app, including moving payment fields into a cross-origin embedded form.
+
+**Why:** A previously working browser payment test could not find any fields even though Checkout visibly rendered and accepted sandbox payments. The failure was an obsolete test assumption, not a broken checkout.
+
+**How to apply:** Inspect the current hosted page's frames and accessible fields before diagnosing missing selectors as a payment failure. Do not change storefront payment behavior to accommodate outdated test selectors.

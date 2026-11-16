@@ -8,7 +8,7 @@ export const CATALOG = {
   'duo-domore': { name: 'The Do More Duo', once: 4499, sub: 3824 },
   'duo-relax': { name: 'The Relaxation Duo', once: 4499, sub: 3824 },
   stack: { name: 'The Variety Pack', once: 7999, sub: 7199 },
-  sample: { name: 'Sample Pack', once: 999 },
+  sample: { name: 'Sample Pack', once: 1199 },
 };
 export function purchaseModes(item) {
   return ['once', 'sub'].filter(mode => Number.isInteger(item[mode]));
@@ -34,15 +34,16 @@ export function shippingForSubtotal(subtotal) {
   return subtotal > 4500 ? 0 : 599;
 }
 export function cartTotals(items) {
-  let first = 0, monthly = 0;
+  let first = 0, monthly = 0, shippingSubtotal = 0;
   for (const item of items) {
     const amount = CATALOG[item.sku][item.mode] * item.qty;
     first += amount;
+    if (item.sku !== 'sample') shippingSubtotal += amount;
     if (item.mode === 'sub') monthly += amount;
   }
   return {
     first, monthly,
-    firstShipping: shippingForSubtotal(first),
+    firstShipping: shippingSubtotal ? shippingForSubtotal(shippingSubtotal) : 0,
     monthlyShipping: monthly ? shippingForSubtotal(monthly) : 0,
   };
 }

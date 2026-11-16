@@ -24,10 +24,10 @@ app.use(helmet({
   // Preserve the imported inline styling; card collection is hosted by Stripe.
   contentSecurityPolicy: {
     directives: {
-      defaultSrc: ["'self'"], scriptSrc: ["'self'"], scriptSrcAttr: ["'none'"],
+      defaultSrc: ["'self'"], scriptSrc: ["'self'", 'https://connect.facebook.net'], scriptSrcAttr: ["'none'"],
       styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
       fontSrc: ["'self'", 'https://fonts.gstatic.com'],
-      imgSrc: ["'self'", 'data:'], connectSrc: ["'self'"],
+      imgSrc: ["'self'", 'data:', 'https://www.facebook.com'], connectSrc: ["'self'", 'https://www.facebook.com', 'https://connect.facebook.net'],
       formAction: ["'self'"], frameAncestors: ["'self'", 'https://*.replit.dev', 'https://replit.com'],
       upgradeInsecureRequests: process.env.NODE_ENV === 'production' ? [] : null,
     },
@@ -95,17 +95,17 @@ app.post('/api/create-checkout-session', async (req, res, next) => {
     if (previous.cart_hash !== cartHash) return res.status(409).json({ error: 'Your bag changed. Please retry checkout.' });
     if (previous.session_id) {
       const old = await stripe.checkout.sessions.retrieve(previous.session_id);
-      if (old.status === 'open' && old.url) return res.json({ url: old.url });
+      if (old.status === 'open' && old.url) return res.json({ url: old.url, total: old.amount_total / 100 });
       return res.status(409).json({ error: 'That checkout has finished or expired. Start a new checkout.' });
     }
     const params = buildCheckout(cart, prices, {
-      successUrl: `${origin}/thanks.html?session_id={CHECKOUT_SESSION_ID}&proof=${proof(requestId)}`,
+      successUrl: `${process.env.NODE_ENV === 'production' ? 'https://docostrips.com' : origin}/thanks.html?session_id={CHECKOUT_SESSION_ID}&proof=${proof(requestId)}`,
       cancelUrl: `${origin}/shop.html?checkout=canceled`,
       requestId,
     });
     const session = await stripe.checkout.sessions.create(params, { idempotencyKey: `doco-${requestId}` });
     await pool.query('UPDATE public.checkout_requests SET session_id=$1 WHERE id=$2', [session.id, requestId]);
-    res.json({ url: session.url });
+    res.json({ url: session.url, total: session.amount_total / 100 });
   } catch (error) { next(error); }
 });
 app.get('/api/checkout-status', async (req, res, next) => {
@@ -122,7 +122,14 @@ app.get('/api/checkout-status', async (req, res, next) => {
       return res.status(404).json({ error: 'Checkout confirmation not found.' });
     }
     const paid = session.status === 'complete' && session.payment_status === 'paid';
-    res.json({ paid, status: session.status, testMode: !session.livemode, reference: paid ? session.id.slice(-8) : null });
+    let contentIds = [];
+    if (paid) {
+      const lines = await stripe.checkout.sessions.listLineItems(id, { limit: 100, expand: ['data.price.product'] });
+      contentIds = [...new Set(lines.data.map(line => line.price?.product?.metadata?.doco_sku)
+        .filter(sku => sku && sku !== '_shipping'))];
+    }
+    res.json({ paid, status: session.status, testMode: !session.livemode, reference: paid ? session.id.slice(-8) : null,
+      ...(paid ? { sessionId: session.id, amount_total: session.amount_total, currency: session.currency, content_ids: contentIds } : {}) });
   } catch (error) { next(error); }
 });
 registerAdmin(app, { pool, stripe, notify: studio.notify });

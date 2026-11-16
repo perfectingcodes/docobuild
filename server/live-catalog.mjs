@@ -32,7 +32,7 @@ export const LIVE_CATALOG = {
     sub: ['prod_VWHs66slkeiuf3', 'price_1UVFIRG2IwfaSIOPBwhG0zZn'],
   },
   sample: {
-    once: ['prod_Vd9W1Ov7iPqS0G', 'price_1UbtDiG2IwfaSIOPHHmQReYQ'],
+    once: ['prod_Vd9W1Ov7iPqS0G', 'price_1UcHxvG2IwfaSIOPDdtVX9Jr'],
   },
   _shipping: {
     once: ['prod_VWHu4YtaF5nqJo', 'price_1UVFKsG2IwfaSIOP4HJxdSjD'],

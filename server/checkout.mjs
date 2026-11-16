@@ -23,7 +23,7 @@ export function buildCheckout(items, prices, { successUrl, cancelUrl, requestId 
     billing_address_collection: 'required',
     phone_number_collection: { enabled: true },
     success_url: successUrl, cancel_url: cancelUrl,
-    metadata: { doco_checkout: 'true', checkout_request_id: requestId },
+    metadata: { doco_checkout: 'true', checkout_request_id: requestId, content_ids: JSON.stringify([...new Set(cart.map(item => item.sku))]) },
     ...(totals.monthly ? {
       subscription_data: { metadata: { doco_subscription: 'true', shipping_country: 'US' } },
     } : { customer_creation: 'always' }),

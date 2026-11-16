@@ -5,7 +5,7 @@ description: Approved commerce scope and shipping rules for DOCO.
 
 The user approved connecting the website to real Stripe payments, including one-time purchases and monthly subscriptions. This supersedes the earlier catalog-only launch restriction.
 
-Shipping is US only, costs $5.99, and is free on orders over $45.
+Shipping is US only, costs $5.99, and is free on orders over $45. Sample Packs are the user-approved exception: they always ship free and do not count toward the other products' free-shipping threshold in mixed carts.
 
 **Why:** The user explicitly approved real Stripe checkout, selected one-time purchases and monthly subscriptions, and confirmed these shipping rules.
 

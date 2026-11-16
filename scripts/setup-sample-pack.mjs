@@ -1,5 +1,6 @@
 // Explicit merchant-requested catalog addition. Never called during startup.
 import { stripe, pool } from '../server/stripe.mjs';
+import { LIVE_CATALOG } from '../server/live-catalog.mjs';
 
 try {
   const production = process.env.NODE_ENV === 'production';
@@ -9,7 +10,8 @@ try {
   }
   const products = await stripe.products.list({ active: true, limit: 100 }).autoPagingToArray({ limit: 10000 });
   if (products.some(p => p.livemode !== production)) throw new Error('Wrong Stripe environment.');
-  const matches = products.filter(p => p.metadata?.doco_sku === 'sample' || p.name === 'Sample Pack');
+  const matches = products.filter(p => production ? p.id === LIVE_CATALOG.sample.once[0] :
+    (p.metadata?.doco_sku === 'sample' || p.name === 'Sample Pack'));
   if (matches.length > 1) throw new Error('Ambiguous Sample Pack products; review before setup.');
   let product = matches[0];
   if (product && product.metadata?.doco_sku !== 'sample') throw new Error('Existing Sample Pack lacks approved metadata.');
@@ -18,12 +20,12 @@ try {
     shippable: true, metadata: { doco_sku: 'sample', strips: '4' },
   }, { idempotencyKey: 'doco-sample-pack-product' });
   const prices = await stripe.prices.list({ product: product.id, active: true, limit: 100 }).autoPagingToArray({ limit: 10000 });
-  const matching = prices.filter(p => p.type === 'one_time' && p.currency === 'usd' && p.unit_amount === 999 && p.livemode === production);
+  const matching = prices.filter(p => p.type === 'one_time' && p.currency === 'usd' && p.unit_amount === 1199 && p.livemode === production);
   if (matching.length > 1) throw new Error('Ambiguous Sample Pack prices.');
   const price = matching[0] || await stripe.prices.create({
-    product: product.id, currency: 'usd', unit_amount: 999,
+    product: product.id, currency: 'usd', unit_amount: 1199,
     metadata: { doco_sku: 'sample', doco_mode: 'once' },
-  }, { idempotencyKey: 'doco-sample-pack-once-usd-999' });
+  }, { idempotencyKey: 'doco-sample-pack-once-usd-1199' });
   if (price.metadata?.doco_mode !== 'once' || price.metadata?.doco_sku !== 'sample') {
     await stripe.prices.update(price.id, { metadata: { doco_sku: 'sample', doco_mode: 'once' } });
   }

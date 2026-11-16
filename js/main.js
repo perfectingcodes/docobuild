@@ -110,8 +110,8 @@
       desc: 'The fastest way to find your favorites and cover every part of your day — energy, focus, calm and sleep.',
       pills: ['4 formulas', 'Save 33%', '120 strips'], benefits: ['All four formulas in one box', 'Save 33% vs. buying separately', 'One box of each formula'],
       inside: 'One box each of Multivitamin, Sports Energy, Calm + Stress and Sleep.', gallery: ['assets/box-grass-four.jpg', 'assets/box-calm-sleep-sky.jpg', 'assets/box-sport-berries.jpg'] },
-    sample: { kind: 'bundle', includes: ['multi', 'sport', 'calm', 'sleep'], name: 'Sample Pack', eyebrow: 'Try DOCO', tag: 'Start small. Find your favorites.', strips: 4, price: 9.99, color: '#ef8120', img: 'assets/pouch-stack.webp', pouch: 'assets/pouch-stack.webp',
-      desc: 'Try DOCO with a 4-strip Sample Pack for $9.99. A simple way to explore the collection before choosing a full-size pack.',
+    sample: { kind: 'bundle', includes: ['multi', 'sport', 'calm', 'sleep'], name: 'Sample Pack', eyebrow: 'Try DOCO', tag: 'Start small. Find your favorites.', strips: 4, price: 11.99, color: '#ef8120', img: 'assets/pouch-stack.webp', pouch: 'assets/pouch-stack.webp',
+      desc: 'Try DOCO with a 4-strip Sample Pack for $11.99. A simple way to explore the collection before choosing a full-size pack.',
       pills: ['4 strips', 'Sample size', 'One-time purchase'], benefits: ['Try DOCO before choosing a full-size pack', '4 strips per pack', 'One-time purchase — no subscription'],
       inside: '4 sample strips. This is a sample-size pack, not four full-size boxes.', gallery: ['assets/pouch-stack.webp'] }
   };
@@ -177,18 +177,20 @@
   function save() { try { localStorage.setItem('doco_cart', JSON.stringify(cart)); } catch (e) {} track('cart_update', { items: cart.map(function (l) { return { sku: l.sku, mode: l.mode, qty: l.qty }; }) }); }
   function linePrice(l) { return l.mode === 'sub' ? P[l.sku].sub : P[l.sku].price; }
   function subtotal() { return cart.reduce(function (s, l) { return s + linePrice(l) * l.qty; }, 0); }
+  function shippingSubtotal() { return cart.reduce(function (s, l) { return s + (l.sku === 'sample' ? 0 : Math.round(linePrice(l) * 100) * l.qty); }, 0); }
   function count() { return cart.reduce(function (s, l) { return s + l.qty; }, 0); }
   function renderCart() {
     if (!COMMERCE_ENABLED) return;
     var c = count(), sub = subtotal();
     if (headCount) { headCount.textContent = c; headCount.classList.toggle('has', c > 0); }
     bagCount.textContent = c; bagSub.textContent = money(sub);
-    shipBar.style.width = Math.min(100, sub / FREE_SHIP * 100) + '%';
-    shipMsg.innerHTML = sub > FREE_SHIP ? '<b>You’ve unlocked free US shipping on this shipment.</b>' : 'US shipping is $5.99. Free on orders over <b>$45</b>.';
+    var eligible = shippingSubtotal(), freeShipping = eligible === 0 || eligible > FREE_SHIP * 100;
+    shipBar.style.width = (freeShipping ? 100 : Math.min(100, eligible / (FREE_SHIP * 100) * 100)) + '%';
+    shipMsg.innerHTML = freeShipping ? '<b>You’ve unlocked free US shipping on this shipment.</b>' : cart.some(function (l) { return l.sku === 'sample'; }) ? 'Sample Packs ship free. Other items: US shipping is $5.99, free over <b>$45</b> excluding Sample Packs.' : 'US shipping is $5.99. Free on orders over <b>$45</b>.';
     var recurring = cart.reduce(function (sum, l) { return sum + (l.mode === 'sub' ? Math.round(linePrice(l) * 100) * l.qty : 0); }, 0);
     $('.bag__note').textContent = recurring
-      ? 'Initial shipping: ' + (sub > FREE_SHIP ? 'free' : '$5.99') + '. Then ' + money(recurring / 100) + '/month + ' + (recurring > 4500 ? 'free US shipping' : '$5.99 US shipping') + '. Renews monthly until canceled. Manage or cancel via the footer link.'
-      : 'US only. Shipping: ' + (sub > FREE_SHIP ? 'free' : '$5.99') + '. Final total shown in Stripe checkout.';
+      ? 'Initial shipping: ' + (freeShipping ? 'free' : '$5.99') + '. Then ' + money(recurring / 100) + '/month + ' + (recurring > 4500 ? 'free US shipping' : '$5.99 US shipping') + '. Renews monthly until canceled. Manage or cancel via the footer link.'
+      : 'US only. Shipping: ' + (freeShipping ? 'free' : '$5.99') + '. Final total shown in Stripe checkout.';
     checkoutBtn.disabled = c === 0;
     if (!cart.length) { bagItems.innerHTML = '<div class="bag__empty"><img src="assets/mark-orange.png" alt=""><h4>Your bag is empty</h4><p>Pick a formula and start doing more.</p><a class="btn btn--solid btn--sm" href="/shop">Shop the formulas →</a></div>'; return; }
     bagItems.innerHTML = cart.map(function (l, i) { var p = P[l.sku]; return '<div class="line" style="--c:' + p.color + '"><div class="line__img"><img src="' + p.img + '" alt=""></div><div class="line__body"><div class="line__top"><b>' + p.name + '</b><span class="line__price">' + money(linePrice(l) * l.qty) + '</span></div><p class="line__meta">' + (l.mode === 'sub' ? 'Subscribe & save · ' + money(p.sub) + '/mo' : 'One-time · ' + money(p.price)) + '</p><div class="line__ctl"><div class="qty"><button type="button" aria-label="Decrease" data-line-qty="-1" data-i="' + i + '">−</button><span>' + l.qty + '</span><button type="button" aria-label="Increase" data-line-qty="1" data-i="' + i + '">+</button></div><button type="button" class="line__rm" data-rm="' + i + '">Remove</button></div></div></div>'; }).join('');
@@ -199,6 +201,7 @@
     var i = -1; cart.forEach(function (l, k) { if (l.sku === sku && l.mode === mode) i = k; });
     if (i > -1) cart[i].qty = Math.min(20, cart[i].qty + qty); else cart.push({ sku: sku, mode: mode, qty: qty });
     track('add_to_cart', { sku: sku, mode: mode, qty: qty });
+    if (window.docoMeta) window.docoMeta('AddToCart', { content_ids: [sku], content_type: 'product', value: (mode === 'sub' ? P[sku].sub : P[sku].price) * qty, currency: 'USD' });
     save(); renderCart();
     if (!quiet) toast('<img src="' + P[sku].img + '" alt=""><div><b>Added to your bag</b><span>' + P[sku].name + (qty > 1 ? ' × ' + qty : '') + (mode === 'sub' ? ' · subscription' : '') + '</span></div><button type="button" data-bag-open>View bag</button>');
     if (headCount) { headCount.classList.remove('pop'); void headCount.offsetWidth; headCount.classList.add('pop'); }
@@ -215,7 +218,7 @@
   function stripeCheckout() {
     track('checkout_start', { items: cart.map(function (l) { return { sku: l.sku, mode: l.mode, qty: l.qty }; }) });
     var items = cart.map(function (l) { return { sku: l.sku, mode: l.mode, qty: l.qty }; });
-    var requestKey = 'doco_checkout_request', body = JSON.stringify(items), pending;
+    var requestKey = 'doco_checkout_request', body = JSON.stringify({ items: items, samplePrice: P.sample.price, sampleShipping: 'free-excluded-from-threshold' }), pending;
     try { pending = JSON.parse(sessionStorage.getItem(requestKey) || 'null'); } catch (_) {}
     if (!pending || pending.body !== body) pending = { body: body, key: crypto.randomUUID() };
     try { sessionStorage.setItem(requestKey, JSON.stringify(pending)); } catch (_) {}
@@ -229,7 +232,9 @@
         }
         return data;
       })
-      .then(function (d) { if (!d || !/^https:\/\/checkout\.stripe\.com\//.test(d.url)) throw new Error('Invalid checkout URL'); location.href = d.url; })
+      .then(function (d) { if (!d || !/^https:\/\/checkout\.stripe\.com\//.test(d.url)) throw new Error('Invalid checkout URL');
+        if (window.docoMeta) window.docoMeta('InitiateCheckout', { content_ids: cart.map(function (l) { return l.sku; }), content_type: 'product', value: d.total, currency: 'USD', num_items: count() });
+        location.href = d.url; })
       .catch(function (err) { checkoutBtn.disabled = false; checkoutBtn.innerHTML = orig; toast('<div><b>Checkout is unavailable right now</b><span>Please try again in a moment. (' + esc(err.message) + ')</span></div>'); });
   }
   checkoutBtn.addEventListener('click', function () {
@@ -247,6 +252,7 @@
         var status = await response.json();
         if (!response.ok) throw new Error('Unable to verify this checkout.');
         if (status.paid) {
+          if (window.docoMetaPurchase) window.docoMetaPurchase(status);
           cart = []; save(); renderCart();
           try { sessionStorage.removeItem('doco_checkout_request'); } catch (_) {}
           kicker.textContent = status.testMode ? 'Test payment confirmed' : 'Payment confirmed';
@@ -365,8 +371,9 @@
   if (pdp) {
     var sku = (new URLSearchParams(location.search).get('sku') || 'multi'); if (ORDER.indexOf(sku) < 0) sku = 'multi';
     var p = P[sku], isB = p.kind === 'bundle'; document.title = 'DOCO ' + p.name + ' Strips — ' + money(p.price) + ' · ' + p.strips + ' strips'; seoProduct(sku, p);
+    if (window.docoMeta) window.docoMeta('ViewContent', { content_ids: [sku], content_type: 'product', value: p.price, currency: 'USD' });
     pdp.style.setProperty('--c', p.color); pdp.dataset.sku = sku;
-    var keys = sku === 'sample' ? [{ a: 4, n: 'strips' }, { a: '$9.99', n: 'per pack' }, { a: 'One-time', n: 'purchase' }] : isB ? [{ a: p.includes.length, n: 'formulas' }, { a: p.strips, n: 'strips' }, { a: 'Save ' + money(p.includes.length * P.multi.price - p.price), n: 'vs. singles' }] : p.ingredients.slice(0, 3).map(function (r) { return { a: r[1], n: r[0] }; });
+    var keys = sku === 'sample' ? [{ a: 4, n: 'strips' }, { a: '$11.99', n: 'per pack' }, { a: 'One-time', n: 'purchase' }] : isB ? [{ a: p.includes.length, n: 'formulas' }, { a: p.strips, n: 'strips' }, { a: 'Save ' + money(p.includes.length * P.multi.price - p.price), n: 'vs. singles' }] : p.ingredients.slice(0, 3).map(function (r) { return { a: r[1], n: r[0] }; });
     var first = isB ? P[p.includes[0]] : p, timing = TIMING[isB ? p.includes[0] : sku];
     var html =
       '<div class="pdp__hero"><div class="container pdp__crumbs"><a href="/">Home</a> / <a href="/shop">Shop</a> / <span>' + esc(p.name) + '</span></div>' +
@@ -375,7 +382,7 @@
       '<div class="pdp__thumbs"><button type="button" class="is-on is-stage" data-thumb="stage" aria-label="Product"><img src="' + p.pouch + '" alt=""></button>' + p.gallery.map(function (g, i) { return '<button type="button" data-thumb="' + g + '" aria-label="Image ' + (i + 2) + '"><img src="' + g + '" alt=""></button>'; }).join('') + '</div></div>' +
       '<div class="pdp__info"><p class="eyebrow">' + esc(p.eyebrow) + '</p><h1 class="display">' + esc(p.name) + '</h1><p class="serif-accent">' + esc(p.tag) + '</p>' +
       '<ul class="pdp__chips">' + chips(p).map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>' +
-      '<p class="pdp__desc"><b>' + money(p.price) + '</b> USD · US shipping only</p>' +
+      '<p class="pdp__desc"><b>' + money(p.price) + '</b>' + (sku === 'sample' ? ' - Free US shipping' : ' USD · US shipping only') + '</p>' +
       '<p class="pdp__desc">' + p.desc + '</p>' +
       '<div class="pdp__keys">' + keys.map(function (k) { return '<div class="pdp__key"><b>' + esc(k.a) + '</b><span>' + esc(k.n) + '</span></div>'; }).join('') + '</div>' +
       '<a class="pdp__more" href="#inside">See the full panel ↓</a>' +
