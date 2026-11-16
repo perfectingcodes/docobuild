@@ -273,10 +273,11 @@
   /* ---------- product grid + tabs ---------- */
   function cardHTML(sku) {
     var p = P[sku], media = (p.pouch ? '<img class="pcard__pouch" src="' + p.pouch + '" alt="' + esc(p.name) + '" loading="lazy">' : '<img src="' + p.img + '" alt="' + esc(p.name) + '" loading="lazy">') + (p.gallery && p.gallery[0] ? '<img class="pcard__photo" src="' + p.gallery[0] + '" alt="" loading="lazy">' : '');
+    var panelLinks = p.kind === 'bundle' && $('#shopIngredients') ? '<div class="pcard__contents"><span>' + (sku === 'sample' ? 'Explore formula ingredient panels' : 'Formula ingredient panels') + '</span><div>' + p.includes.map(function (s) { return '<a href="#ingredients-' + s + '">' + esc(P[s].name) + '</a>'; }).join('') + '</div></div>' : '';
     return '<article class="pcard pcard--' + p.kind + '" data-kind="' + p.kind + '" style="--c:' + p.color + '">' +
       '<a class="pcard__media" href="/product?sku=' + sku + '">' + media + '<span class="pcard__tag">' + esc(p.eyebrow) + '</span></a>' +
       '<div class="pcard__body"><div class="pcard__top"><h3><a href="/product?sku=' + sku + '">' + esc(p.name) + '</a></h3><span class="pcard__price">' + money(p.price) + '</span></div>' +
-      '<p class="pcard__tagline">' + esc(p.tag) + '</p>' +
+      '<p class="pcard__tagline">' + esc(p.tag) + '</p>' + panelLinks +
       '<div class="pcard__foot"><span class="pcard__sub">' + (COMMERCE_ENABLED ? (p.sub == null ? 'One-time purchase' : 'One-time or ' + money(p.sub) + '/month') : 'Checkout unavailable') + '</span><span class="pcard__acts">' + (COMMERCE_ENABLED ? '<button type="button" class="pcard__add" data-add="' + sku + '" data-mode="once">Add to bag</button>' : '') + '<a class="pcard__link" href="/product?sku=' + sku + '">View &rarr;</a></span></div></div></article>';
   }
   $$('[data-product-grid]').forEach(function (g) {
@@ -284,6 +285,15 @@
     if (g.dataset.limit) list = list.slice(0, +g.dataset.limit);
     g.innerHTML = list.map(cardHTML).join('');
   });
+  var ingredientsGrid = $('#shopIngredients');
+  if (ingredientsGrid) {
+    ingredientsGrid.innerHTML = ['multi', 'sport', 'calm', 'sleep'].map(function (sku, i) {
+      var p = P[sku];
+      return '<article class="ingredient-panel" id="ingredients-' + sku + '" style="--c:' + p.color + '" aria-labelledby="ingredient-title-' + sku + '">' +
+        '<div class="ingredient-panel__top"><img src="' + p.pouch + '" alt="' + esc(p.name) + ' pouch" loading="lazy"><div><p class="eyebrow">Formula 0' + (i + 1) + '</p><h3 id="ingredient-title-' + sku + '">' + esc(p.name) + '</h3><a href="/product?sku=' + sku + '">View product <span aria-hidden="true">→</span></a></div></div>' +
+        factsHTML(p) + '</article>';
+    }).join('');
+  }
   $$('[data-filter]').forEach(function (t) {
     t.addEventListener('click', function () {
       var wrap = t.closest('.tabs'); $$('[data-filter]', wrap).forEach(function (x) { x.classList.toggle('is-on', x === t); });
@@ -326,8 +336,8 @@
   };
   function factsHTML(p) {
     return '<div class="facts"><div class="facts__h">Supplement Facts</div><div class="facts__serv"><span>Serving size: 1 strip</span><span>Servings per box: ' + p.strips + '</span></div>' +
-      '<table><tr><th>Amount per strip</th><th></th></tr>' + p.ingredients.map(function (r) { return '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td></tr>'; }).join('') + '</table>' +
-      (p.other ? '<p class="facts__other"><b>Other ingredients:</b> ' + p.other + '</p>' : '') +
+      '<table><thead><tr><th scope="col">Active ingredient</th><th scope="col">Amount per strip</th></tr></thead><tbody>' + p.ingredients.map(function (r) { return '<tr><th scope="row">' + esc(r[0]) + '</th><td>' + esc(r[1]) + '</td></tr>'; }).join('') + '</tbody></table>' +
+      (p.other ? '<p class="facts__other"><b>Other ingredients:</b> ' + esc(p.other) + '</p>' : '') +
       '<p class="facts__legal">These statements have not been evaluated by the Food and Drug Administration. This product is not intended to diagnose, treat, cure, or prevent any disease.</p></div>';
   }
   function otherHTML(p) {

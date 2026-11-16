@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="assets/favicon.png">
-<link rel="stylesheet" href="css/style.css?v=66">
+<link rel="stylesheet" href="css/style.css?v=67">
 </head>
 <body>
 
@@ -80,13 +80,22 @@
 <main id="main">
 <section class="shophero">
   <div class="container shophero__inner">
-    <div><p class="eyebrow">The collection</p><h1 class="display">Four formulas.<br>Three ways to <span class="accent">stack.</span></h1><p class="serif-accent serif-accent--dark">Pick your edge. One-time and monthly options.</p></div>
+    <div><p class="eyebrow">The collection</p><h1 class="display">Four formulas.<br>Three ways to <span class="accent">stack.</span></h1><p class="serif-accent serif-accent--dark">Pick your edge. One-time and monthly options.</p><a class="shophero__ingredients-link" href="#ingredients">See every ingredient <span aria-hidden="true">↓</span></a></div>
     <div class="shophero__photo"><img src="assets/box-grass-four.jpg" alt="All four DOCO formulas" width="933" height="1400"></div>
     <div class="tabs" role="tablist" data-target="#shopGrid"><button type="button" class="tab is-on" data-filter="all">All</button><button type="button" class="tab" data-filter="formula">Formulas</button><button type="button" class="tab" data-filter="bundle">Bundles</button></div>
   </div>
 </section>
 <section class="shopgrid"><div class="container"><div class="pgrid" id="shopGrid" data-product-grid></div></div></section>
 <section class="shopperks"><div class="container shopperks__grid"><div><b>Four formulas</b><span>multivitamin, energy, calm and sleep</span></div><div><b>Two bundles</b><span>daily and nighttime combinations</span></div><div><b>Fast-dissolving strips</b><span>no water needed</span></div><div><b>US shipping</b><span>$5.99, free on orders over $45</span></div></div></section>
+<section class="ingredients" id="ingredients" aria-labelledby="ingredientsTitle">
+  <div class="container">
+    <div class="ingredients__head">
+      <div><p class="eyebrow">The full label</p><h2 class="display" id="ingredientsTitle">Every ingredient.<br><span class="accent">Every amount.</span></h2></div>
+      <p>Active ingredients and their amounts per strip, plus the complete Other ingredients list for each formula. Values are taken from the product labels.</p>
+    </div>
+    <div class="ingredients__grid" id="shopIngredients" aria-live="polite"></div>
+  </div>
+</section>
 <!-- ===== IN THE WILD — real boxes ===== -->
 <section class="wild" aria-label="DOCO boxes in real life">
   <div class="container wild__head reveal"><p class="eyebrow">In the wild</p><h2 class="display">Real boxes.<br><span class="accent">Real days.</span></h2></div>
@@ -126,6 +135,6 @@
 
 
 <script src="js/commerce-config.js?v=66"></script>
-<script src="js/main.js?v=66"></script>
+<script src="js/main.js?v=67"></script>
 </body>
 </html>
