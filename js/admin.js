@@ -9,10 +9,10 @@
   var when = function (s) { var d = new Date(s * 1000), today = d.getTime() >= dayStart(); return (today ? 'Today' : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })) + ' · ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); };
   var whenIso = function (iso) { var d = new Date(iso); return d.getTime() >= dayStart() ? 'Today ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); };
   var login = $('#admLogin'), app = $('#admApp'), form = $('#loginForm'), err = $('#loginErr'), daysSel = $('#admDays');
-  var TITLES = { overview: 'Overview', orders: 'Orders', carts: 'Carts', analytics: 'Insights', people: 'People', social: 'Social', email: 'Email', design: 'Design' };
-  var STUDIO = { social: 1, email: 1, design: 1 };
+  var TITLES = { overview: 'Overview', orders: 'Orders', carts: 'Carts', analytics: 'Insights', people: 'People', social: 'Social', email: 'Email', design: 'Design', influencers: 'Influencers' };
+  var STUDIO = { social: 1, email: 1, design: 1, influencers: 1 };
   var state = { tab: 'overview', sub: { orders: 'orders', people: 'creators', email: 'automations' }, days: 30, filter: 'all', open: null, orders: null, subs: null, creators: null, emails: null, carts: null, testMode: false,
-    social: { posts: [], filter: 'upcoming', platforms: [], statuses: [], editing: null }, email: null, settings: null };
+    social: { posts: [], filter: 'upcoming', platforms: [], statuses: [], editing: null }, email: null, settings: null, inf: { list: [], filter: 'all', statuses: [], platforms: [], editing: null } };
 
   function api(path, opts) {
     return fetch('/api/admin/' + path, Object.assign({ credentials: 'same-origin', headers: { 'Content-Type': 'application/json' } }, opts || {})).then(function (r) {
@@ -49,7 +49,7 @@
   function go(tab, sub) {
     state.tab = tab;
     $$('[data-tab]').forEach(function (b) { b.classList.toggle('is-on', b.dataset.tab === tab); });
-    $('#admMoreBtn').classList.toggle('is-on', !!{ carts: 1, analytics: 1, people: 1, design: 1 }[tab]);
+    $('#admMoreBtn').classList.toggle('is-on', !!{ carts: 1, analytics: 1, people: 1, design: 1, influencers: 1 }[tab]);
     $$('.adm__panel').forEach(function (p) { p.hidden = p.dataset.panel !== tab; });
     $('#pTitle').textContent = TITLES[tab] || tab;
     $('.adm__main').classList.toggle('is-studio', !!STUDIO[tab]);
@@ -74,7 +74,8 @@
       api('emails').then(function (r) { state.emails = r.emails || []; state.code = r.code; renderEmails(); }).catch(note('#emailsList')),
       api('social').then(function (r) { state.social.posts = r.posts || []; state.social.platforms = r.platforms || []; state.social.statuses = r.statuses || []; renderSocial(); }).catch(note('#socialList')),
       api('email').then(function (r) { state.email = r; renderEmailPortal(); }).catch(note('#autoList')),
-      api('settings').then(function (r) { state.settings = r.settings; renderDesign(); fillSender(); }).catch(note('#driveCard'))
+      api('settings').then(function (r) { state.settings = r.settings; renderDesign(); fillSender(); }).catch(note('#driveCard')),
+      api('influencers').then(function (r) { state.inf.list = r.influencers || []; state.inf.statuses = r.statuses || []; state.inf.platforms = r.platforms || []; renderInf(); }).catch(note('#infList'))
     ]).then(function () { spin(false); renderToday(); renderAttention(); $('#admUpdated').textContent = 'Updated ' + new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); });
   }
   function note(sel) { return function (ex) { if (ex.message !== 'Signed out') $(sel).innerHTML = '<p class="adm__empty">' + esc(ex.message) + '</p>'; }; }
@@ -102,7 +103,9 @@
     var dueToday = state.social.posts.filter(function (p) { var t = new Date(p.scheduledAt).getTime(); return t >= dayStart() && t < dayStart() + 86400000 && p.status !== 'posted' && p.status !== 'skipped'; }).length;
     badge('social', dueToday);
     badge('email', state.email && !state.email.connected ? '!' : 0);
+    badge('inf', infDue().length);
   }
+  function infDue() { var t = dayStart() + 86400000; return state.inf.list.filter(function (x) { return x.nextActionAt && new Date(x.nextActionAt + 'T12:00:00').getTime() < t && x.status !== 'declined'; }); }
   function renderAttention() {
     var items = [], fresh = (state.creators || []).filter(function (c) { return c.status === 'new'; }).length, cancel = (state.subs || []).filter(function (s) { return s.cancelAtPeriodEnd; }).length, past = (state.subs || []).filter(function (s) { return s.status === 'past_due' || s.status === 'unpaid'; }).length;
     var due = state.social.posts.filter(function (p) { var t = new Date(p.scheduledAt).getTime(); return t < dayStart() + 86400000 && p.status !== 'posted' && p.status !== 'skipped'; }).length;
@@ -110,6 +113,7 @@
     if (past) items.push(['#d63a30', past + ' subscription' + (past > 1 ? 's' : '') + ' with a failed payment', 'orders', 'subs']);
     if (cancel) items.push(['#6a4fc9', cancel + ' subscription' + (cancel > 1 ? 's' : '') + ' set to cancel at period end', 'orders', 'subs']);
     if (due) items.push(['#f7941d', due + ' social post' + (due > 1 ? 's' : '') + ' due today or overdue', 'social']);
+    var dueInf = infDue().length; if (dueInf) items.push(['#d63a30', dueInf + ' influencer follow-up' + (dueInf > 1 ? 's' : '') + ' due', 'influencers']);
     if (state.email && !state.email.connected) items.push(['#ffd23e', 'Email automations are not connected yet', 'email', 'automations']);
     if (state.carts && state.carts.abandonedAfterCheckout) items.push(['#2592c9', state.carts.abandonedAfterCheckout + ' shopper' + (state.carts.abandonedAfterCheckout > 1 ? 's' : '') + ' reached checkout and left this week', 'carts']);
     $('#attention').innerHTML = items.length ? '<ul class="adm__alerts">' + items.map(function (i) { return '<li style="--c:' + i[0] + '"><i></i>' + esc(i[1]) + '<button type="button" data-go="' + i[2] + '"' + (i[3] ? ' data-sub2="' + i[3] + '"' : '') + '>Open →</button></li>'; }).join('') + '</ul>' : '<ul class="adm__alerts"><li class="ok"><i style="background:#2f9e63"></i>All clear. Nothing is waiting on you.</li></ul>';
@@ -168,11 +172,16 @@
   function renderCreators() {
     var l = state.creators || [], fresh = l.filter(function (x) { return x.status === 'new'; }).length;
     $('#creatorsNote').textContent = l.length + ' application' + (l.length === 1 ? '' : 's') + ' · ' + fresh + ' new';
-    $('#creatorsList').innerHTML = l.length ? l.map(function (x) { return '<div class="adm__row adm__creator" data-id="' + esc(x.id) + '"><div><div class="who"><b>' + esc(x.name) + '</b><small>' + esc(x.handle) + (x.platform ? ' · ' + esc(x.platform) : '') + (x.audience ? ' · ' + esc(x.audience) : '') + '</small></div><small><a href="mailto:' + esc(x.email) + '">' + esc(x.email) + '</a>' + (x.website ? ' · <a href="' + esc(/^https?:/.test(x.website) ? x.website : 'https://' + x.website) + '" target="_blank" rel="noopener">' + esc(x.website) + '</a>' : '') + ' · ' + whenIso(x.ts) + '</small></div><select class="adm__status" data-status aria-label="Status">' + ['new', 'contacted', 'approved', 'declined'].map(function (s) { return '<option' + (s === x.status ? ' selected' : '') + '>' + s + '</option>'; }).join('') + '</select>' + (x.message ? '<p class="adm__msg">' + esc(x.message) + '</p>' : '') + '</div>'; }).join('') : '<p class="adm__empty">No applications yet. Share docostrips.com/creators with creators.</p>';
+    $('#creatorsList').innerHTML = l.length ? l.map(function (x) { return '<div class="adm__row adm__creator" data-id="' + esc(x.id) + '"><div><div class="who"><b>' + esc(x.name) + '</b><small>' + esc(x.handle) + (x.platform ? ' · ' + esc(x.platform) : '') + (x.audience ? ' · ' + esc(x.audience) : '') + '</small></div><small><a href="mailto:' + esc(x.email) + '">' + esc(x.email) + '</a>' + (x.website ? ' · <a href="' + esc(/^https?:/.test(x.website) ? x.website : 'https://' + x.website) + '" target="_blank" rel="noopener">' + esc(x.website) + '</a>' : '') + ' · ' + whenIso(x.ts) + '</small></div><select class="adm__status" data-status aria-label="Status">' + ['new', 'contacted', 'approved', 'declined'].map(function (s) { return '<option' + (s === x.status ? ' selected' : '') + '>' + s + '</option>'; }).join('') + '</select>' + (x.message ? '<p class="adm__msg">' + esc(x.message) + '</p>' : '') + '<button type="button" class="todeal" data-todeal>' + (state.inf.list.some(function (i) { return i.applicationId === x.id; }) ? 'In influencer deals ✓' : '+ Add to influencer deals') + '</button></div>'; }).join('') : '<p class="adm__empty">No applications yet. Share docostrips.com/creators with creators.</p>';
   }
   $('#creatorsList').addEventListener('change', function (e) {
     var s = e.target.closest('[data-status]'); if (!s) return; var id = s.closest('[data-id]').dataset.id;
     api('creators/' + id, { method: 'POST', body: JSON.stringify({ status: s.value }) }).then(function () { (state.creators || []).forEach(function (c) { if (c.id === id) c.status = s.value; }); renderToday(); renderAttention(); $('#creatorsNote').textContent = state.creators.length + ' applications · ' + state.creators.filter(function (x) { return x.status === 'new'; }).length + ' new'; if (s.value === 'approved') toast('Approved. The welcome email goes out if email is connected.'); }).catch(function (ex) { toast(ex.message, true); });
+  });
+  $('#creatorsList').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-todeal]'); if (!b) return; var id = b.closest('[data-id]').dataset.id; var x = (state.creators || []).filter(function (c) { return c.id === id; })[0]; if (!x) return;
+    var existing = state.inf.list.filter(function (i) { return i.applicationId === id; })[0];
+    go('influencers'); openInfForm(existing || { name: x.name, handle: x.handle, platform: state.inf.platforms.indexOf(x.platform) > -1 ? x.platform : 'Other', email: x.email, link: x.website ? (/^https?:/.test(x.website) ? x.website : 'https://' + x.website) : '', niche: '', notes: (x.audience ? 'Audience: ' + x.audience + '\n' : '') + (x.message || ''), status: x.status === 'approved' ? 'active' : 'contacted', source: 'application', applicationId: id, lastContactAt: x.ts ? x.ts.slice(0, 10) : '' });
   });
   function renderEmails() {
     var l = state.emails || []; $('#emailsNote').textContent = l.length + ' signup' + (l.length === 1 ? '' : 's') + (state.code ? ' · code ' + state.code : '');
@@ -301,6 +310,66 @@
       var btn = e.target.closest('[data-test]'); btn.disabled = true;
       api('email/test', { method: 'POST', body: JSON.stringify({ kind: kind, to: to, subject: subj.value, body: body.value }) }).then(function () { toast('Test sent to ' + to); }).catch(function (ex) { toast(ex.message, true); }).then(function () { btn.disabled = false; });
     }
+  });
+
+  /* ---------- influencer deals ---------- */
+  function fmtK(n) { n = Number(n || 0); return n >= 1e6 ? (n / 1e6).toFixed(1).replace(/\.0$/, '') + 'M' : n >= 1e3 ? (n / 1e3).toFixed(n >= 1e4 ? 0 : 1).replace(/\.0$/, '') + 'K' : String(n); }
+  function dateShort(d) { return d ? new Date(d + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : ''; }
+  function renderInf() {
+    var L = state.inf.list, f = state.inf.filter, q = ($('#infSearch').value || '').toLowerCase(), due = infDue();
+    var active = L.filter(function (x) { return x.status === 'active'; }), talks = L.filter(function (x) { return x.status === 'contacted' || x.status === 'negotiating'; }), prospects = L.filter(function (x) { return x.status === 'prospect'; });
+    var reach = active.reduce(function (a, x) { return a + Number(x.followers || 0); }, 0);
+    $('#infStats').innerHTML = tile('Active deals', active.length, reach ? fmtK(reach) + ' combined followers' : 'no live deals yet', true) + tile('In talks', talks.length, 'contacted or negotiating') + tile('Prospects', prospects.length, 'not reached out yet') + tile('Follow-ups due', due.length, due.length ? 'today or overdue' : 'nothing waiting');
+    var list = L.filter(function (x) {
+      if (q && (x.name + ' ' + x.handle + ' ' + x.niche + ' ' + x.code + ' ' + x.platform).toLowerCase().indexOf(q) === -1) return false;
+      if (f === 'pipeline') return x.status === 'contacted' || x.status === 'negotiating' || x.status === 'prospect';
+      if (f === 'active') return x.status === 'active' || x.status === 'paused';
+      if (f === 'due') return due.indexOf(x) > -1;
+      if (f === 'declined') return x.status === 'declined';
+      return true;
+    });
+    if (f === 'due') list.sort(function (a, b) { return a.nextActionAt < b.nextActionAt ? -1 : 1; });
+    $('#infList').innerHTML = list.length ? list.map(function (x) {
+      var isDue = due.indexOf(x) > -1, deal = [];
+      if (x.rate) deal.push('$' + Number(x.rate).toLocaleString() + ' flat'); if (x.commissionPct != null && x.commissionPct !== '') deal.push(x.commissionPct + '% commission'); if (x.code) deal.push('Code ' + x.code); if (x.freeProduct) deal.push(x.freeProduct);
+      return '<div class="adm__row adm__inf" data-id="' + esc(x.id) + '"><div><div class="who"><b>' + esc(x.name) + '</b><small>' + esc(x.handle || '') + (x.platform ? ' · ' + esc(x.platform) : '') + (x.followers ? ' · ' + fmtK(x.followers) : '') + (x.niche ? ' · ' + esc(x.niche) : '') + '</small></div><small>' + (x.email ? '<a href="mailto:' + esc(x.email) + '">' + esc(x.email) + '</a>' : '') + (x.link ? (x.email ? ' · ' : '') + '<a href="' + esc(x.link) + '" target="_blank" rel="noopener">Profile ↗</a>' : '') + (x.location ? ' · ' + esc(x.location) : '') + (x.lastContactAt ? ' · last contact ' + dateShort(x.lastContactAt) : '') + '</small></div>' +
+        '<div class="acts"><select class="adm__status" data-istatus aria-label="Status">' + state.inf.statuses.map(function (s) { return '<option' + (s === x.status ? ' selected' : '') + '>' + s + '</option>'; }).join('') + '</select><button type="button" data-iedit>Edit</button></div>' +
+        (deal.length ? '<div class="deal">' + deal.map(function (d) { return '<span>' + esc(d) + '</span>'; }).join('') + '</div>' : '') +
+        (x.nextAction || x.nextActionAt ? '<div class="next' + (isDue ? ' is-due' : '') + '"><i></i>' + esc(x.nextAction || 'Follow up') + (x.nextActionAt ? ' · ' + dateShort(x.nextActionAt) + (isDue ? ' · due' : '') : '') + '</div>' : '') + '</div>';
+    }).join('') : '<p class="adm__empty">' + (L.length ? 'Nothing matches that filter.' : 'No influencers yet. Add the people you want to work with, or pull one in from a creator application.') + '</p>';
+  }
+  var inf = $('#infForm');
+  function openInfForm(p) {
+    state.inf.editing = p && p.id ? p.id : null; p = p || {};
+    $('#infFormTitle').textContent = p.id ? 'Edit ' + p.name : 'Add influencer';
+    inf.platform.innerHTML = state.inf.platforms.map(function (x) { return '<option>' + x + '</option>'; }).join('');
+    inf.status.innerHTML = state.inf.statuses.map(function (x) { return '<option>' + x + '</option>'; }).join('');
+    ['name', 'handle', 'followers', 'niche', 'email', 'phone', 'location', 'link', 'rate', 'commissionPct', 'code', 'freeProduct', 'dealNotes', 'nextAction', 'nextActionAt', 'lastContactAt', 'notes'].forEach(function (k) { inf[k].value = p[k] == null ? '' : p[k]; });
+    inf.platform.value = p.platform || 'Instagram'; inf.status.value = p.status || 'prospect';
+    inf.dataset.source = p.source || 'manual'; inf.dataset.applicationId = p.applicationId || '';
+    $('[data-inf-delete]', inf).hidden = !p.id; $('#infErr').hidden = true;
+    inf.hidden = false; inf.scrollIntoView({ behavior: 'smooth', block: 'start' }); setTimeout(function () { inf.name.focus(); }, 300);
+  }
+  $('#infNew').addEventListener('click', function () { openInfForm(null); });
+  $('#infSearch').addEventListener('input', renderInf);
+  $('#infChips').addEventListener('click', function (e) { var b = e.target.closest('[data-ifilter]'); if (!b) return; state.inf.filter = b.dataset.ifilter; $$('#infChips button').forEach(function (x) { x.classList.toggle('is-on', x === b); }); renderInf(); });
+  function reloadInf(msg) { return api('influencers').then(function (r) { state.inf.list = r.influencers || []; renderInf(); renderCreators(); renderToday(); renderAttention(); if (msg) toast(msg); }); }
+  inf.addEventListener('click', function (e) {
+    if (e.target.closest('[data-inf-cancel]')) { inf.hidden = true; return; }
+    if (e.target.closest('[data-inf-delete]') && state.inf.editing) { if (!confirm('Remove this influencer from the database?')) return; api('influencers/' + state.inf.editing, { method: 'DELETE' }).then(function () { inf.hidden = true; return reloadInf('Removed'); }).catch(function (ex) { toast(ex.message, true); }); }
+  });
+  inf.addEventListener('submit', function (e) {
+    e.preventDefault(); $('#infErr').hidden = true; var body = {};
+    ['name', 'handle', 'platform', 'followers', 'niche', 'email', 'phone', 'location', 'link', 'status', 'rate', 'commissionPct', 'code', 'freeProduct', 'dealNotes', 'nextAction', 'nextActionAt', 'lastContactAt', 'notes'].forEach(function (k) { body[k] = inf[k].value.trim(); });
+    body.source = inf.dataset.source; body.applicationId = inf.dataset.applicationId;
+    api('influencers' + (state.inf.editing ? '/' + state.inf.editing : ''), { method: 'POST', body: JSON.stringify(body) })
+      .then(function () { inf.hidden = true; return reloadInf(state.inf.editing ? 'Saved' : 'Added to influencer deals'); })
+      .catch(function (ex) { $('#infErr').textContent = ex.message; $('#infErr').hidden = false; });
+  });
+  $('#infList').addEventListener('click', function (e) { var b = e.target.closest('[data-iedit]'); if (!b) return; var id = b.closest('[data-id]').dataset.id; var p = state.inf.list.filter(function (x) { return x.id === id; })[0]; if (p) openInfForm(p); });
+  $('#infList').addEventListener('change', function (e) {
+    var s = e.target.closest('[data-istatus]'); if (!s) return; var id = s.closest('[data-id]').dataset.id;
+    api('influencers/' + id, { method: 'POST', body: JSON.stringify({ status: s.value }) }).then(function () { return reloadInf('Status updated'); }).catch(function (ex) { toast(ex.message, true); });
   });
 
   /* ---------- design access ---------- */

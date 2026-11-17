@@ -143,3 +143,22 @@ export function validateSettings(input, current) {
 }
 
 export function validEmail(v) { return typeof v === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v) && v.length <= 120; }
+
+/* ---- influencer deals ---- */
+export const INF_STATUSES = ['prospect', 'contacted', 'negotiating', 'active', 'paused', 'declined'];
+export function validateInfluencer(input) {
+  const str = (v, max) => String(v ?? '').trim().slice(0, max);
+  const name = str(input?.name, 80); if (name.length < 2) throw new Error('Add the influencer’s name.');
+  const email = str(input?.email, 120).toLowerCase(); if (email && !validEmail(email)) throw new Error('Email is not valid.');
+  const link = str(input?.link, 500); if (link && !/^https?:\/\//i.test(link)) throw new Error('Profile link must start with http:// or https://');
+  const num = (v, lo, hi) => { if (v === '' || v == null) return null; const n = Number(v); if (!Number.isFinite(n)) return null; return Math.min(hi, Math.max(lo, Math.round(n))); };
+  const date = v => { if (!v) return null; const d = new Date(v); return Number.isNaN(d.getTime()) ? null : d.toISOString().slice(0, 10); };
+  return {
+    name, handle: str(input?.handle, 80), platform: PLATFORMS.includes(input?.platform) ? input.platform : 'Instagram',
+    followers: num(input?.followers, 0, 1e9), niche: str(input?.niche, 80), email, phone: str(input?.phone, 40), link, location: str(input?.location, 80),
+    status: INF_STATUSES.includes(input?.status) ? input.status : 'prospect',
+    rateCents: num(input?.rate, 0, 1e7) == null ? null : Math.round(Number(input.rate) * 100), commissionPct: num(input?.commissionPct, 0, 100), code: str(input?.code, 30).toUpperCase(), freeProduct: str(input?.freeProduct, 120),
+    dealNotes: str(input?.dealNotes, 2000), notes: str(input?.notes, 4000), nextAction: str(input?.nextAction, 160), nextActionAt: date(input?.nextActionAt), lastContactAt: date(input?.lastContactAt),
+    source: input?.source === 'application' ? 'application' : 'manual', applicationId: /^[0-9a-f-]{36}$/.test(String(input?.applicationId || '')) ? input.applicationId : null,
+  };
+}

@@ -31,7 +31,7 @@ export function buildSeries(days, orders, visitorRows, now = Date.now()) {
   return out;
 }
 export function summarizeOrders(orders) {
-  const revenue = orders.reduce((s, o) => s + (o.amount_total || 0), 0);
+  const revenue = orders.reduce((s, o) => s + Number(o.total ?? o.amount_total ?? 0), 0);
   return { revenue, orders: orders.length, aov: orders.length ? Math.round(revenue / orders.length) : 0 };
 }
 export function liveCarts(snapshots, catalog) {
