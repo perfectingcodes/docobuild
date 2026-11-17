@@ -12,13 +12,14 @@ test('Resend uses the connected integration without extracting credentials', asy
   await assert.rejects(mailer.send({}), /not connected/);
   await mailer.initialize();
   assert.equal(mailer.connected(), true);
-  assert.equal(await mailer.send({ from: 'DOCO <orders@example.com>', to: 'test@example.com', subject: 'Test', text: 'Hello', replyTo: 'help@example.com' }), 'email-id');
+  assert.equal(await mailer.send({ from: 'DOCO <orders@example.com>', to: 'test@example.com', subject: 'Test', text: 'Hello', replyTo: 'help@example.com', idempotencyKey: 'doco-owner-order-test' }), 'email-id');
   const [provider, endpoint, options] = calls[0];
   assert.equal(provider, 'resend');
   assert.equal(endpoint, '/emails');
   assert.equal(options.connectionId, 'email-connection');
   assert.equal(options.method, 'POST');
   assert.equal(options.headers.Authorization, undefined);
+  assert.equal(options.headers['Idempotency-Key'], 'doco-owner-order-test');
   assert.deepEqual(JSON.parse(options.body), { from: 'DOCO <orders@example.com>', to: ['test@example.com'], subject: 'Test', text: 'Hello', reply_to: 'help@example.com' });
 });
 

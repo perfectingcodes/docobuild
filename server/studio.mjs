@@ -4,7 +4,7 @@ import { randomUUID } from 'node:crypto';
 import { ADMIN_COOKIE, verifyToken, parseCookies } from './admin-auth.mjs';
 import { sessionToOrder } from './analytics-aggregate.mjs';
 import { resendConnected, resendSend } from './mailer.mjs';
-import { EMAIL_KINDS, DEFAULT_TEMPLATES, DEFAULT_SETTINGS, SAMPLE_VARS, PLATFORMS, POST_STATUSES, renderEmail, orderVars, money, validateTemplate, validateSocialPost, validateSettings, validEmail } from './studio-lib.mjs';
+import { EMAIL_KINDS, DEFAULT_TEMPLATES, DEFAULT_SETTINGS, SAMPLE_VARS, PLATFORMS, POST_STATUSES, renderEmail, orderVars, ownerOrderVars, money, validateTemplate, validateSocialPost, validateSettings, validEmail } from './studio-lib.mjs';
 
 export async function ensureStudioTables(pool) {
   await pool.query(`CREATE TABLE IF NOT EXISTS public.admin_settings (key text PRIMARY KEY, value jsonb NOT NULL, updated_at timestamptz NOT NULL DEFAULT now())`);
@@ -23,7 +23,7 @@ function production() { return process.env.NODE_ENV === 'production'; }
 function isAdmin(req) { return verifyToken(parseCookies(req.headers.cookie)[ADMIN_COOKIE]); }
 function requireAdmin(req, res, next) { if (isAdmin(req)) return next(); res.status(401).json({ error: 'Sign in required.' }); }
 
-export function createStudio({ pool, stripe }) {
+export function createStudio({ pool, stripe, sendEmail = resendSend, mailConnected = resendConnected }) {
   let settingsCache = null, templatesCache = null;
   async function getSettings() {
     if (settingsCache && settingsCache.until > Date.now()) return settingsCache.value;
@@ -54,10 +54,11 @@ export function createStudio({ pool, stripe }) {
       const [settings, templates] = await Promise.all([getSettings(), getTemplates()]);
       const tpl = templates[kind];
       if (!tpl.enabled) return 'disabled';
-      if (!resendConnected() || !senderFrom(settings)) { await log({ kind, to, status: 'skipped', ref, error: resendConnected() ? 'No sender address set' : 'Resend not connected' }); return 'not-connected'; }
+      if (!mailConnected() || !senderFrom(settings)) { await log({ kind, to, status: 'skipped', ref, error: mailConnected() ? 'No sender address set' : 'Resend not connected' }); return 'not-connected'; }
       if (ref) { const dup = (await pool.query("SELECT 1 FROM public.email_log WHERE kind=$1 AND ref=$2 AND status='sent' LIMIT 1", [kind, ref])).rows[0]; if (dup) return 'duplicate'; }
       const mail = renderEmail(tpl, vars);
-      const providerId = await resendSend({ from: senderFrom(settings), to, subject: mail.subject, html: mail.html, text: mail.text, replyTo: settings.email.replyTo || undefined });
+      const providerId = await sendEmail({ from: senderFrom(settings), to, subject: mail.subject, html: mail.html, text: mail.text, replyTo: settings.email.replyTo || undefined,
+        ...(kind === 'owner_order' && ref ? { idempotencyKey: `doco-owner-order-${ref}` } : {}) });
       await log({ kind, to, subject: mail.subject, status: 'sent', ref, providerId });
       return 'sent';
     } catch (error) {
@@ -70,12 +71,18 @@ export function createStudio({ pool, stripe }) {
   /** Called with an already signature-verified Stripe event. Fire-and-forget. */
   async function onStripeEvent(event) {
     try {
-      if (event?.type !== 'checkout.session.completed') return;
+      if (!['checkout.session.completed', 'checkout.session.async_payment_succeeded'].includes(event?.type)) return;
       const obj = event.data?.object; if (!obj || obj.metadata?.doco_checkout !== 'true' || obj.payment_status !== 'paid') return;
       if (!!obj.livemode !== production()) return;
       const session = await stripe.checkout.sessions.retrieve(obj.id, { expand: ['line_items'] });
+      if (session.status !== 'complete' || session.payment_status !== 'paid' ||
+          session.metadata?.doco_checkout !== 'true' || !!session.livemode !== production()) return;
+      if (session.line_items?.has_more) {
+        session.line_items = { data: await stripe.checkout.sessions.listLineItems(session.id, { limit: 100 }).autoPagingToArray({ limit: 100 }) };
+      }
       const order = sessionToOrder(session);
       await notify('order_confirmation', orderVars(order), { to: order.email, ref: session.id });
+      await notify('owner_order', ownerOrderVars(session, order), { to: 'joyce@docostrips.com', ref: session.id });
     } catch (error) { console.error('order email hook failed:', error.message); }
   }
 

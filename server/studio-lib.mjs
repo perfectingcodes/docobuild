@@ -5,6 +5,7 @@ export const PLATFORMS = ['Instagram', 'TikTok', 'YouTube', 'Facebook', 'X', 'Pi
 export const POST_STATUSES = ['idea', 'planned', 'scheduled', 'posted', 'skipped'];
 
 export const EMAIL_KINDS = {
+  owner_order: { name: 'New paid order — owner notification', trigger: 'Sent to joyce@docostrips.com when a DOCO checkout is paid.', vars: ['customer_name', 'customer_email', 'reference', 'items', 'total', 'ship_to', 'mode'] },
   order_confirmation: { name: 'Order confirmation', trigger: 'Sent the moment a Stripe checkout is paid.', vars: ['name', 'reference', 'items', 'total', 'ship_to', 'mode'] },
   welcome: { name: 'Welcome offer', trigger: 'Sent when someone enters their email in the welcome popup.', vars: ['code'] },
   creator_received: { name: 'Creator application received', trigger: 'Sent when a creator submits the application form.', vars: ['name'] },
@@ -14,6 +15,8 @@ export const EMAIL_KINDS = {
 };
 
 export const DEFAULT_TEMPLATES = {
+  owner_order: { enabled: true, subject: 'New paid DOCO order — #{{reference}}',
+    body: 'A new DOCO order has been paid.\n\n**Order #{{reference}}**\nPurchase type: {{mode}}\nCustomer: {{customer_name}}\nCustomer email: {{customer_email}}\n\n{{items}}\n\n**Order total: {{total}}**\n\nShipping to:\n{{ship_to}}\n\nReview the order in your DOCO admin or Stripe before fulfillment.' },
   order_confirmation: { enabled: true, subject: 'Your DOCO order is in — #{{reference}}',
     body: 'Hi {{name}},\n\nThanks for doing more with us. Your order is confirmed and we are getting it ready.\n\n**Order #{{reference}}**\n{{items}}\nTotal: {{total}}\n\nShipping to:\n{{ship_to}}\n\nYou will get another note when it ships. Questions? Just reply to this email.\n\nDo more. Be more.\nThe DOCO team' },
   welcome: { enabled: true, subject: 'Your 10% off code is inside',
@@ -79,7 +82,23 @@ export function orderVars(order) {
   };
 }
 
+export function ownerOrderVars(session, order) {
+  const shipping = session.collected_information?.shipping_details || session.shipping_details;
+  const address = shipping?.address || order.shipping;
+  return {
+    ...orderVars(order),
+    customer_name: order.name || shipping?.name || 'Not provided',
+    customer_email: order.email || 'Not provided',
+    ship_to: address ? [
+      shipping?.name || order.name, address.line1, address.line2,
+      [address.city, address.state, address.postal_code || address.postal].filter(Boolean).join(' '),
+      address.country,
+    ].filter(Boolean).join('\n') : 'Address on file with Stripe',
+  };
+}
+
 export const SAMPLE_VARS = {
+  customer_name: 'Jordan Lee', customer_email: 'customer@example.com',
   name: 'Jordan', reference: 'A1B2C3D4', items: '1 × Multivitamin DOCO Strips — $29.99\n1 × Sleep DOCO Strips — $29.99', total: '$59.98', mode: 'one-time',
   ship_to: 'Jordan Lee\n1 Main St\nProvidence RI 02903', code: 'LETSGO10', handle: '@jordan', renews_on: 'Nov 28', amount: '$25.49',
 };

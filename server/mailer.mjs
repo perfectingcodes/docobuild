@@ -14,10 +14,10 @@ export function createMailer(connectors) {
       return !!connectionId;
     },
     connected() { return !!connectionId; },
-    async send({ from, to, subject, html, text, replyTo }) {
+    async send({ from, to, subject, html, text, replyTo, idempotencyKey }) {
       if (!connectionId) throw new Error('Resend is not connected. Connect Resend in Integrations and restart the app.');
       const res = await connectors.proxy('resend', '/emails', {
-        connectionId, method: 'POST', headers: { 'Content-Type': 'application/json' },
+        connectionId, method: 'POST', headers: { 'Content-Type': 'application/json', ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {}) },
         body: JSON.stringify({ from, to: [to], subject, html, text, ...(replyTo ? { reply_to: replyTo } : {}) }),
       });
       const data = await res.json().catch(() => ({}));
