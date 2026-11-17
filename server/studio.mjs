@@ -179,7 +179,7 @@ export function createStudio({ pool, stripe }) {
       if (!EMAIL_KINDS[kind] || !validEmail(to)) return res.status(400).json({ error: 'Pick an email type and a valid address.' });
       try {
         const settings = await getSettings();
-        if (!resendConnected()) return res.status(400).json({ error: 'Resend is not connected yet. Add RESEND_API_KEY in Replit Secrets.' });
+        if (!resendConnected()) return res.status(400).json({ error: 'Resend is not connected yet. Connect Resend in Integrations and restart the app.' });
         if (!senderFrom(settings)) return res.status(400).json({ error: 'Set a From email first (a verified Resend domain).' });
         const tpl = req.body?.subject && req.body?.body ? validateTemplate(req.body) : (await getTemplates())[kind];
         const mail = renderEmail(tpl, SAMPLE_VARS);
